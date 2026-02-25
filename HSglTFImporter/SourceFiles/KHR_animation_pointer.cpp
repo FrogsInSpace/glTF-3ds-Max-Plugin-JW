@@ -1,0 +1,800 @@
+#include "HSglTFImporter.h"
+#include "define.h"
+
+Control* CheckIfAlreadyExist(Mtl* pMtl);
+
+//======================================================================
+//======================================================================
+BOOL GetTargetPath(char* jsonStr, std::vector<std::string>& retPath)
+{
+	retPath.clear();
+
+	char buf[MAX_PATH];
+	char* ptr1 = jsonStr;
+	char* ptr2 = buf;
+	while (*ptr1) {
+		if (*ptr1 == '\n' || *ptr1 == '\"' || *ptr1 == '\r' || *ptr1 == '\t') {
+			ptr1++;
+			continue;
+		}
+		if (*ptr1 == ' ') {
+			ptr1++;
+			continue;
+		}
+		*ptr2++ = *ptr1++;
+	}
+	*--ptr2 = 0;
+
+	ptr1 = strchr(buf, ':');
+	if (ptr1)	ptr1 += 2;
+	else		ptr1 = buf;
+
+	char* p = strchr(ptr1, '/');
+	while (p) {
+		*p = 0;
+		retPath.push_back(std::string(ptr1));
+		ptr1 = p + 1;
+		p = strchr(ptr1, '/');
+	}
+	retPath.push_back(std::string(ptr1));
+
+	return TRUE;
+}
+//======================================================================
+//======================================================================
+void SplitPoint3ChannelList(std::map<TimeValue, AnimKeyInfo>& KeyList, std::map<TimeValue, AnimKeyInfo>& XKeyList, std::map<TimeValue, AnimKeyInfo>& YKeyList, std::map<TimeValue, AnimKeyInfo>ZKeyList)
+{
+	XKeyList.clear();
+	YKeyList.clear();
+	ZKeyList.clear();
+	for (auto key : KeyList) {
+		AnimKeyInfo keyInfo;
+
+		TimeValue t = key.first;
+
+		keyInfo.f = key.second.pos.x;
+		XKeyList.insert(std::make_pair(t, keyInfo));
+
+		keyInfo.f = key.second.pos.y;
+		YKeyList.insert(std::make_pair(t, keyInfo));
+
+		float z = key.second.pos.z;
+		ZKeyList.insert(std::make_pair(t, keyInfo));
+	}
+
+}
+//======================================================================
+//======================================================================
+void glTFImporter_Core::SetAnimationPointer(int animID)
+{
+	if (m_glTF_data->animations_count <= animID) return;
+
+	cgltf_animation* animation = &m_glTF_data->animations[animID];
+	if (!animation) return;
+
+
+	struct ofsetCtrl {
+		Control* pUC;
+		Control* pVC;
+	};
+	std::map<Mtl*, ofsetCtrl> ofsetBaseColorTexList;
+	std::map<Mtl*, ofsetCtrl> ofsetEmissiveTexList;
+	ofsetBaseColorTexList.clear();
+	ofsetEmissiveTexList.clear();
+
+	size_t ChannelCnt = animation->channels_count;
+	for (size_t i = 0; i < ChannelCnt; i++) {
+		cgltf_animation_channel* ch = &animation->channels[i];
+		if (!ch)continue;
+		if (ch->target_path != cgltf_animation_path_type_pointer) continue;
+		if (ch->extensions_count == 0) continue;
+
+		cgltf_animation_sampler* sampler = ch->sampler;
+		cgltf_type type = sampler->output->type;
+		cgltf_extension* extension = ch->extensions;
+		for (int j = 0; j < ch->extensions_count; j++, extension++) {
+			if (strcmp(extension->name, "KHR_animation_pointer")) continue;
+
+			std::vector<std::string> retPath;
+			GetTargetPath(extension->data, retPath);
+
+			if (retPath.size() < 1) continue;
+
+
+			if (retPath[0] == "nodes") {
+				cgltf_interpolation_type ScaleInterpType = cgltf_interpolation_type_linear;
+				cgltf_interpolation_type RotInterpType = cgltf_interpolation_type_linear;
+				cgltf_interpolation_type TransInterpType = cgltf_interpolation_type_linear;
+
+				//std::vector<size_t> ChannelList;
+				int idx = atoi(retPath[1].c_str());
+				cgltf_node* node = &m_glTF_data->nodes[idx];
+				INode* pNode = m_NodeMap[node];
+				Matrix3 mtx(1);
+				if (pNode->GetParentNode()->IsRootNode())
+					mtx = YupTM;
+
+				if (retPath[2] == "translation") {
+					std::map<TimeValue, AnimKeyInfo> PosKeyList;
+					TransInterpType = sampler->interpolation;
+					GetPosAnimKeyFrameList(sampler, PosKeyList);
+
+					Control* pPosC = (Control*)GetCOREInterface()->CreateInstance(CTRL_POSITION_CLASS_ID, Class_ID(0x118f7e02, 0xffee238a));
+					pNode->GetTMController()->SetPositionController(pPosC);
+					for (auto key : PosKeyList) {
+						TimeValue t = key.first;
+						Point3 pos = key.second.pos * mtx;
+						pPosC->SetValue(t, &pos);
+						if (m_StartTime > t) m_StartTime = t;
+						if (m_LastTime < t) m_LastTime = t;
+					}
+					SetXYZController(pPosC, TransInterpType, PosKeyList.begin()->first);
+
+					//m_AnimationNodeTab.AppendNode(pNode);
+				}
+				else if (retPath[2] == "rotation") {
+					std::map<TimeValue, AnimKeyInfo> RotKeyList;
+					RotInterpType = sampler->interpolation;
+					GetRotAnimKeyFrameList(sampler, RotKeyList);
+
+					Control* pRotC = (Control*)GetCOREInterface()->CreateInstance(CTRL_ROTATION_CLASS_ID, Class_ID(EULER_CONTROL_CLASS_ID, 0x0));
+					pNode->GetTMController()->SetRotationController(pRotC);
+					for (auto key : RotKeyList) {
+						TimeValue t = key.first;
+						Quat rot = key.second.rot * mtx;
+						pRotC->SetValue(t, &rot);
+						if (m_StartTime > t) m_StartTime = t;
+						if (m_LastTime < t) m_LastTime = t;
+					}
+					SetXYZController(pRotC, RotInterpType, RotKeyList.begin()->first);
+
+				}
+				else if (retPath[2] == "scale") {
+					std::map<TimeValue, AnimKeyInfo> SclKeyList;
+					ScaleInterpType = sampler->interpolation;
+					GetSclAnimKeyFrameList(sampler, SclKeyList);
+
+					Control* pSclC = (Control*)GetCOREInterface()->CreateInstance(CTRL_SCALE_CLASS_ID, Class_ID(0x118f7c01, 0xfeee238b));
+					pNode->GetTMController()->SetScaleController(pSclC);
+					for (auto key : SclKeyList) {
+						TimeValue t = key.first;
+						Point3 scl = key.second.pos * mtx;
+						pSclC->SetValue(t, &scl);
+						if (m_StartTime > t) m_StartTime = t;
+						if (m_LastTime < t) m_LastTime = t;
+					}
+					SetXYZController(pSclC, ScaleInterpType, SclKeyList.begin()->first);
+				}
+				else if (retPath[2] == "weights") {
+					std::map<TimeValue, std::vector<float> > WeightKeyList;
+					GetWeightAnimKeyFrameList(sampler, WeightKeyList, node->mesh->weights_count);
+					SetMorphWeightAnimation(pNode, WeightKeyList);
+				}
+			}
+
+			else if (retPath[0] == "materials") {
+				int idx = atoi(retPath[1].c_str());
+				cgltf_material* mtl = &m_glTF_data->materials[idx];
+				Mtl* pMtl = m_MaterialMap[mtl];
+
+				if (retPath[2] == "emissiveFactor") {
+					std::map<TimeValue, AnimKeyInfo> ColorKeyList;
+					GetClr3AnimKeyFrameList(sampler, ColorKeyList);
+
+					Control* pClrC = CreateColorController(ColorKeyList, type);
+					SetEmissiveColorController(pMtl, pClrC, sampler->interpolation, 0);
+				}
+				else if (retPath[2] == "occlusionTexture") {
+					if (retPath[3] == "strength") {
+						std::map<TimeValue, AnimKeyInfo> FloatKeyList;
+						GetFloatAnimKeyFrameList(sampler, FloatKeyList);
+						Control* pFloatC = CreateFloatController(FloatKeyList);
+						SetOccStrengthController(pMtl, pFloatC, sampler->interpolation, 0);
+					}
+				}
+				else if (retPath[2] == "alphaCutoff") {
+					std::map<TimeValue, AnimKeyInfo> FloatKeyList;
+					GetFloatAnimKeyFrameList(sampler, FloatKeyList);
+
+					Control* pFloatC = CreateFloatController(FloatKeyList);
+					SetAlphaCutOffController(pMtl, pFloatC, sampler->interpolation, 0);
+				}
+				else if (retPath[2] == "normalTexture") {
+					if (retPath[3] == "scale") {
+						std::map<TimeValue, AnimKeyInfo> FloatKeyList;
+						GetFloatAnimKeyFrameList(sampler, FloatKeyList);
+
+						Control* pFloatC = CreateFloatController(FloatKeyList);
+						SetNrmScaleController(pMtl, pFloatC, sampler->interpolation, 0);
+					}
+					if (retPath[3] == "extensions") {
+						if (retPath[4] == "KHR_texture_transform") {
+							if (retPath[5] == "offset") {
+								std::map<TimeValue, AnimKeyInfo> Point2KeyList;
+								GetPoint2AnimKeyFrameList(sampler, Point2KeyList);
+
+								std::map<TimeValue, AnimKeyInfo> FloatXKeyList;
+								std::map<TimeValue, AnimKeyInfo> FloatYKeyList;
+								std::map<TimeValue, AnimKeyInfo> FloatZKeyList;
+								SplitPoint3ChannelList(Point2KeyList, FloatXKeyList, FloatYKeyList, FloatZKeyList);
+
+								ofsetCtrl oc;
+								oc.pUC = CreateFloatController(FloatXKeyList);
+								oc.pVC = CreateFloatController(FloatYKeyList);
+								ofsetBaseColorTexList.insert(std::make_pair(pMtl, oc));
+								//SetUVOffsetController(pMtl, pUC, pVC, sampler->interpolation, 0);
+							}
+							else if (retPath[5] == "rotation") {
+								std::map<TimeValue, AnimKeyInfo> FloatKeyList;
+								GetFloatAnimKeyFrameList(sampler, FloatKeyList);
+
+								Control* pFloatC = CreateFloatController(FloatKeyList);
+								SetUVRotateController(pMtl, pFloatC, sampler->interpolation, 0, TargetTex::NormalMap);
+							}
+							else if (retPath[5] == "scale") {
+								std::map<TimeValue, AnimKeyInfo> Point2KeyList;
+								GetPoint2AnimKeyFrameList(sampler, Point2KeyList);
+
+								std::map<TimeValue, AnimKeyInfo> FloatXKeyList;
+								std::map<TimeValue, AnimKeyInfo> FloatYKeyList;
+								std::map<TimeValue, AnimKeyInfo> FloatZKeyList;
+								SplitPoint3ChannelList(Point2KeyList, FloatXKeyList, FloatYKeyList, FloatZKeyList);
+
+								Control* pUC = CreateFloatController(FloatXKeyList);
+								Control* pVC = CreateFloatController(FloatYKeyList);
+								SetUVScaleController(pMtl, pUC, pVC, sampler->interpolation, 0, TargetTex::NormalMap);
+							}
+						}
+					}
+				}
+
+				else if (retPath[2] == "pbrMetallicRoughness") {
+					if (retPath[3] == "baseColorFactor") {
+						std::map<TimeValue, AnimKeyInfo> ColorKeyList;
+						//TransInterpType = sampler->interpolation;
+						if (type == cgltf_type_vec3) {
+							GetClr3AnimKeyFrameList(sampler, ColorKeyList);
+						}
+						else if (type == cgltf_type_vec4) {
+							GetClr4AnimKeyFrameList(sampler, ColorKeyList);
+						}
+						Control* pOriginalClr = CheckIfAlreadyExist(pMtl);
+						Control* pClrC = CreateColorController(ColorKeyList, type);
+						SetBaseColorController(pMtl, pClrC, sampler->interpolation, 0);
+					}
+					else if (retPath[3] == "roughnessFactor") {
+						std::map<TimeValue, AnimKeyInfo> FloatKeyList;
+						GetFloatAnimKeyFrameList(sampler, FloatKeyList);
+						Control* pFloatC = CreateFloatController(FloatKeyList);
+						SetRoughScaleController(pMtl, pFloatC, sampler->interpolation, 0);
+					}
+					else if (retPath[3] == "metallicFactor") {
+						std::map<TimeValue, AnimKeyInfo> FloatKeyList;
+						GetFloatAnimKeyFrameList(sampler, FloatKeyList);
+
+						Control* pFloatC = CreateFloatController(FloatKeyList);
+						SetMetalScaleController(pMtl, pFloatC, sampler->interpolation, 0);
+					}
+					else if (retPath[3] == "baseColorTexture") {
+						if (retPath[4] == "extensions") {
+							if (retPath[5] == "KHR_texture_transform") {
+								if (retPath[6] == "scale") {
+									std::map<TimeValue, AnimKeyInfo> Point2KeyList;
+									GetPoint2AnimKeyFrameList(sampler, Point2KeyList);
+
+									std::map<TimeValue, AnimKeyInfo> FloatXKeyList;
+									std::map<TimeValue, AnimKeyInfo> FloatYKeyList;
+									std::map<TimeValue, AnimKeyInfo> FloatZKeyList;
+									SplitPoint3ChannelList(Point2KeyList, FloatXKeyList, FloatYKeyList, FloatZKeyList);
+
+									Control* pUC = CreateFloatController(FloatXKeyList);
+									Control* pVC = CreateFloatController(FloatYKeyList);
+									SetUVScaleController(pMtl, pUC, pVC, sampler->interpolation, 0, TargetTex::BaseColorMap);
+								}
+								if (retPath[6] == "offset") {
+									std::map<TimeValue, AnimKeyInfo> Point2KeyList;
+									GetPoint2AnimKeyFrameList(sampler, Point2KeyList);
+
+									std::map<TimeValue, AnimKeyInfo> FloatXKeyList;
+									std::map<TimeValue, AnimKeyInfo> FloatYKeyList;
+									std::map<TimeValue, AnimKeyInfo> FloatZKeyList;
+									SplitPoint3ChannelList(Point2KeyList, FloatXKeyList, FloatYKeyList, FloatZKeyList);
+
+									ofsetCtrl oc;
+									oc.pUC = CreateFloatController(FloatXKeyList);
+									oc.pVC = CreateFloatController(FloatYKeyList);
+									ofsetBaseColorTexList.insert(std::make_pair(pMtl, oc));
+									//SetUVOffsetController(pMtl, pUC, pVC, sampler->interpolation, 0);
+								}
+							}
+						}
+					}
+				}
+
+				else if (retPath[2] == "emissiveTexture") {
+					if (retPath[3] == "extensions") {
+						if (retPath[4] == "KHR_texture_transform") {
+							if (retPath[5] == "scale") {
+								std::map<TimeValue, AnimKeyInfo> Point2KeyList;
+								GetPoint2AnimKeyFrameList(sampler, Point2KeyList);
+
+								std::map<TimeValue, AnimKeyInfo> FloatXKeyList;
+								std::map<TimeValue, AnimKeyInfo> FloatYKeyList;
+								std::map<TimeValue, AnimKeyInfo> FloatZKeyList;
+								SplitPoint3ChannelList(Point2KeyList, FloatXKeyList, FloatYKeyList, FloatZKeyList);
+
+								Control* pUC = CreateFloatController(FloatXKeyList);
+								Control* pVC = CreateFloatController(FloatYKeyList);
+								SetUVScaleController(pMtl, pUC, pVC, sampler->interpolation, 0, TargetTex::EmissiveMap);
+							}
+							if (retPath[5] == "offset") {
+								std::map<TimeValue, AnimKeyInfo> Point2KeyList;
+								GetPoint2AnimKeyFrameList(sampler, Point2KeyList);
+
+								std::map<TimeValue, AnimKeyInfo> FloatXKeyList;
+								std::map<TimeValue, AnimKeyInfo> FloatYKeyList;
+								std::map<TimeValue, AnimKeyInfo> FloatZKeyList;
+								SplitPoint3ChannelList(Point2KeyList, FloatXKeyList, FloatYKeyList, FloatZKeyList);
+
+								ofsetCtrl oc;
+								oc.pUC = CreateFloatController(FloatXKeyList);
+								oc.pVC = CreateFloatController(FloatYKeyList);
+								ofsetEmissiveTexList.insert(std::make_pair(pMtl, oc));
+								//SetUVOffsetController(pMtl, pUC, pVC, sampler->interpolation, 0);
+							}
+						}
+					}
+				}
+
+				else if (retPath[2] == "extensions") {
+
+					if (retPath[3] == "KHR_materials_volume") {
+						if (retPath[4] == "thicknessFactor") {
+							std::map<TimeValue, AnimKeyInfo> FloatKeyList;
+							GetFloatAnimKeyFrameList(sampler, FloatKeyList);
+
+							Control* pFloatC = CreateFloatController(FloatKeyList);
+							SetVolumeThicknessController(pMtl, pFloatC, sampler->interpolation, 0);
+						}
+						else if (retPath[4] == "attenuationDistance") {
+							std::map<TimeValue, AnimKeyInfo> FloatKeyList;
+							GetFloatAnimKeyFrameList(sampler, FloatKeyList);
+
+							Control* pFloatC = CreateFloatController(FloatKeyList);
+							SetVolumeDistanceController(pMtl, pFloatC, sampler->interpolation, 0);
+						}
+						else if (retPath[4] == "attenuationColor") {
+							std::map<TimeValue, AnimKeyInfo> ColorKeyList;
+							if (type == cgltf_type_vec3) {
+								GetClr3AnimKeyFrameList(sampler, ColorKeyList);
+							}
+							else if (type == cgltf_type_vec4) {
+								GetClr4AnimKeyFrameList(sampler, ColorKeyList);
+							}
+							Control* pClrC = CreateColorController(ColorKeyList, type);
+							SetVolumeColorController(pMtl, pClrC, sampler->interpolation, 0);
+						}
+						else if (retPath[4] == "thicknessTexture") {
+							if (retPath[5] == "extensions") {
+								if (retPath[6] == "KHR_texture_transform") {
+									if (retPath[7] == "offset") {
+										std::map<TimeValue, AnimKeyInfo> Point2KeyList;
+										GetPoint2AnimKeyFrameList(sampler, Point2KeyList);
+
+										std::map<TimeValue, AnimKeyInfo> FloatXKeyList;
+										std::map<TimeValue, AnimKeyInfo> FloatYKeyList;
+										std::map<TimeValue, AnimKeyInfo> FloatZKeyList;
+										SplitPoint3ChannelList(Point2KeyList, FloatXKeyList, FloatYKeyList, FloatZKeyList);
+
+										ofsetCtrl oc;
+										oc.pUC = CreateFloatController(FloatXKeyList);
+										oc.pVC = CreateFloatController(FloatYKeyList);
+										ofsetBaseColorTexList.insert(std::make_pair(pMtl, oc));
+										//SetUVOffsetController(pMtl, pUC, pVC, sampler->interpolation, 0);
+									}
+									else if (retPath[7] == "rotation") {
+										std::map<TimeValue, AnimKeyInfo> FloatKeyList;
+										GetFloatAnimKeyFrameList(sampler, FloatKeyList);
+
+										Control* pFloatC = CreateFloatController(FloatKeyList);
+										SetUVRotateController(pMtl, pFloatC, sampler->interpolation, 0, TargetTex::VolumeThicknessMap);
+									}
+									else if (retPath[7] == "scale") {
+										std::map<TimeValue, AnimKeyInfo> Point2KeyList;
+										GetPoint2AnimKeyFrameList(sampler, Point2KeyList);
+
+										std::map<TimeValue, AnimKeyInfo> FloatXKeyList;
+										std::map<TimeValue, AnimKeyInfo> FloatYKeyList;
+										std::map<TimeValue, AnimKeyInfo> FloatZKeyList;
+										SplitPoint3ChannelList(Point2KeyList, FloatXKeyList, FloatYKeyList, FloatZKeyList);
+
+										Control* pUC = CreateFloatController(FloatXKeyList);
+										Control* pVC = CreateFloatController(FloatYKeyList);
+										SetUVScaleController(pMtl, pUC, pVC, sampler->interpolation, 0, TargetTex::VolumeThicknessMap);
+									}
+								}
+							}
+						}
+					}
+
+					else if (retPath[3] == "KHR_materials_transmission") {
+						if (retPath[4] == "transmissionFactor") {
+							std::map<TimeValue, AnimKeyInfo> FloatKeyList;
+							GetFloatAnimKeyFrameList(sampler, FloatKeyList);
+
+							Control* pFloatC = CreateFloatController(FloatKeyList);
+							SetTransmissionController(pMtl, pFloatC, sampler->interpolation, 0);
+						}
+					}
+
+					else if (retPath[3] == "KHR_materials_emissive_strength") {
+						if (retPath[4] == "emissiveStrength") {
+							std::map<TimeValue, AnimKeyInfo> FloatKeyList;
+							GetFloatAnimKeyFrameList(sampler, FloatKeyList);
+							Control* pFloatC = CreateFloatController(FloatKeyList);
+							SetEmissiveStrengthController(pMtl, pFloatC, sampler->interpolation, 0);
+						}
+					}
+
+					else if (retPath[3] == "KHR_materials_ior") {
+						if (retPath[4] == "ior") {
+							std::map<TimeValue, AnimKeyInfo> FloatKeyList;
+							GetFloatAnimKeyFrameList(sampler, FloatKeyList);
+
+							Control* pFloatC = CreateFloatController(FloatKeyList);
+							SetIORController(pMtl, pFloatC, sampler->interpolation, 0);
+						}
+					}
+
+					else if (retPath[3] == "KHR_materials_iridescence") {
+						if (retPath[4] == "iridescenceFactor") {
+							std::map<TimeValue, AnimKeyInfo> FloatKeyList;
+							GetFloatAnimKeyFrameList(sampler, FloatKeyList);
+
+							Control* pFloatC = CreateFloatController(FloatKeyList);
+							SetIridescenceFactorController(pMtl, pFloatC, sampler->interpolation, 0);
+						}
+						else if (retPath[4] == "iridescenceIor") {
+							std::map<TimeValue, AnimKeyInfo> FloatKeyList;
+							GetFloatAnimKeyFrameList(sampler, FloatKeyList);
+
+							Control* pFloatC = CreateFloatController(FloatKeyList);
+							SetIridescenceIorController(pMtl, pFloatC, sampler->interpolation, 0);
+						}
+						else if (retPath[4] == "iridescenceThicknessMaximum") {
+							std::map<TimeValue, AnimKeyInfo> FloatKeyList;
+							GetFloatAnimKeyFrameList(sampler, FloatKeyList);
+
+							Control* pFloatC = CreateFloatController(FloatKeyList);
+							SetIridescenceMaxController(pMtl, pFloatC, sampler->interpolation, 0);
+						}
+						else if (retPath[4] == "iridescenceThicknessMinimum") {
+							std::map<TimeValue, AnimKeyInfo> FloatKeyList;
+							GetFloatAnimKeyFrameList(sampler, FloatKeyList);
+
+							Control* pFloatC = CreateFloatController(FloatKeyList);
+							SetIridescenceMinController(pMtl, pFloatC, sampler->interpolation, 0);
+						}
+					}
+					else if (retPath[3] == "KHR_materials_clearcoat") {
+						if (retPath[4] == "clearcoatFactor") {
+							std::map<TimeValue, AnimKeyInfo> FloatKeyList;
+							GetFloatAnimKeyFrameList(sampler, FloatKeyList);
+
+							Control* pFloatC = CreateFloatController(FloatKeyList);
+							SetClearcoatFactorController(pMtl, pFloatC, sampler->interpolation, 0);
+						}
+						else if (retPath[4] == "clearcoatRoughnessFactor") {
+							std::map<TimeValue, AnimKeyInfo> FloatKeyList;
+							GetFloatAnimKeyFrameList(sampler, FloatKeyList);
+
+							Control* pFloatC = CreateFloatController(FloatKeyList);
+							SetClearcoatRoughFactorController(pMtl, pFloatC, sampler->interpolation, 0);
+						}
+						else if (retPath[4] == "clearcoatTexture") {
+							if (retPath[5] == "extensions") {
+								if (retPath[6] == "KHR_texture_transform") {
+									if (retPath[7] == "offset") {
+									std::map<TimeValue, AnimKeyInfo> Point2KeyList;
+									GetPoint2AnimKeyFrameList(sampler, Point2KeyList);
+
+									std::map<TimeValue, AnimKeyInfo> FloatXKeyList;
+									std::map<TimeValue, AnimKeyInfo> FloatYKeyList;
+									std::map<TimeValue, AnimKeyInfo> FloatZKeyList;
+									SplitPoint3ChannelList(Point2KeyList, FloatXKeyList, FloatYKeyList, FloatZKeyList);
+
+									ofsetCtrl oc;
+									oc.pUC = CreateFloatController(FloatXKeyList);
+									oc.pVC = CreateFloatController(FloatYKeyList);
+									ofsetBaseColorTexList.insert(std::make_pair(pMtl, oc));
+									//SetUVOffsetController(pMtl, pUC, pVC, sampler->interpolation, 0);
+									}
+									else if (retPath[7] == "rotation") {
+									}
+									else if (retPath[7] == "scale") {
+										std::map<TimeValue, AnimKeyInfo> Point2KeyList;
+										GetPoint2AnimKeyFrameList(sampler, Point2KeyList);
+
+										std::map<TimeValue, AnimKeyInfo> FloatXKeyList;
+										std::map<TimeValue, AnimKeyInfo> FloatYKeyList;
+										std::map<TimeValue, AnimKeyInfo> FloatZKeyList;
+										SplitPoint3ChannelList(Point2KeyList, FloatXKeyList, FloatYKeyList, FloatZKeyList);
+
+										Control* pUC = CreateFloatController(FloatXKeyList);
+										Control* pVC = CreateFloatController(FloatYKeyList);
+										SetUVScaleController(pMtl, pUC, pVC, sampler->interpolation, 0, TargetTex::ClearcoatMap);
+									}
+								}
+							}
+						}
+					}
+					else if (retPath[3] == "KHR_materials_sheen") {
+						if (retPath[4] == "sheenColorFactor") {
+							std::map<TimeValue, AnimKeyInfo> ColorKeyList;
+							GetClr3AnimKeyFrameList(sampler, ColorKeyList);
+
+							Control* pColorC = CreateFloatController(ColorKeyList);
+							SetSheenColorController(pMtl, pColorC, sampler->interpolation, 0);
+						}
+						else if (retPath[4] == "sheenRoughnessFactor") {
+							std::map<TimeValue, AnimKeyInfo> FloatKeyList;
+							GetFloatAnimKeyFrameList(sampler, FloatKeyList);
+
+							Control* pFloatC = CreateFloatController(FloatKeyList);
+							SetSheenRoughFactorController(pMtl, pFloatC, sampler->interpolation, 0);
+						}
+					}
+					else if (retPath[3] == "KHR_materials_specular") {
+						if (retPath[4] == "specularFactor") {
+							std::map<TimeValue, AnimKeyInfo> FloatKeyList;
+							GetFloatAnimKeyFrameList(sampler, FloatKeyList);
+
+							Control* pFloatC = CreateFloatController(FloatKeyList);
+							SetSpecularFactorController(pMtl, pFloatC, sampler->interpolation, 0);
+						}
+						else if (retPath[4] == "specularColorFactor") {
+							std::map<TimeValue, AnimKeyInfo> ColorKeyList;
+							GetClr3AnimKeyFrameList(sampler, ColorKeyList);
+
+							Control* pColorC = CreateFloatController(ColorKeyList);
+							SetSpecularColorController(pMtl, pColorC, sampler->interpolation, 0);
+						}
+					}
+					else if (retPath[3] == "KHR_materials_dispersion") {
+						if (retPath[4] == "dispersion") {
+							std::map<TimeValue, AnimKeyInfo> FloatKeyList;
+							GetFloatAnimKeyFrameList(sampler, FloatKeyList);
+
+							Control* pFloatC = CreateFloatController(FloatKeyList);
+							SetDispersionController(pMtl, pFloatC, sampler->interpolation, 0);
+						}
+					}
+					else if (retPath[3] == "KHR_materials_anisotropy") {
+						if (retPath[4] == "anisotropyStrength") {
+							std::map<TimeValue, AnimKeyInfo> FloatKeyList;
+							GetFloatAnimKeyFrameList(sampler, FloatKeyList);
+
+							Control* pFloatC = CreateFloatController(FloatKeyList);
+							SetAnisotropyStrengthController(pMtl, pFloatC, sampler->interpolation, 0);
+						}
+						else if (retPath[4] == "anisotropyRotation") {
+							std::map<TimeValue, AnimKeyInfo> FloatKeyList;
+							GetFloatAnimKeyFrameList(sampler, FloatKeyList);
+
+							Control* pFloatC = CreateFloatController(FloatKeyList);
+							SetAnisotropyRotationController(pMtl, pFloatC, sampler->interpolation, 0);
+						}
+					}
+					else if (retPath[3] == "KHR_materials_diffuse_transmission") {
+						if (retPath[4] == "diffuseTransmissionFactor") {
+							std::map<TimeValue, AnimKeyInfo> FloatKeyList;
+							GetFloatAnimKeyFrameList(sampler, FloatKeyList);
+
+							Control* pFloatC = CreateFloatController(FloatKeyList);
+							SetDiffTransFactorController(pMtl, pFloatC, sampler->interpolation, 0);
+						}
+						else if (retPath[4] == "diffuseTransmissionColorFactor") {
+							std::map<TimeValue, AnimKeyInfo> ColorKeyList;
+							GetClr3AnimKeyFrameList(sampler, ColorKeyList);
+
+							Control* pColorC = CreateFloatController(ColorKeyList);
+							SetDiffTransColorController(pMtl, pColorC, sampler->interpolation, 0);
+						}
+					}
+					else if (retPath[3] == "KHR_materials_pbrSpecularGlossiness") {
+					if (retPath[4] == "diffuseFactor") {
+						}
+						else if (retPath[4] == "specularFactor") {
+						}
+						else if (retPath[4] == "glossinessFactor") {
+						}
+					}
+
+				}
+			}
+
+			else if (retPath[0] == "cameras") {
+				int idx = atoi(retPath[1].c_str());
+				cgltf_camera* camera = &m_glTF_data->cameras[idx];
+				GenCamera* pCamera = m_CameraMap[camera];
+
+				if (retPath[2] == "perspective") {
+					if (retPath[3] == "znear") {
+						std::map<TimeValue, AnimKeyInfo> FloatKeyList;
+						GetFloatAnimKeyFrameList(sampler, FloatKeyList);
+
+						Control* pFloatC = CreateFloatController(FloatKeyList, m_scale);
+						SetCamPZnearController(pCamera, pFloatC, sampler->interpolation, 0);
+					}
+					if (retPath[3] == "zfar") {
+						std::map<TimeValue, AnimKeyInfo> FloatKeyList;
+						GetFloatAnimKeyFrameList(sampler, FloatKeyList);
+
+						Control* pFloatC = CreateFloatController(FloatKeyList, m_scale);
+						SetCamPZfarController(pCamera, pFloatC, sampler->interpolation, 0);
+					}
+					if (retPath[3] == "yfov") {
+						std::map<TimeValue, AnimKeyInfo> FloatKeyList;
+						GetFloatAnimKeyFrameList(sampler, FloatKeyList);
+
+						Control* pFloatC = CreateFloatController(FloatKeyList);
+						SetCamPYfovController(pCamera, pFloatC, sampler->interpolation, 0);
+					}
+				}
+				if (retPath[2] == "orthographic") {
+					if (retPath[3] == "ymag") {
+						std::map<TimeValue, AnimKeyInfo> FloatKeyList;
+						GetFloatAnimKeyFrameList(sampler, FloatKeyList);
+
+						Control* pFloatC = CreateFloatController(FloatKeyList);
+						SetCamOYmagController(pCamera, pFloatC, sampler->interpolation, 0);
+					}
+					if (retPath[3] == "xmag") {
+						std::map<TimeValue, AnimKeyInfo> FloatKeyList;
+						GetFloatAnimKeyFrameList(sampler, FloatKeyList);
+
+						Control* pFloatC = CreateFloatController(FloatKeyList);
+						SetCamOXmagController(pCamera, pFloatC, sampler->interpolation, 0);
+					}
+					if (retPath[3] == "znear") {
+						std::map<TimeValue, AnimKeyInfo> FloatKeyList;
+						GetFloatAnimKeyFrameList(sampler, FloatKeyList);
+
+						Control* pFloatC = CreateFloatController(FloatKeyList, m_scale);
+						SetCamOZnearController(pCamera, pFloatC, sampler->interpolation, 0);
+					}
+					if (retPath[3] == "zfar") {
+						std::map<TimeValue, AnimKeyInfo> FloatKeyList;
+						GetFloatAnimKeyFrameList(sampler, FloatKeyList);
+
+						Control* pFloatC = CreateFloatController(FloatKeyList, m_scale);
+						SetCamOZfarController(pCamera, pFloatC, sampler->interpolation, 0);
+					}
+				}
+			}
+
+			else if (retPath[0] == "extensions") {
+				if (retPath[1] == "KHR_lights_punctual") {
+					if (retPath[2] == "lights") {
+						int idx = atoi(retPath[3].c_str());
+						cgltf_light* light = &m_glTF_data->lights[idx];
+						GenLight* pLight = m_LightMap[light];
+						int lightType = pLight->Type();
+
+						if (retPath[4] == "intensity") {
+							std::map<TimeValue, AnimKeyInfo> FloatKeyList;
+							GetFloatAnimKeyFrameList(sampler, FloatKeyList);
+							float iscale = 1.0f;
+							if (lightType == TSPOT_LIGHT || lightType == FSPOT_LIGHT || lightType == OMNI_LIGHT) iscale = m_LiteIntensityScale;
+							Control* pFloatC = CreateFloatController(FloatKeyList, iscale);
+							SetLightIntensController(pLight, pFloatC, sampler->interpolation, 0);
+						}
+						if (retPath[4] == "range") {
+							std::map<TimeValue, AnimKeyInfo> FloatKeyList;
+							GetFloatAnimKeyFrameList(sampler, FloatKeyList);
+
+							Control* pFloatC = CreateFloatController(FloatKeyList, m_scale);
+							SetLightRangeController(pLight, pFloatC, sampler->interpolation, 0);
+						}
+						if (retPath[4] == "color") {
+							std::map<TimeValue, AnimKeyInfo> ColorKeyList;
+							if (type == cgltf_type_vec3) {
+								GetClr3AnimKeyFrameList(sampler, ColorKeyList);
+							}
+							else if (type == cgltf_type_vec4) {
+								GetClr4AnimKeyFrameList(sampler, ColorKeyList);
+							}
+
+							Control* pClrC = CreateColorController(ColorKeyList, type);
+							SetLightColorController(pLight, pClrC, sampler->interpolation, 0);
+						}
+						if (retPath[4] == "spot") {
+							if (retPath[5] == "outerConeAngle") {
+								std::map<TimeValue, AnimKeyInfo> FloatKeyList;
+								GetFloatAnimKeyFrameList(sampler, FloatKeyList);
+
+								Control* pFloatC = CreateFloatController(FloatKeyList, 180.0f / PI);
+								SetLightOutAngleController(pLight, pFloatC, sampler->interpolation, 0);
+							}
+							if (retPath[5] == "innerConeAngle") {
+								std::map<TimeValue, AnimKeyInfo> FloatKeyList;
+								GetFloatAnimKeyFrameList(sampler, FloatKeyList);
+
+								Control* pFloatC = CreateFloatController(FloatKeyList, 180.0f / PI);
+								SetLightInAngleController(pLight, pFloatC, sampler->interpolation, 0);
+							}
+						}
+					}
+				}
+			}
+
+			int xxx = 1;
+			/*
+						if (type == "nodes") {
+							cgltf_node* node = &m_glTF_data->nodes[target];
+							INode* pNode = m_NodeMap[node];
+						}
+						if (type == "materials") {
+							cgltf_material* mtl = &m_glTF_data->materials[target];
+							Mtl* pMtl = m_MaterialMap[mtl];
+						}
+						if (type == "cameras") {
+						}
+			*/
+
+		}
+
+	}
+
+	for (auto om : ofsetBaseColorTexList) {
+		SetUVOffsetController(om.first, om.second.pUC, om.second.pVC, cgltf_interpolation_type_linear, 0, TargetTex::BaseColorMap);
+	}
+	for (auto om : ofsetEmissiveTexList) {
+		SetUVOffsetController(om.first, om.second.pUC, om.second.pVC, cgltf_interpolation_type_linear, 0, TargetTex::EmissiveMap);
+	}
+}
+
+void glTFImporter_Core::SetUVAnimation(Mtl *pMtl, cgltf_animation_sampler* sampler, TargetTex target)
+{
+	std::map<TimeValue, AnimKeyInfo> Point2KeyList;
+	GetPoint2AnimKeyFrameList(sampler, Point2KeyList);
+
+	std::map<TimeValue, AnimKeyInfo> FloatXKeyList;
+	std::map<TimeValue, AnimKeyInfo> FloatYKeyList;
+	std::map<TimeValue, AnimKeyInfo> FloatZKeyList;
+	SplitPoint3ChannelList(Point2KeyList, FloatXKeyList, FloatYKeyList, FloatZKeyList);
+
+	Control* pUC = CreateFloatController(FloatXKeyList);
+	Control* pVC = CreateFloatController(FloatYKeyList);
+	SetUVScaleController(pMtl, pUC, pVC, sampler->interpolation, 0, target);
+}
+
+Control* CheckIfAlreadyExist(Mtl* pMtl)
+{
+	if (!pMtl) return NULL;
+
+	if (pMtl->ClassID() == StandardMtlID) {
+	}
+	else if (pMtl->ClassID() == glTFMaterialID) {
+	}
+	else if (pMtl->ClassID() == PBRMetalMtlID) {
+		IParamBlock2* pBlock1 = pMtl->GetParamBlockByID(1);
+		return pBlock1->GetControllerByID(pbr_base_color);
+	}
+	else if (pMtl->ClassID() == PBRSpecGlossMtlID) {
+		IParamBlock2* pBlock = pMtl->GetParamBlockByID(1);
+		pBlock->GetControllerByID(pbr_sg_base_color);
+	}
+	else if (pMtl->ClassID() == PHYSICALMATERIAL_CLASS_ID) {
+		IParamBlock2* pBlock = pMtl->GetParamBlockByID(0);
+		return pBlock->GetControllerByID(fm_base_color);
+	}
+	else if (pMtl->ClassID() == Arnold_StandardSufaceID) {
+		IParamBlock2* pBlock = pMtl->GetParamBlockByID(1);
+		pBlock->GetControllerByID(an_sf_base_color);
+	}
+	else if (pMtl->ClassID() == VRayMaterialID) {
+	}
+
+	return NULL;
+}

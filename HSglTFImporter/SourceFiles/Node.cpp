@@ -1,0 +1,980 @@
+﻿
+#include "HSglTFImporter.h"
+#include <iEditNormals.h>
+#include <MeshNormalSpec.h>
+#include <iMaterialViewportShading.h>
+#include <shape.h>
+#include <splshape.h>	// SplineShape に必要
+
+BOOL CheckBufferSize(cgltf_accessor *acc)
+{
+	if (!acc) return FALSE;
+
+	int dataSize = sizeof(float);
+	switch (acc->component_type) {
+	case cgltf_component_type_r_8:	dataSize = 1; break; /* BYTE */
+	case cgltf_component_type_r_8u:	dataSize = 1; break; /* UNSIGNED_BYTE */
+	case cgltf_component_type_r_16:	 dataSize = 2; break;  /* SHORT */
+	case cgltf_component_type_r_16u: dataSize = 2; break; /* UNSIGNED_SHORT */
+	case cgltf_component_type_r_32u: dataSize = 4; break;  /* UNSIGNED_INT */
+	case cgltf_component_type_r_32f: dataSize = 4; break;  /* FLOAT */
+	}
+
+	int typeSize = 1;
+	switch (acc->type) {
+	case cgltf_type_invalid: typeSize = 1; break;
+	case cgltf_type_scalar: typeSize = 1; break;
+	case cgltf_type_vec2: typeSize = 2; break;
+	case cgltf_type_vec3: typeSize = 3; break;
+	case cgltf_type_vec4: typeSize = 4; break;
+	case cgltf_type_mat2: typeSize = 4; break;
+	case cgltf_type_mat3: typeSize = 9; break;
+	case cgltf_type_mat4: typeSize = 16; break;
+	}
+
+	cgltf_buffer_view* view = acc->buffer_view;
+	int bufferSize = view->size;
+	int stride = view->stride;
+
+	int size = 0;
+	if (stride > 0)
+		size = stride * acc->count - acc->offset;
+	else 
+		size = typeSize * dataSize * acc->count - acc->offset;
+
+	return size <= bufferSize;
+}
+
+
+//======================================================================
+//======================================================================
+void SetNormal(Mesh *pMesh, const std::vector<Point3> &VertNormalTable)
+{
+	pMesh->SpecifyNormals();
+	MeshNormalSpec *pNrmSpec = pMesh->GetSpecifiedNormals();
+	//pNrmSpec->SetParent(pMesh);
+	pNrmSpec->SetNumFaces(pMesh->numFaces);
+	pNrmSpec->SetNumNormals(VertNormalTable.size());
+
+	Face *pFace = pMesh->faces;
+	for (int i = 0; i < pMesh->numFaces; i++, pFace++) {
+		DWORD  *v = pFace->v;
+		for (int j = 0; j < 3; j++, v++) {
+			Point3 nrm(1.0f,0.0f,0.0f);
+			if ((*v) < VertNormalTable.size()) {
+				nrm = VertNormalTable[*v];
+			}
+			pNrmSpec->SetNormal(i, j, nrm);
+		}
+	}
+	pNrmSpec->SetAllExplicit(TRUE);
+}
+
+//======================================================================
+//======================================================================
+cgltf_accessor* findAttrAccesor(cgltf_primitive *pr, const char *str)
+{
+	cgltf_attribute *attr = pr->attributes;
+	for (int i = 0; i < pr->attributes_count; i++, attr++) {
+		if (!_stricmp(str, attr->name)) return attr->data;
+	}
+	return NULL;
+}
+
+//======================================================================
+// 実際のノードオブジェクトを作成
+//======================================================================
+INode* glTFImporter_Core::CreateMaxNode(cgltf_node* node, INode* pParent)
+{
+	tstring name;
+	const char* pname = node->name;
+	if (pname) name = StringToWString(pname);
+	//DebugPrint(StringToWString(name.C_Str()).c_str());
+	std::vector<Mtl*> mtlIdTable;
+
+	//size_t meshId;
+	// メッシュ情報を持たない場合、ダミーオブジェクト
+	if (!node->mesh) {
+		DummyObject* pObj = (DummyObject*)GetCOREInterface()->CreateInstance(HELPER_CLASS_ID, Class_ID(DUMMY_CLASS_ID, 0));
+		pObj->SetBox(Box3(Point3(-10, -10, -10), Point3(10, 10, 10)));
+		INode* pNode = GetCOREInterface()->CreateObjectNode(pObj);
+		if (name.size() > 0) {
+			pNode->SetName(name.c_str());
+		}
+		else if (m_AvoidDupName) {
+			TSTR n = _T("Dummy");
+			GetCOREInterface()->MakeNameUnique(n);
+			pNode->SetName(n);
+		}
+		else {
+			pNode->SetName(name.c_str());
+		}
+
+		if (m_HideDummy) pNode->Hide(TRUE);
+		return pNode;
+	}
+
+	Mesh NewMesh;
+	BezierShape NewShape;
+	//NewMesh.setSmoothFlags(1);
+
+	cgltf_mesh* mesh = node->mesh;
+	if (!pname) name = StringToWString(mesh->name);
+
+	if (m_Instancing) {
+		INode* pInstanceNode = m_MeshNodeMap[mesh];
+		if (pInstanceNode) {
+			Object* pObj = pInstanceNode->GetObjectRef();
+			INode* pNode = GetCOREInterface()->CreateObjectNode(pObj);
+			pNode->SetName(name.c_str()); //StringToWString(name.C_Str()).c_str());
+			pNode->SetMtl(pInstanceNode->GetMtl());
+			return pNode;
+		}
+	}
+
+	int VertOffset = 0;
+	int FaceOffset = 0;
+	int Tex1Offset = 0;
+	int Tex2Offset = 0;
+	int vClrOffset = 0;
+	int NormalOffset = 0;
+	BOOL ViewVertColor = FALSE;
+	int ObjectType = 0;
+
+	std::vector<Point3> VertNormalTable;
+	VertNormalTable.clear();
+
+	//DWORD smGroupBit = 0x1;
+	//UINT primId = 0;
+	StdMat* pCompositeMtl = NULL;
+
+	Matrix3 parentTM(1);
+	if (pParent) {
+		parentTM = pParent->GetNodeTM(0);
+		parentTM.SetTrans(Point3(0, 0, 0));
+	}
+
+	if (mesh->primitives_count > 0) {
+		cgltf_primitive* pr = &mesh->primitives[0];
+		ObjectType = pr->type;
+		if (pr->targets_count > 0)
+			m_MorphTable.push_back(node);
+		if (pr->mappings_count > 0 && m_CompositeMtl) {
+			switch (GetMtlType()) {
+			case 0:
+				pCompositeMtl = (StdMat*)GetCOREInterface()->CreateInstance(MATERIAL_CLASS_ID, MaterialSwitcherClassID); ;
+				if(!pCompositeMtl)
+					pCompositeMtl = (StdMat*)GetCOREInterface()->CreateInstance(MATERIAL_CLASS_ID, StdMtlSwitcherClassID);
+				break;
+			case 1:
+				pCompositeMtl = (StdMat*)GetCOREInterface()->CreateInstance(MATERIAL_CLASS_ID, MaterialSwitcherClassID); ;
+				if (!pCompositeMtl)
+					pCompositeMtl = (StdMat*)GetCOREInterface()->CreateInstance(MATERIAL_CLASS_ID, PysicMtlSwitcherClassID);
+				break;
+			case 2:
+				pCompositeMtl = (StdMat*)GetCOREInterface()->CreateInstance(MATERIAL_CLASS_ID, MaterialSwitcherClassID); break;
+				if (!pCompositeMtl)
+					pCompositeMtl = (StdMat*)GetCOREInterface()->CreateInstance(MATERIAL_CLASS_ID, PBRMtlSwitcherClassID);
+				break;
+			case 3:
+				pCompositeMtl = (StdMat*)GetCOREInterface()->CreateInstance(MATERIAL_CLASS_ID, MaterialSwitcherClassID); break;
+				if (!pCompositeMtl)
+					pCompositeMtl = (StdMat*)GetCOREInterface()->CreateInstance(MATERIAL_CLASS_ID, glTFMtlSwitcherClassID);
+				break;
+			case 4:
+				pCompositeMtl = (StdMat*)GetCOREInterface()->CreateInstance(MATERIAL_CLASS_ID, ArnoldSwitchShaderID);	break;
+			case 5:
+				pCompositeMtl = (StdMat*)GetCOREInterface()->CreateInstance(MATERIAL_CLASS_ID, MaterialSwitcherClassID); break;
+				if (!pCompositeMtl)
+					pCompositeMtl = (StdMat*)GetCOREInterface()->CreateInstance(MATERIAL_CLASS_ID, USDMtlSwitcherClassID);
+				break;
+			case 6:
+				pCompositeMtl = (StdMat*)GetCOREInterface()->CreateInstance(MATERIAL_CLASS_ID, MaterialSwitcherClassID); break;
+				break;
+			case 7:
+				pCompositeMtl = (StdMat*)GetCOREInterface()->CreateInstance(MATERIAL_CLASS_ID, CoronaSelectMtlID);	break;
+				break;
+			case 9:
+				pCompositeMtl = (StdMat*)GetCOREInterface()->CreateInstance(MATERIAL_CLASS_ID, MaterialSwitcherClassID); break;
+				break;
+			default:
+				pCompositeMtl = NULL;
+				break;
+			}
+
+			if (!pCompositeMtl)
+				pCompositeMtl = (StdMat*)GetCOREInterface()->CreateInstance(MATERIAL_CLASS_ID, CompositeMtlClassID);
+		}
+
+		// マップを持つプリミティブと持たないプリミティブが混在する可能性があるので
+		for (int i = 0; i < mesh->primitives_count; i++) {
+			cgltf_primitive* pr = &mesh->primitives[i];
+
+			if (findAttrAccesor(pr, "COLOR_0")) {
+				NewMesh.setMapSupport(0, TRUE);
+				if (m_ViewVertexColor) ViewVertColor = TRUE;
+			}
+
+			int maxMap = 1;
+			if (findAttrAccesor(pr, "TEXCOORD_0")) maxMap = 2;
+			if (findAttrAccesor(pr, "TEXCOORD_1")) maxMap = 3;
+			NewMesh.setNumMaps(maxMap, FALSE);
+			if (maxMap == 2) {
+				NewMesh.setMapSupport(1, TRUE);
+			}
+			else if (maxMap == 3) {
+				NewMesh.setMapSupport(1, TRUE);
+				NewMesh.setMapSupport(2, TRUE);
+			}
+		}
+	}
+
+	for (int i = 0; i < mesh->primitives_count; i++) {
+		cgltf_primitive* pr = &mesh->primitives[i];
+		cgltf_draco_mesh_compression* mc = NULL;
+		if (pr->has_draco_mesh_compression) {
+			mc = &pr->draco_mesh_compression;
+		}
+		float scale_u = 1.0f;
+		float scale_v = 1.0f;
+		float offset_u = 0.0f;
+		float offset_v = 0.0f;
+		if (m_Quantization) {
+			if (pr->material->has_pbr_metallic_roughness) {
+				if (pr->material->pbr_metallic_roughness.base_color_texture.has_transform) {
+					scale_u = pr->material->pbr_metallic_roughness.base_color_texture.transform.scale[0];
+					scale_v = pr->material->pbr_metallic_roughness.base_color_texture.transform.scale[1];
+					offset_u = pr->material->pbr_metallic_roughness.base_color_texture.transform.offset[0];
+					offset_v = pr->material->pbr_metallic_roughness.base_color_texture.transform.offset[1];
+				}
+			}
+		}
+
+		std::vector<Point3> texCoords;
+		std::vector<Point3> tex2Coords;
+		std::vector<UINT> nrmId;
+
+		int mId = 0;
+		cgltf_material* material = pr->material;
+		if (material) {
+			Mtl* pMtl = m_MaterialMap[material];
+			std::vector<Mtl*>::iterator itr = std::find(mtlIdTable.begin(), mtlIdTable.end(), pMtl);
+			if (itr == mtlIdTable.end()) {
+				mtlIdTable.push_back(pMtl);
+				mId = mtlIdTable.size();
+			}
+			else {
+				mId = std::distance(mtlIdTable.begin(), itr) + 1;
+			}
+		}
+
+		// 頂点の設定
+		int attr_index;
+		std::vector<float> VertIdList;
+		if (mc) {
+			DracoTest(mc->buffer_view, VertIdList, DracoDecodeType::POSITION);
+		}
+		else {
+			GetDataList(VertIdList, findAttrAccesor(pr, "POSITION"));
+		}
+		UINT VertNum = 0;
+		if ((pr->type == cgltf_primitive_type_triangles) ||
+			(pr->type == cgltf_primitive_type_triangle_strip) ||
+			(pr->type == cgltf_primitive_type_triangle_fan)){
+			VertNum = VertIdList.size() / 3;
+			NewMesh.setNumVerts(VertNum + VertOffset, TRUE);
+			UINT vIdx = VertOffset;
+			for (std::vector<float>::iterator v = VertIdList.begin(); v != VertIdList.end(); v += 3, vIdx++) {
+				Point3 p(*v, *(v + 1), *(v + 2));
+				NewMesh.setVert(vIdx, p * m_scale);
+			}
+		}
+
+		std::vector<Point3> ShapePointVector;
+		if ((pr->type == cgltf_primitive_type_lines)||
+			(pr->type == cgltf_primitive_type_line_loop)||
+			(pr->type == cgltf_primitive_type_line_strip)) {
+			ShapePointVector.clear();
+			VertNum = VertIdList.size();
+			UINT vIdx = VertOffset;
+			for (std::vector<float>::iterator v = VertIdList.begin(); v != VertIdList.end(); v += 3, vIdx++) {
+				Point3 p(*v, *(v + 1), *(v + 2));
+				ShapePointVector.push_back(p * m_scale);
+			}
+		}
+
+		// 面の設定
+		UINT FaceNum = 0;
+		if ((pr->type == cgltf_primitive_type_triangles) ||
+			(pr->type == cgltf_primitive_type_triangle_strip) ||
+			(pr->type == cgltf_primitive_type_triangle_fan)) {
+			std::vector<float> FaceIdList;
+			if (mc) {
+				GetDracoMeshIndexList(mc->buffer_view, FaceIdList);
+			}
+			else {
+				if (pr->indices) {
+					GetDataList(FaceIdList, pr->indices);
+				}
+				else {
+					int numf = NewMesh.numVerts / 3;
+					for (int i = 0; i < numf; i++) {
+						float v1 = i * 3 + 0 + VertOffset;
+						float v2 = i * 3 + 1 + VertOffset;
+						float v3 = i * 3 + 2 + VertOffset;
+						FaceIdList.push_back(v1);
+						FaceIdList.push_back(v2);
+						FaceIdList.push_back(v3);
+					}
+				}
+			}
+
+			if (pr->type == cgltf_primitive_type_triangles) {
+				FaceNum = FaceIdList.size() / 3;
+				NewMesh.setNumFaces(FaceNum + FaceOffset, TRUE);
+				UINT fIdx = FaceOffset;
+				for (std::vector<float>::iterator f = FaceIdList.begin(); f != FaceIdList.end(); f += 3, fIdx++) {
+					NewMesh.faces[fIdx].v[0] = (int)*(f)+VertOffset;
+					NewMesh.faces[fIdx].v[1] = (int)*(f + 1) + VertOffset;
+					NewMesh.faces[fIdx].v[2] = (int)*(f + 2) + VertOffset;
+					NewMesh.faces[fIdx].setEdgeVisFlags(EDGE_VIS, EDGE_VIS, EDGE_VIS);
+					NewMesh.faces[fIdx].setMatID(mId);
+					//NewMesh.faces[fIdx].setSmGroup(smGroupBit);
+				}
+			}
+			else if (pr->type == cgltf_primitive_type_triangle_strip) {
+				FaceNum = FaceIdList.size() - 2;
+				NewMesh.setNumFaces(FaceNum + FaceOffset, TRUE);
+				UINT fIdx = FaceOffset;
+				auto f = FaceIdList.begin();
+				UINT vIdx1 = (UINT) * (f++) + VertOffset;
+				UINT vIdx2 = (UINT) * (f++) + VertOffset;
+				UINT vIdx3 = (UINT) * (f++) + VertOffset;
+				NewMesh.faces[fIdx].v[0] = vIdx1;
+				NewMesh.faces[fIdx].v[1] = vIdx2;
+				NewMesh.faces[fIdx].v[2] = vIdx3;
+				NewMesh.faces[fIdx].setEdgeVisFlags(EDGE_VIS, EDGE_VIS, EDGE_VIS);
+				NewMesh.faces[fIdx].setMatID(mId);
+				fIdx++;
+				BOOL CCW = FALSE;
+				for (; f != FaceIdList.end(); f++, fIdx++) {
+					vIdx1 = vIdx2;
+					vIdx2 = vIdx3;
+					vIdx3 = (UINT) * (f)+VertOffset;
+					NewMesh.faces[fIdx].v[0] = vIdx1;
+					NewMesh.faces[fIdx].v[1] = CCW ? vIdx2 : vIdx3;
+					NewMesh.faces[fIdx].v[2] = CCW ? vIdx3 : vIdx2;
+					NewMesh.faces[fIdx].setEdgeVisFlags(EDGE_VIS, EDGE_VIS, EDGE_VIS);
+					NewMesh.faces[fIdx].setMatID(mId);
+					CCW = !CCW;
+				}
+			}
+			else if (pr->type == cgltf_primitive_type_triangle_fan) {
+				FaceNum = FaceIdList.size() - 1;
+				NewMesh.setNumFaces(FaceNum + FaceOffset, TRUE);
+				UINT fIdx = FaceOffset;
+				auto f = FaceIdList.begin();
+				UINT vIdx1 = (UINT) * (f++) + VertOffset;
+				UINT vIdx2 = (UINT) * (f++) + VertOffset;
+				for (; f != FaceIdList.end(); f++, fIdx++) {
+					UINT vIdx3 = (UINT) * (f) + VertOffset;
+					NewMesh.faces[fIdx].v[0] = vIdx1;
+					NewMesh.faces[fIdx].v[1] = vIdx2;
+					NewMesh.faces[fIdx].v[2] = vIdx3;
+					NewMesh.faces[fIdx].setEdgeVisFlags(EDGE_VIS, EDGE_VIS, EDGE_VIS);
+					NewMesh.faces[fIdx].setMatID(mId);
+					vIdx2 = vIdx3;
+				}
+			}
+		}
+		/*
+		if (pr->type == cgltf_primitive_type_triangle_strip) {
+			std::vector<float> FaceIdList;
+			if (mc) {
+				GetDracoMeshIndexList(mc->buffer_view, FaceIdList);
+			}
+			else {
+				if (pr->indices) {
+					GetDataList(FaceIdList, pr->indices);
+				}
+			}
+		}
+		*/
+
+		// ShapeLineの設定
+		if ((pr->type == cgltf_primitive_type_lines) ||
+			(pr->type == cgltf_primitive_type_line_loop)||
+			(pr->type == cgltf_primitive_type_line_strip)) {
+			std::vector<float> KnotIdList;
+			if (mc) {
+				GetDracoMeshIndexList(mc->buffer_view, KnotIdList);
+			}
+			else {
+				if (pr->indices) {
+					GetDataList(KnotIdList, pr->indices);
+				}
+				else {
+					for (UINT vIdx = 0; vIdx < VertIdList.size()/3; vIdx++) {
+						KnotIdList.push_back(vIdx);
+					}
+				}
+			}
+			UINT vIdx = VertOffset;
+			if (pr->type == cgltf_primitive_type_lines) {
+				for (int idx = 0; idx < KnotIdList.size(); idx += 2) {
+					Spline3D* pSpline = NewShape.NewSpline();
+					Point3 p1 = ShapePointVector[KnotIdList[idx]];
+					Point3 p2 = ShapePointVector[KnotIdList[idx + 1]];
+					pSpline->AddKnot(SplineKnot(KTYPE_AUTO, LTYPE_LINE, p1, p1, p1));
+					pSpline->AddKnot(SplineKnot(KTYPE_AUTO, LTYPE_LINE, p2, p2, p2));
+					pSpline->SetClosed(0);			// こちらのスプラインは開曲線
+					pSpline->ComputeBezPoints();	// スプラインの内部情報を更新するために必要
+				}
+			}
+			else if (pr->type == cgltf_primitive_type_line_loop) {
+				Spline3D* pSpline = NewShape.NewSpline();
+				for (auto idx : KnotIdList) {
+					Point3 p1 = ShapePointVector[(UINT)idx];
+					pSpline->AddKnot(SplineKnot(KTYPE_AUTO, LTYPE_LINE, p1, p1, p1));
+				}
+				pSpline->SetClosed(1);			// こちらのスプラインは閉曲線
+				pSpline->ComputeBezPoints();	// スプラインの内部情報を更新するために必要
+			}
+			else if (pr->type == cgltf_primitive_type_line_strip) {
+				Spline3D* pSpline = NewShape.NewSpline();
+				for (auto idx : KnotIdList) {
+					Point3 p1 = ShapePointVector[(UINT)idx];
+					pSpline->AddKnot(SplineKnot(KTYPE_AUTO, LTYPE_LINE, p1, p1, p1));
+				}
+				if (KnotIdList[0] == KnotIdList[KnotIdList.size() - 1]) {
+					pSpline->SetClosed(1);			// こちらのスプラインは閉曲線
+				}
+				else {
+					pSpline->SetClosed(0);			// こちらのスプラインは開曲線
+				}
+				pSpline->ComputeBezPoints();	// スプラインの内部情報を更新するために必要
+			}
+
+		}
+
+		// 頂点法線の設定
+		std::vector<float> NormalList;
+		if (mc) {
+			DracoTest(mc->buffer_view, NormalList, DracoDecodeType::NORMAL);
+		}
+		else {
+			GetDataList(NormalList, findAttrAccesor(pr, "NORMAL"));
+		}
+		UINT normalNum = NormalList.size() / 3;
+		if (normalNum > 0) {
+			int vIdx = NormalOffset;
+			for (std::vector<float>::iterator v = NormalList.begin(); v != NormalList.end(); v += 3, vIdx++) {
+				Point3 p(0.0f, 0.0f, 0.0f);
+				p.x = *v;
+				p.y = *(v+1);
+				p.z = *(v+2);
+				VertNormalTable.push_back(p);
+			}
+			//if (normalNum != VertNormalTable.size())VertNormalTable.clear();
+		}
+
+		// 頂点カラーの設定
+		std::vector<float> vClrList;
+		cgltf_type val_type= cgltf_type_vec4;
+		float vcScale = 255.0f;
+		if (mc) {
+			DracoTest(mc->buffer_view, vClrList, DracoDecodeType::COLOR);
+			cgltf_accessor* acc = findAttrAccesor(pr, "COLOR_0");
+			if (acc) {
+				if (acc->component_type == cgltf_component_type::cgltf_component_type_r_32f) vcScale = 1.0f;
+				val_type = acc->type;
+			}
+		}
+		else {
+			cgltf_accessor *acc = findAttrAccesor(pr, "COLOR_0");
+			GetDataList(vClrList, acc);
+			if (acc) {
+				if (acc->component_type == cgltf_component_type::cgltf_component_type_r_32f) vcScale = 1.0f;
+				val_type = acc->type;
+			}
+		}
+		UINT data_size = (val_type == cgltf_type_vec3)? 3:4;
+		UINT vClrNum = vClrList.size() / data_size;
+		if (vClrNum > 0) {
+			NewMesh.setMapSupport(0, TRUE);
+			NewMesh.setNumMapVerts(0, VertNum + VertOffset, TRUE);
+			NewMesh.setNumMapFaces(0, FaceNum + FaceOffset, TRUE);
+
+			if (NewMesh.mapFaces(0)) {
+				MeshMap *pMap = &NewMesh.Map(0);
+				TVFace *pTVFace = &NewMesh.mapFaces(0)[FaceOffset];
+
+				Face *pFace = &NewMesh.faces[FaceOffset];
+				for (UINT f = FaceOffset; f < FaceOffset + FaceNum; f++) {
+					pTVFace->t[0] = pFace->v[0];
+					pTVFace->t[1] = pFace->v[1];
+					pTVFace->t[2] = pFace->v[2];
+					pTVFace++;
+					pFace++;
+				}
+				UINT vclrIdx = vClrOffset;
+				UVVert *pDstUV = &(pMap->tv[vclrIdx]);
+				for (std::vector<float>::iterator v = vClrList.begin(); v != vClrList.end(); v += data_size, vclrIdx++) {
+					float r = *v / vcScale;
+					float g = *(v + 1) / vcScale;
+					float b = *(v + 2) / vcScale;
+					float alpha = 0.0f;
+					if(val_type == cgltf_type_vec4) alpha = *(v + 3);
+					*pDstUV++ = UVVert(r, g, b);
+				}
+			}
+		}
+
+		// 頂点UV1の設定
+		std::vector<float> texCoord1List;
+		if (mc) {
+			DracoTest(mc->buffer_view, texCoord1List, DracoDecodeType::TEX_COORD);
+		}
+		else {
+			cgltf_accessor* acc = findAttrAccesor(pr, "TEXCOORD_0");
+			if(CheckBufferSize(acc))
+				GetDataList(texCoord1List, acc);
+		}
+
+		UINT tex1Num = texCoord1List.size() / 2;
+		if (NewMesh.mapSupport(1)&& tex1Num==0) {
+			//tex1Num=VertNum;
+			/*
+			NewMesh.setNumMapVerts(1, VertNum + VertOffset, TRUE);
+			NewMesh.setNumMapFaces(1, FaceNum + FaceOffset, TRUE);
+			TVFace *pTVFace = &NewMesh.mapFaces(1)[FaceOffset];
+			Face *pFace = &NewMesh.faces[FaceOffset];
+			for (UINT f = FaceOffset; f < FaceOffset + FaceNum; f++) {
+				pTVFace->t[0] = pFace->v[0];
+				pTVFace->t[1] = pFace->v[1];
+				pTVFace->t[2] = pFace->v[2];
+				pTVFace++;
+				pFace++;
+			}
+
+			tex1Num = FaceNum * 3;
+			UINT vtex1Idx = Tex1Offset;
+			MeshMap *pMap = &NewMesh.Map(1);
+			UVVert *pDstUV = &(pMap->tv[vtex1Idx]);
+			for (int vi = 0; vi< tex1Num; vi++) {
+				*pDstUV++ = UVVert(0.0f, 0.0f, 0.0f);
+			}
+			*/
+		}
+		else if (tex1Num > 0) {
+			//NewMesh.setMapSupport(1, TRUE);
+			NewMesh.setNumMapVerts(1, VertNum + VertOffset, TRUE);
+			NewMesh.setNumMapFaces(1, FaceNum + FaceOffset, TRUE);
+			TVFace *pTVFace = &NewMesh.mapFaces(1)[FaceOffset];
+			Face *pFace = &NewMesh.faces[FaceOffset];
+			for (UINT f = FaceOffset; f < FaceOffset + FaceNum; f++) {
+				pTVFace->t[0] = pFace->v[0];
+				pTVFace->t[1] = pFace->v[1];
+				pTVFace->t[2] = pFace->v[2];
+				pTVFace++;
+				pFace++;
+			}
+			Box2D RectUV;
+			RectUV.max = Point2(0.0f, 0.0f);
+			RectUV.min = Point2(1.0f, 1.0f);
+			UINT vtex1Idx = Tex1Offset;
+			MeshMap *pMap = &NewMesh.Map(1);
+			UVVert *pDstUV = &(pMap->tv[vtex1Idx]);
+			for (std::vector<float>::iterator v = texCoord1List.begin(); v != texCoord1List.end(); v += 2, vtex1Idx++) {
+				float x = *v * scale_u + offset_u;
+				float y = -(*(v + 1) * scale_v + offset_v) + 1.0f;
+				if (x > RectUV.max.x) RectUV.max.x = x;
+				if (x < RectUV.min.x) RectUV.min.x = x;
+				if (y > RectUV.max.y) RectUV.max.y = y;
+				if (y < RectUV.min.y) RectUV.min.y = y;
+				*pDstUV++ = UVVert(x, y, 0.0f);
+			}
+			//Point2 UV1Size(max_U - min_U, max_V - min_V);
+			if(mId>0) RescaleUVOffset(mtlIdTable[mId-1], RectUV);
+		}
+
+		// 頂点UV2の設定
+		std::vector<float> texCoord2List;
+		if (mc) {
+			//DracoTest(mc->buffer_view, texCoord2List, DracoDecodeType::TEX_COORD);
+		}
+		else {
+			cgltf_accessor* acc = findAttrAccesor(pr, "TEXCOORD_1");
+			if (CheckBufferSize(acc))
+				GetDataList(texCoord2List, acc);
+		}
+		UINT tex2Num = texCoord2List.size() / 2;
+		if (tex2Num > 0) {
+			//NewMesh.setMapSupport(2, TRUE);
+			NewMesh.setNumMapVerts(2, VertNum + VertOffset, TRUE);
+			NewMesh.setNumMapFaces(2, FaceNum + FaceOffset, TRUE);
+			MeshMap *pMap = &NewMesh.Map(2);
+			TVFace *pTVFace = &NewMesh.mapFaces(2)[FaceOffset];
+			Face *pFace = &NewMesh.faces[FaceOffset];
+			for (UINT f = FaceOffset; f < FaceOffset + FaceNum; f++) {
+				pTVFace->t[0] = pFace->v[0];
+				pTVFace->t[1] = pFace->v[1];
+				pTVFace->t[2] = pFace->v[2];
+				pTVFace++;
+				pFace++;
+			}
+			UINT vtex2Idx = Tex2Offset;
+			UVVert *pDstUV = &(pMap->tv[vtex2Idx]);
+			for (std::vector<float>::iterator v = texCoord2List.begin(); v != texCoord2List.end(); v += 2, vtex2Idx++) {
+				float x = *v;
+				float y = *(v + 1);
+				*pDstUV++ = UVVert(x, -y+1.0f, 0.0f);
+			}
+		}
+
+		VertOffset += VertNum;
+		FaceOffset += FaceNum;
+		NormalOffset += normalNum;
+		vClrOffset += vClrNum;
+		Tex1Offset += tex1Num;
+		Tex2Offset += tex2Num;
+	}
+	//primId++;
+	//smGroupBit = smGroupBit << 1;
+	//m_UsingMtlIdxTab.push_back(pr.material);
+
+	if (VertNormalTable.size() > 0) {
+		SetNormal(&NewMesh, VertNormalTable);
+	}
+
+	INode* pNode = NULL;
+	if ((ObjectType == cgltf_primitive_type_triangles) ||
+		(ObjectType == cgltf_primitive_type_triangle_strip)||
+		(ObjectType == cgltf_primitive_type_triangle_fan)) {
+		TriObject* pTri = CreateNewTriObject();
+		pTri->mesh = NewMesh;
+		pNode = GetCOREInterface()->CreateObjectNode(pTri);
+	}
+	if ((ObjectType == cgltf_primitive_type_lines) ||
+		(ObjectType == cgltf_primitive_type_line_loop)||
+		(ObjectType == cgltf_primitive_type_line_strip)) {
+		NewShape.UpdateSels();
+		NewShape.InvalidateGeomCache();
+		SplineShape* pSpline = (SplineShape*)GetCOREInterface()->CreateInstance(SHAPE_CLASS_ID, splineShapeClassID);
+		pSpline->shape = NewShape;
+		pNode = GetCOREInterface()->CreateObjectNode(pSpline);
+		pNode->SetWireColor(RGB(255, 255, 255));
+	}
+
+	if (!pNode) return NULL;
+
+
+	pNode->SetName(name.c_str()); //StringToWString(name.C_Str()).c_str());
+	//m_MeshNodeMap.insert(std::make_pair(mesh,pNode));
+	m_MeshNodeMap[mesh] = pNode;
+
+	if (mtlIdTable.size() >= 1) {
+		if (pCompositeMtl) {
+			//IMaterialViewportShading *p = (IMaterialViewportShading*)pCompositeMtl->GetInterface(IID_MATERIAL_VIEWPORT_SHADING);
+			if (pCompositeMtl->ClassID()== MaterialSwitcherClassID) {
+				int num = mesh->primitives[0].mappings_count;
+				IParamBlock2* pBlock = pCompositeMtl->GetParamBlock(0);
+				pBlock->SetCount(0, num);
+				pBlock->SetCount(1, num);
+				pBlock->SetValue(2, m_time, 1);
+				pBlock->SetValue(3, m_time, num);
+			}
+
+			cgltf_material_mapping *mappings = mesh->primitives[0].mappings;
+			for (int i = 0; i < mesh->primitives[0].mappings_count; i++) {
+				cgltf_material *material = mappings[i].material;
+				Mtl *pMtl = m_MaterialMap[material];
+				tstring str = StringToWString(m_VariantTable[i].c_str());
+				TSTR name;
+				name.printf(_T("%s__%s"), pMtl->GetName().data(), str.c_str());
+				pMtl->SetName(name);
+				pMtl->ActivateTexDisplay(FALSE);
+				if (pCompositeMtl->ClassID() == MaterialSwitcherClassID) {//(pCompositeMtl->ClassID() == glTFMtlSwitcherClassID) {
+					IParamBlock2* pBlock = pCompositeMtl->GetParamBlock(0);
+					pBlock->SetValue(0, m_time, pMtl, i);
+					pBlock->SetValue(1, m_time, str.c_str(), i);
+				}
+				else if (pCompositeMtl->ClassID() == ArnoldSwitchShaderID) {//(pCompositeMtl->ClassID() == glTFMtlSwitcherClassID) {
+					IParamBlock2* pBlock = pCompositeMtl->GetParamBlock(1);
+					pBlock->SetValue(i+3, m_time, pMtl);
+				}
+				else if(pCompositeMtl->ClassID() == CoronaSelectMtlID) {
+					IParamBlock2* pBlock = pCompositeMtl->GetParamBlock(0);
+					pBlock->SetValue(312, m_time, pMtl, i);
+				}
+				else {
+					pCompositeMtl->SetSubMtl(i, pMtl);
+				}
+			}
+			pNode->SetMtl(pCompositeMtl);
+			if ((pCompositeMtl->ClassID() == glTFMtlSwitcherClassID) ||
+				(pCompositeMtl->ClassID() == PBRMtlSwitcherClassID) ||
+				(pCompositeMtl->ClassID() == PBRMtlSwitcherClassID) ||
+				(pCompositeMtl->ClassID() == USDMtlSwitcherClassID) ||
+				(pCompositeMtl->ClassID() == PysicMtlSwitcherClassID) ){
+				GetCOREInterface()->SelectNode(pNode);
+#if MAX_RELEASE >= 24000
+				ExecuteMAXScriptScript(_T("global mm = $.material"), MAXScript::ScriptSource::NonEmbedded);
+				ExecuteMAXScriptScript(_T("mm.Init()"), MAXScript::ScriptSource::NonEmbedded);
+#else
+				ExecuteMAXScriptScript(_T("global mm = $.material"));
+				ExecuteMAXScriptScript(_T("mm.Init()"));
+#endif
+			}
+			else if (pCompositeMtl->ClassID() == CoronaSelectMtlID) {
+				IParamBlock2* pBlock = pCompositeMtl->GetParamBlock(0);
+				pBlock->SetValue(311, m_time, (int)(mesh->primitives[0].mappings_count));
+			}
+			else {
+			}
+			//pCompositeMtl->EnableMap(0, TRUE);
+			//m_MaterialMap[mappings[0].material]->ActivateTexDisplay(TRUE);
+			//pCompositeMtl->SetActiveMB(m_MaterialMap[0]);
+		}
+		else {
+			pNode->SetMtl(mtlIdTable[0]);
+		}
+
+		if (mtlIdTable.size() > 1 && mesh->primitives[0].mappings_count==0) {
+			MultiMtl* pNewMtl = NewDefaultMultiMtl();
+			pNewMtl->SetNumSubMtls(0);
+			int idx = 1;
+			for (auto m : mtlIdTable) {
+				pNewMtl->SetSubMtlAndName(idx++, m, m->GetName());
+			}
+			pNewMtl->RemoveMtl(0);	// 1つ目が余計
+			pNode->SetMtl(pNewMtl);
+		}
+	}
+
+	if (ViewVertColor) {
+		pNode->SetCVertMode(TRUE);
+		pNode->SetShadeCVerts(TRUE);
+	}
+
+
+	//m_NodeUVSizeMap.insert(std::make_pair(pNode, UV1Size));
+
+	return pNode;
+}
+
+//======================================================================
+// オブジェクト作成
+//======================================================================
+void glTFImporter_Core::CreateNodeInfosRec(cgltf_node *node, INode *targetParent)
+{
+	Matrix3 tm(1);
+
+	if (node->has_matrix) {
+		float *mtx = node->matrix;
+		tm = Matrix3(
+			Point3(mtx[0], mtx[1], mtx[2]),
+			Point3(mtx[4], mtx[5], mtx[6]),
+			Point3(mtx[8], mtx[9], mtx[10]),
+			Point3(mtx[12], mtx[13], mtx[14])*m_scale);
+	}
+	else {
+		float scl[] = { 1.0, 1.0 ,1.0 };
+		if (node->has_scale) {
+			scl[0] = node->scale[0];
+			scl[1] = node->scale[1];
+			scl[2] = node->scale[2];
+		}
+		float rot[] = { 0.0, 0.0 ,0.0, 0.0 };
+		if (node->has_rotation) {
+			rot[0] = node->rotation[0];
+			rot[1] = node->rotation[1];
+			rot[2] = node->rotation[2];
+			rot[3] = node->rotation[3];
+		}
+		Quat q(-rot[0], -rot[1], -rot[2], rot[3]);
+		float pos[] = { 0.0, 0.0 , 0.0 };
+		if (node->has_translation) {
+			pos[0] = node->translation[0];
+			pos[1] = node->translation[1];
+			pos[2] = node->translation[2];
+		}
+
+		tm.IdentityMatrix();
+		tm.SetRotate(q);
+		tm.PreScale(Point3(scl[0], scl[1], scl[2]));
+		tm.SetTrans(Point3(pos[0], pos[1], pos[2])*m_scale);
+	}
+
+	INode *pNewObject = NULL;
+	if (node->camera) {
+		pNewObject = CreateCamera(node);
+		if (_tcslen(pNewObject->GetName()) == 0 && m_AvoidDupName) {
+			TSTR name = _T("Camera");
+			GetCOREInterface()->MakeNameUnique(name);
+			pNewObject->SetName(name);
+		}
+	}
+	else if (node->light) {
+		pNewObject = CreateLight(node);
+		if (_tcslen(pNewObject->GetName()) == 0 && m_AvoidDupName) {
+			TSTR name = _T("Light");
+			GetCOREInterface()->MakeNameUnique(name);
+			pNewObject->SetName(name);
+		}
+	}
+	else {
+		pNewObject = CreateMaxNode(node, targetParent);
+		if (!pNewObject) return;
+		if (_tcslen(pNewObject->GetName()) == 0 && m_AvoidDupName) {
+			TSTR name = _T("Object");
+			GetCOREInterface()->MakeNameUnique(name);
+			pNewObject->SetName(name);
+		}
+		if (!pNewObject->GetMtl()&& pNewObject->GetObjectRef()->SuperClassID()== GEOMOBJECT_CLASS_ID) {
+			pNewObject->SetWireColor(RGB(128,128,128));
+		}
+
+		cgltf_size size;
+		cgltf_result ret = cgltf_copy_extras_json(m_glTF_data, &node->extras, NULL, &size);
+		if (size > 0) {
+			std::vector<custAttrParam> attrTbl;
+			CreateParamTableFromExtras(node->extras, size, attrTbl);
+			//AttacheCustAttr(pNewObject->GetObjectRef(), attrTbl);
+			if (m_ExtraToUserProp)
+				SetUserPropParam(pNewObject, attrTbl);
+			if(m_ExtraToCustAttr)
+				AttacheCustAttr(pNewObject, attrTbl);
+		}
+	}
+
+	if (m_AvoidDupName) {
+		TSTR n = pNewObject->GetName();
+		GetCOREInterface()->MakeNameUnique(n);
+		pNewObject->SetName(n);
+	}
+
+	m_NodeMap.insert(std::make_pair(node, pNewObject));
+	SetNodeImportStatus(1);
+
+	if (targetParent) {
+		pNewObject->SetNodeTM(0, tm*targetParent->GetNodeTM(m_time));
+		if(!ISFlatHierarchy())targetParent->AttachChild(pNewObject);
+	}
+	else
+		pNewObject->SetNodeTM(0, tm*YupTM);
+
+	if(IsLogOut())
+	{
+		AffineParts parts;
+		float xyz[3];
+
+		decomp_affine(tm, &parts);
+		tstring posStr1 = _T("T:[") + std::to_wstring(parts.t.x) + _T(",");
+		posStr1 += std::to_wstring(parts.t.y) + _T(",");
+		posStr1 += std::to_wstring(parts.t.z) + _T("]");
+		QuatToEuler(parts.q, xyz);
+		tstring rotStr1 = _T("R:[") + std::to_wstring(RadToDeg(xyz[0])) + _T(",");
+		rotStr1 += std::to_wstring(RadToDeg(xyz[1])) + _T(",");
+		rotStr1 += std::to_wstring(RadToDeg(xyz[2])) + _T("]");
+		tstring sclStr1 = _T("S:[") + std::to_wstring(parts.k.x) + _T(",");
+		sclStr1 += std::to_wstring(parts.k.y) + _T(",");
+		sclStr1 += std::to_wstring(parts.k.z) + _T("]");
+
+		Matrix3 postTM = pNewObject->GetNodeTM(0);
+		decomp_affine(postTM, &parts);
+		tstring posStr2 = _T("[") + std::to_wstring(parts.t.x) + _T(",");
+		posStr2 += std::to_wstring(parts.t.y) + _T(",");
+		posStr2 += std::to_wstring(parts.t.z) + _T("]");
+		QuatToEuler(parts.q, xyz);
+		tstring rotStr2 = _T("[") + std::to_wstring(RadToDeg(xyz[0])) + _T(",");
+		rotStr2 += std::to_wstring(RadToDeg(xyz[1])) + _T(",");
+		rotStr2 += std::to_wstring(RadToDeg(xyz[2])) + _T("]");
+		tstring sclStr2 = _T("[") + std::to_wstring(parts.k.x) + _T(",");
+		sclStr2 += std::to_wstring(parts.k.y) + _T(",");
+		sclStr2 += std::to_wstring(parts.k.z) + _T("]");
+
+		LogOutput(_T("--------------"));
+		LogOutput(StringToWString(node->name));
+		LogOutput(posStr1 + _T("->") + posStr2);
+		LogOutput(rotStr1 + _T("->") + rotStr2);
+		LogOutput(sclStr1 + _T("->") + sclStr2);
+	}
+
+	if (node->has_mesh_gpu_instancing) {
+		std::vector<Point3> posList;
+		std::vector<Quat> rotList;
+		std::vector<Point3> sclList;
+		cgltf_mesh_gpu_instancing* inst = &node->mesh_gpu_instancing;
+		for (int xx = 0; xx < inst->attributes_count; xx++) {
+			cgltf_attribute* attr = &inst->attributes[xx];
+			if (!stricmp(attr->name, "TRANSLATION")) {
+				cgltf_accessor* acc = attr->data;
+				std::vector<float> tList;
+				GetDataList(tList, acc);
+				for (auto x = tList.begin(); x < tList.end(); x+=3) {
+					Point3 p(*x, *(x+ 1), *(x + 2));
+					posList.push_back(p);
+				}
+			}
+			if (!stricmp(attr->name, "ROTATION")) {
+				cgltf_accessor* acc = attr->data;
+				std::vector<float> rList;
+				GetDataList(rList, acc);
+				for (auto x = rList.begin(); x < rList.end(); x += 4) {
+					Quat p(*x, *(x + 1), *(x + 2), *(x + 3));
+					rotList.push_back(p);
+				}
+			}
+			if (!stricmp(attr->name, "SCALE")) {
+				cgltf_accessor* acc = attr->data;
+				std::vector<float> sList;
+				GetDataList(sList, acc);
+				for (auto x = sList.begin(); x < sList.end(); x += 3) {
+					Point3 p(*x, *(x + 1), *(x + 2));
+					sclList.push_back(p);
+				}
+			}
+		}
+
+		for (UINT xx = 0; xx < posList.size(); xx++) {
+			Matrix3 tm;
+			tm.IdentityMatrix();
+			if (xx < rotList.size()) tm.SetRotate(rotList.at(xx));
+			if (xx < sclList.size()) tm.PreScale(sclList.at(xx));
+			tm.SetTrans(posList.at(xx) * m_scale);
+			if (targetParent)
+				tm = tm * targetParent->GetNodeTM(m_time);
+			else
+				tm = tm * YupTM;
+
+			if (xx == 0) {
+				pNewObject->SetNodeTM(m_time, tm);
+			}
+			else {
+				INode *pNode = GetCOREInterface()->CreateObjectNode(pNewObject->GetObjectRef());
+				pNode->SetNodeTM(m_time, tm);
+
+				if (pNewObject->GetMtl())
+					pNode->SetMtl(pNewObject->GetMtl());
+				else
+					pNode->SetWireColor(RGB(128, 128, 128));
+
+			}
+		}
+	}
+	//Matrix3 tmm = tm * YupTM;
+
+	cgltf_extension* ext = node->extensions;
+	for (int cnt = 0; cnt < node->extensions_count; cnt++, ext++) {
+		char* name = ext->name;
+		char* data = ext->data;
+		if (!stricmp(name, "KHR_physics_rigid_bodies"))
+			CreateRigidTable(pNewObject, data);
+	}
+
+	for (int ch = 0; ch < node->children_count; ch++) {
+		CreateNodeInfosRec(node->children[ch], pNewObject);
+	}
+}
+
