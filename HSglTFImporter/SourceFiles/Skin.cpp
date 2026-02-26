@@ -4,7 +4,7 @@
 #include "HSglTFImporter.h"
 
 //======================================================================
-// Skin割り当て
+// Assign Skin
 //======================================================================
 void glTFImporter_Core::SetSkin(cgltf_node *node)
 {
@@ -74,7 +74,7 @@ void glTFImporter_Core::SetSkin(cgltf_node *node)
 		}
 	}
 
-	// ウエイト割り当て
+	// Weight
 	std::vector<Point4>::iterator pb = boneIDList.begin();
 	std::vector<Point4>::iterator pw = weightList.begin();
 	int numVert = weightList.size();

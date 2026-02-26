@@ -61,7 +61,7 @@
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>.\;.\include;$(ADSK_3DSMAX_SDK_2026)\include;$(ADSK_3DSMAX_SDK_2025)\include\Geom;$(ADSK_3DSMAX_SDK_2025)\samples\modifiers\bonesdef;$(ADSK_3DSMAX_SDK_2025)\samples\modifiers\morpher;$(ADSK_3DSMAX_SDK_2025)\howto\utilities\customattribute;F:\cgltf\cgltf-1.12b;F:\draco\draco-master\src;F:\jsoncpp-master\include;;F:\libwebp-main\src;F:\KTX-Software\lib\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\;.\include;$(ADSK_3DSMAX_SDK_2026)\include;$(ADSK_3DSMAX_SDK_2026)\include\Geom;$(ADSK_3DSMAX_SDK_2026)\samples\modifiers\bonesdef;$(ADSK_3DSMAX_SDK_2026)\samples\modifiers\morpher;$(ADSK_3DSMAX_SDK_2026)\howto\utilities\customattribute;..\3rd_Party_Products</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_WINDOWS;_DEBUG;DRACO_ENABLED;EXT_PROP_ANIM;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
@@ -89,7 +89,7 @@
       <AdditionalDependencies>odbc32.lib;odbccp32.lib;comctl32.lib;shlwapi.lib;bmm.lib;core.lib;geom.lib;gfx.lib;mesh.lib;maxutil.lib;maxscrpt.lib;gup.lib;paramblk2.lib;MNMath.lib;bonesDef.lib;assetmanagement.lib;Morpher.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>C:\Program Files\Autodesk\3ds Max 2026\Plugins\HSglTFImporter.dli</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>$(ADSK_3DSMAX_SDK_2026)\lib\x64\Release;$(ADSK_3DSMAX_SDK_2025)\samples\modifiers\morpher\Lib\x64\Release;.\libraries\vs2019\Debug;F:\KTX-Software\lib</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ADSK_3DSMAX_SDK_2026)\lib\x64\Release;$(ADSK_3DSMAX_SDK_2025)\samples\modifiers\morpher\Lib\x64\Release;..\3rd_Party_Products</AdditionalLibraryDirectories>
       <ModuleDefinitionFile>.\HSglTFImporter.def</ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>.\Hybrid2026/HSglTFImporter.pdb</ProgramDatabaseFile>
@@ -116,7 +116,7 @@
     <ClCompile>
       <AdditionalOptions>/LD  %(AdditionalOptions)</AdditionalOptions>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
-      <AdditionalIncludeDirectories>.\;.\include;$(ADSK_3DSMAX_SDK_2026)\include;$(ADSK_3DSMAX_SDK_2025)\include\Geom;$(ADSK_3DSMAX_SDK_2025)\samples\modifiers\bonesdef;$(ADSK_3DSMAX_SDK_2025)\samples\modifiers\morpher;$(ADSK_3DSMAX_SDK_2025)\howto\utilities\customattribute;F:\cgltf\cgltf-1.12b;F:\draco\draco-master\src;F:\jsoncpp-master\include;F:\jsoncpp-master\include;F:\libwebp-main\src;F:\KTX-Software\lib\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\;.\include;$(ADSK_3DSMAX_SDK_2026)\include;$(ADSK_3DSMAX_SDK_2025)\include\Geom;$(ADSK_3DSMAX_SDK_2025)\samples\modifiers\bonesdef;$(ADSK_3DSMAX_SDK_2025)\samples\modifiers\morpher;$(ADSK_3DSMAX_SDK_2025)\howto\utilities\customattribute;..\3rd_Party_Products</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>NDEBUG;_WINDOWS;_USRDLL;DRACO_ENABLED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
@@ -140,7 +140,7 @@
       <AdditionalDependencies>odbc32.lib;odbccp32.lib;comctl32.lib;shlwapi.lib;bmm.lib;core.lib;geom.lib;gfx.lib;mesh.lib;maxutil.lib;maxscrpt.lib;gup.lib;paramblk2.lib;MNMath.lib;bonesDef.lib;assetmanagement.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>C:\Program Files\Autodesk\3ds Max 2026\Plugins\HSglTFImporter.dli</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>$(ADSK_3DSMAX_SDK_2026)\lib\x64\Release;$(ADSK_3DSMAX_SDK_2025)\samples\modifiers\morpher\Lib\x64\Release;.\libraries\vs2019\Release</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ADSK_3DSMAX_SDK_2026)\lib\x64\Release;$(ADSK_3DSMAX_SDK_2025)\samples\modifiers\morpher\Lib\x64\Release;..\3rd_Party_Products</AdditionalLibraryDirectories>
       <ModuleDefinitionFile>.\HSglTFImporter.def</ModuleDefinitionFile>
       <ProgramDatabaseFile>.\Release2026/HSglTFImporter.pdb</ProgramDatabaseFile>
       <SubSystem>Windows</SubSystem>
@@ -152,7 +152,8 @@
       <TargetMachine>MachineX64</TargetMachine>
     </Link>
     <PostBuildEvent>
-      <Command>copy "C:\Program Files\Autodesk\3ds Max 2026\plugins\HSglTFImporter.dli" "F:\devel\glTFPluginInstaller\Files\max2026\HSglTFImporter.dli"</Command>
+      <Command>
+      </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>

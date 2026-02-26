@@ -1,3 +1,5 @@
+//======================================================================
+//======================================================================
 
 
 #include "HSglTFImporter.h"
@@ -12,6 +14,8 @@ static int Total_Skin = 0;
 static int Total_Morph = 0;
 static int Physic_Morph = 0;
 
+//======================================================================
+//======================================================================
 INT_PTR CALLBACK HSglTFProgressDlgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
 
 	//TCHAR buf[MAX_PATH];
@@ -33,6 +37,8 @@ INT_PTR CALLBACK HSglTFProgressDlgProc(HWND hWnd, UINT message, WPARAM wParam, L
 	return 0;
 }
 
+//======================================================================
+//======================================================================
 void OpenProgreessDlg(cgltf_data* m_glTF_data)
 {
 	Total_Node = m_glTF_data->nodes_count;
@@ -45,8 +51,8 @@ void OpenProgreessDlg(cgltf_data* m_glTF_data)
 	hProgressWnd = ::CreateDialogParam(hInstance, MAKEINTRESOURCE(IDD_PROGRESS_DLG), GetActiveWindow(), HSglTFProgressDlgProc, (LPARAM)NULL);
 }
 
-
-
+//======================================================================
+//======================================================================
 TCHAR *GetProgressStr(void)
 {
 	static TSTR progSTr[] = {
@@ -71,7 +77,10 @@ TCHAR *GetProgressStr(void)
 	return ProgressBuf;
 }
 
-void SetNodeImportStatus(int Count) {
+//======================================================================
+//======================================================================
+void SetNodeImportStatus(int Count)
+{
 	switch (Count) {
 	case 0:	SendMessage(GetDlgItem(hProgressWnd, IDC_NODE_STATE), WM_SETTEXT, 0, (LPARAM)_T("InProgress")); break;
 	case -1: {
@@ -82,7 +91,11 @@ void SetNodeImportStatus(int Count) {
 	default:SendMessage(GetDlgItem(hProgressWnd, IDC_NODE_COUNT), WM_SETTEXT, 0, (LPARAM)GetProgressStr()); break;
 	}
 }
-void SetMtlImportStatus(int Count) {
+
+//======================================================================
+//======================================================================
+void SetMtlImportStatus(int Count)
+{
 	switch (Count) {
 	case 0:	SendMessage(GetDlgItem(hProgressWnd, IDC_MTL_STATE), WM_SETTEXT, 0, (LPARAM)_T("InProgress")); break;
 	case -1: {
@@ -104,7 +117,11 @@ void SetTexImportStatus(int Count) {
 	default:SendMessage(GetDlgItem(hProgressWnd, IDC_TEX_COUNT), WM_SETTEXT, 0, (LPARAM)GetProgressStr()); break;
 	}
 }
-void SetAnimImportStatus(int Count) {
+
+//======================================================================
+//======================================================================
+void SetAnimImportStatus(int Count)
+{
 	switch (Count) {
 	case 0:	SendMessage(GetDlgItem(hProgressWnd, IDC_ANIM_STATE), WM_SETTEXT, 0, (LPARAM)_T("InProgress")); break;
 	case -1: {
@@ -126,7 +143,11 @@ void SetSkinImportStatus(int Count) {
 	default:SendMessage(GetDlgItem(hProgressWnd, IDC_SKIN_COUNT), WM_SETTEXT, 0, (LPARAM)GetProgressStr()); break;
 	}
 }
-void SetPhysicImportStatus(int Count) {
+
+//======================================================================
+//======================================================================
+void SetPhysicImportStatus(int Count)
+{
 	switch (Count) {
 	case 0:	SendMessage(GetDlgItem(hProgressWnd, IDC_PHYSIC_STATE), WM_SETTEXT, 0, (LPARAM)_T("InProgress")); break;
 	case -1: {

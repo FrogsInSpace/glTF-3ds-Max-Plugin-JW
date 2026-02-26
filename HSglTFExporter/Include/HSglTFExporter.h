@@ -62,7 +62,7 @@
 #include <CustAttrib.h>
 #include <XRef\iXrefMaterial.h>
 
-#include <tiny_gltf.h>
+#include <tinygltf/tiny_gltf.h>
 
 #include "resource.h"
 #include "MimeTypes.h"

@@ -61,7 +61,7 @@
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>.\;.\include;$(ADSK_3DSMAX_SDK_2026)\include;$(ADSK_3DSMAX_SDK_2025)\modifiers\bonesdef;$(ADSK_3DSMAX_SDK_2025)\include\geom;$(ADSK_3DSMAX_SDK_2025)\samples\modifiers\morpher;F:\tinygltf\tinygltf-master;F:\draco\draco-master\src;F:\libwebp-main\src;F:\KTX-Software\lib\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\;.\include;$(ADSK_3DSMAX_SDK_2026)\include;$(ADSK_3DSMAX_SDK_2026)\modifiers\bonesdef;$(ADSK_3DSMAX_SDK_2026)\include\geom;$(ADSK_3DSMAX_SDK_2026)\samples\modifiers\morpher;..\3rd_Party_Products;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_WINDOWS;_DEBUG;ENABLE_BUILD_WITH_DRACO;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
@@ -89,7 +89,7 @@
       <AdditionalDependencies>odbc32.lib;odbccp32.lib;comctl32.lib;bmm.lib;core.lib;geom.lib;gfx.lib;mesh.lib;maxutil.lib;maxscrpt.lib;gup.lib;paramblk2.lib;MNMath.lib;bonesDef.lib;Shlwapi.lib;assetmanagement.lib;iGame.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>C:\Program Files\Autodesk\3ds Max 2026\Plugins\HSglTFExporter.dle</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>$(ADSK_3DSMAX_SDK_2026)\lib\x64\Release;$(ADSK_3DSMAX_SDK_2025)\samples\modifiers\morpher\Lib\x64\Release;.\libraries\vs2019\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ADSK_3DSMAX_SDK_2026)\lib\x64\Release;$(ADSK_3DSMAX_SDK_2026)\samples\modifiers\morpher\Lib\x64\Release;..\3rd_Party_Products;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ModuleDefinitionFile>.\HSglTFExporter.def</ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>.\Hybrid2026/HSglTFExporter.pdb</ProgramDatabaseFile>
@@ -116,7 +116,7 @@
     <ClCompile>
       <AdditionalOptions>/LD  %(AdditionalOptions)</AdditionalOptions>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
-      <AdditionalIncludeDirectories>.\;.\include;$(ADSK_3DSMAX_SDK_2026)\include;$(ADSK_3DSMAX_SDK_2025)\modifiers\bonesdef;$(ADSK_3DSMAX_SDK_2025)\include\geom;$(ADSK_3DSMAX_SDK_2025)\samples\modifiers\morpher;F:\tinygltf\tinygltf-master;F:\draco\draco-master\src;F:\libwebp-main\src;F:\KTX-Software\lib\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\;.\include;$(ADSK_3DSMAX_SDK_2026)\include;$(ADSK_3DSMAX_SDK_2026)\modifiers\bonesdef;$(ADSK_3DSMAX_SDK_2026)\include\geom;$(ADSK_3DSMAX_SDK_2026)\samples\modifiers\morpher;..\3rd_Party_Products;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>NDEBUG;_WINDOWS;_USRDLL;ENABLE_BUILD_WITH_DRACO;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
@@ -141,7 +141,7 @@
       <AdditionalDependencies>odbc32.lib;odbccp32.lib;comctl32.lib;bmm.lib;core.lib;geom.lib;gfx.lib;mesh.lib;maxutil.lib;maxscrpt.lib;gup.lib;paramblk2.lib;MNMath.lib;bonesDef.lib;Shlwapi.lib;assetmanagement.lib;iGame.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>C:\Program Files\Autodesk\3ds Max 2026\Plugins\HSglTFExporter.dle</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>$(ADSK_3DSMAX_SDK_2026)\lib\x64\Release;$(ADSK_3DSMAX_SDK_2025)\samples\modifiers\morpher\Lib\x64\Release;.\libraries\vs2019\Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ADSK_3DSMAX_SDK_2026)\lib\x64\Release;$(ADSK_3DSMAX_SDK_2026)\samples\modifiers\morpher\Lib\x64\Release;..\3rd_Party_Products;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ModuleDefinitionFile>.\HSglTFExporter.def</ModuleDefinitionFile>
       <ProgramDatabaseFile>.\Release2026/HSglTFExporter.pdb</ProgramDatabaseFile>
       <SubSystem>Windows</SubSystem>
@@ -153,7 +153,8 @@
       <TargetMachine>MachineX64</TargetMachine>
     </Link>
     <PostBuildEvent>
-      <Command>copy "C:\Program Files\Autodesk\3ds Max 2026\plugins\HSglTFExporter.dle" "F:\devel\glTFPluginInstaller\Files\max2026\HSglTFExporter.dle"</Command>
+      <Command>
+      </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>

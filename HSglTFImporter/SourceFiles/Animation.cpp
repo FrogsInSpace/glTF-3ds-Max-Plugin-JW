@@ -1,4 +1,7 @@
-﻿
+﻿//======================================================================
+//
+//======================================================================
+
 #include "HSglTFImporter.h"
 #include <istdplug.h>
 #include "define.h"
@@ -6,7 +9,7 @@
 Control* ConvertFloatToColorController(Control* pSrcC, UINT ch);
 
 //======================================================================
-// 指定ノードのアニメーションチャンネルリスト(TRS)を構築
+// Create (TRS) animation channel list of specified node
 //======================================================================
 BOOL glTFImporter_Core::FindAnimationChannels(cgltf_node *node, cgltf_animation *animation, std::vector<size_t> &ChannelList)
 {
@@ -24,7 +27,7 @@ BOOL glTFImporter_Core::FindAnimationChannels(cgltf_node *node, cgltf_animation 
 }
 
 //======================================================================
-// 指定ノードのアニメーションチャンネルリストを構築
+// Create animation channel list of specified material
 //======================================================================
 BOOL glTFImporter_Core::FindMtlAnimationChannels(cgltf_material* mtl, cgltf_animation* animation, std::vector<size_t>& ChannelList)
 {
@@ -55,7 +58,7 @@ BOOL glTFImporter_Core::FindMtlAnimationChannels(cgltf_material* mtl, cgltf_anim
 }
 
 //======================================================================
-// 位置コントローラのキーフレームリストを作る
+// Create position controler key frame list
 //======================================================================
 void glTFImporter_Core::GetPosAnimKeyFrameList(cgltf_animation_sampler *sampler, std::map<TimeValue, AnimKeyInfo> &PosKeyList)
 {
@@ -101,7 +104,7 @@ void glTFImporter_Core::GetPosAnimKeyFrameList(cgltf_animation_sampler *sampler,
 	}
 }
 //======================================================================
-// 回転コントローラのキーフレームリストを作る
+// Create rotation controler key frame list
 //======================================================================
 void glTFImporter_Core::GetRotAnimKeyFrameList(cgltf_animation_sampler *sampler, std::map<TimeValue, AnimKeyInfo> &RotKeyList)
 {
@@ -150,7 +153,7 @@ void glTFImporter_Core::GetRotAnimKeyFrameList(cgltf_animation_sampler *sampler,
 	}
 }
 //======================================================================
-// カラー（）コントローラのキーフレームリストを作る
+// Create color controler key frame list
 //======================================================================
 void glTFImporter_Core::GetClr3AnimKeyFrameList(cgltf_animation_sampler* sampler, std::map<TimeValue, AnimKeyInfo>& PosKeyList)
 {
@@ -197,7 +200,7 @@ void glTFImporter_Core::GetClr3AnimKeyFrameList(cgltf_animation_sampler* sampler
 }
 
 //======================================================================
-// カラー（alpha）コントローラのキーフレームリストを作る
+// Create clor+alpha controler key frame list
 //======================================================================
 void glTFImporter_Core::GetClr4AnimKeyFrameList(cgltf_animation_sampler* sampler, std::map<TimeValue, AnimKeyInfo>& PosKeyList)
 {
@@ -246,8 +249,9 @@ void glTFImporter_Core::GetClr4AnimKeyFrameList(cgltf_animation_sampler* sampler
 		}
 	}
 }
+
 //======================================================================
-// 実数（float）コントローラのキーフレームリストを作る
+// Create float controler key frame list
 //======================================================================
 void glTFImporter_Core::GetFloatAnimKeyFrameList(cgltf_animation_sampler* sampler, std::map<TimeValue, AnimKeyInfo>& FloatKeyList)
 {
@@ -284,7 +288,9 @@ void glTFImporter_Core::GetFloatAnimKeyFrameList(cgltf_animation_sampler* sample
 		}
 	}
 }
+
 //======================================================================
+// Create time & key info list from Key Frame List 
 //======================================================================
 void glTFImporter_Core::GetPoint2AnimKeyFrameList(cgltf_animation_sampler* sampler, std::map<TimeValue, AnimKeyInfo>& Point2KeyList)
 {
@@ -324,10 +330,10 @@ void glTFImporter_Core::GetPoint2AnimKeyFrameList(cgltf_animation_sampler* sampl
 			p += 2;
 		}
 	}
-
 }
 
 //======================================================================
+// Create float controler from Key Frame List
 //======================================================================
 Control* glTFImporter_Core::CreateFloatController(const std::map<TimeValue, AnimKeyInfo> &KeyList, float scale)
 {
@@ -343,6 +349,7 @@ Control* glTFImporter_Core::CreateFloatController(const std::map<TimeValue, Anim
 	return pFloatC;
 }
 //======================================================================
+// Create color controler from Key Frame List
 //======================================================================
 Control* glTFImporter_Core::CreateColorController(const std::map<TimeValue, AnimKeyInfo>& KeyList, cgltf_type type, Control* pOriginalC)
 {
@@ -371,9 +378,8 @@ Control* glTFImporter_Core::CreateColorController(const std::map<TimeValue, Anim
 	return pClrC;
 }
 
-
-
 //======================================================================
+// Create XYZ controler from Key Frame List
 //======================================================================
 void glTFImporter_Core::SetXYZController(Control *pCtrl, cgltf_interpolation_type InterpType, TimeValue start)
 {
@@ -441,7 +447,9 @@ void glTFImporter_Core::SetXYZController(Control *pCtrl, cgltf_interpolation_typ
 		//pIkeyZCrl->GetKey(0, &Key);
 	}
 }
+
 //======================================================================
+// Set Base color controller
 //======================================================================
 void glTFImporter_Core::SetBaseColorController(Mtl* pMtl, Control* pCtrl, cgltf_interpolation_type InterpType, TimeValue start)
 {
@@ -504,6 +512,7 @@ void glTFImporter_Core::SetBaseColorController(Mtl* pMtl, Control* pCtrl, cgltf_
 	}
 }
 //======================================================================
+// Set Normal scale controller
 //======================================================================
 void glTFImporter_Core::SetNrmScaleController(Mtl* pMtl, Control* pCtrl, cgltf_interpolation_type InterpType, TimeValue start)
 {
@@ -545,6 +554,7 @@ void glTFImporter_Core::SetNrmScaleController(Mtl* pMtl, Control* pCtrl, cgltf_i
 }
 
 //======================================================================
+// Set vplume thivknress controller
 //======================================================================
 void glTFImporter_Core::SetVolumeThicknessController(Mtl* pMtl, Control* pCtrl, cgltf_interpolation_type InterpType, TimeValue start)
 {
@@ -590,6 +600,7 @@ void glTFImporter_Core::SetVolumeThicknessController(Mtl* pMtl, Control* pCtrl, 
 }
 
 //======================================================================
+// Set vplume distance controller
 //======================================================================
 void glTFImporter_Core::SetVolumeDistanceController(Mtl* pMtl, Control* pCtrl, cgltf_interpolation_type InterpType, TimeValue start)
 {
@@ -633,7 +644,9 @@ void glTFImporter_Core::SetVolumeDistanceController(Mtl* pMtl, Control* pCtrl, c
 	else if (pMtl->ClassID() == OpenPBRMaterialID) {
 	}
 }
+
 //======================================================================
+// Set vplume color controller
 //======================================================================
 void glTFImporter_Core::SetVolumeColorController(Mtl* pMtl, Control* pCtrl, cgltf_interpolation_type InterpType, TimeValue start)
 {
@@ -683,6 +696,7 @@ void glTFImporter_Core::SetVolumeColorController(Mtl* pMtl, Control* pCtrl, cglt
 }
 
 //======================================================================
+// Set transmission controller
 //======================================================================
 void glTFImporter_Core::SetTransmissionController(Mtl* pMtl, Control* pCtrl, cgltf_interpolation_type InterpType, TimeValue start)
 {
@@ -726,7 +740,9 @@ void glTFImporter_Core::SetTransmissionController(Mtl* pMtl, Control* pCtrl, cgl
 		pBlock->SetControllerByID(opbr_transmission_weight, 0, pCtrl);
 	}
 }
+
 //======================================================================
+// Set metal scale controller
 //======================================================================
 void glTFImporter_Core::SetMetalScaleController(Mtl* pMtl, Control* pCtrl, cgltf_interpolation_type InterpType, TimeValue start)
 {
@@ -766,6 +782,7 @@ void glTFImporter_Core::SetMetalScaleController(Mtl* pMtl, Control* pCtrl, cgltf
 	}
 }
 //======================================================================
+// Set metal roughness controller
 //======================================================================
 void glTFImporter_Core::SetRoughScaleController(Mtl* pMtl, Control* pCtrl, cgltf_interpolation_type InterpType, TimeValue start)
 {
@@ -811,7 +828,9 @@ void glTFImporter_Core::SetRoughScaleController(Mtl* pMtl, Control* pCtrl, cgltf
 		pBlock->SetControllerByID(opbr_specular_roughness, 0, pCtrl);
 	}
 }
+
 //======================================================================
+// Set occulusion strength controller
 //======================================================================
 void glTFImporter_Core::SetOccStrengthController(Mtl* pMtl, Control* pCtrl, cgltf_interpolation_type InterpType, TimeValue start)
 {
@@ -840,7 +859,9 @@ void glTFImporter_Core::SetOccStrengthController(Mtl* pMtl, Control* pCtrl, cglt
 	else if (pMtl->ClassID() == OpenPBRMaterialID) {
 	}
 }
+
 //======================================================================
+// Set alpha cutoff controller
 //======================================================================
 void glTFImporter_Core::SetAlphaCutOffController(Mtl* pMtl, Control* pCtrl, cgltf_interpolation_type InterpType, TimeValue start)
 {
@@ -910,7 +931,9 @@ void glTFImporter_Core::SetAlphaCutOffController(Mtl* pMtl, Control* pCtrl, cglt
 	else if (pMtl->ClassID() == OpenPBRMaterialID) {
 	}
 }
+
 //======================================================================
+// Set emissive color controller
 //======================================================================
 void glTFImporter_Core::SetEmissiveColorController(Mtl* pMtl, Control* pCtrl, cgltf_interpolation_type InterpType, TimeValue start)
 {
@@ -952,7 +975,9 @@ void glTFImporter_Core::SetEmissiveColorController(Mtl* pMtl, Control* pCtrl, cg
 		pBlock->SetControllerByID(opbr_emission_color, 0, pCtrl);
 	}
 }
+
 //======================================================================
+// Set emissive strength controller
 //======================================================================
 void glTFImporter_Core::SetEmissiveStrengthController(Mtl* pMtl, Control* pCtrl, cgltf_interpolation_type InterpType, TimeValue start)
 {
@@ -990,7 +1015,9 @@ void glTFImporter_Core::SetEmissiveStrengthController(Mtl* pMtl, Control* pCtrl,
 	else if (pMtl->ClassID() == OpenPBRMaterialID) {
 	}
 }
+
 //======================================================================
+// Set IOR controller
 //======================================================================
 void glTFImporter_Core::SetIORController(Mtl* pMtl, Control* pCtrl, cgltf_interpolation_type InterpType, TimeValue start)
 {
@@ -1039,6 +1066,7 @@ void glTFImporter_Core::SetIORController(Mtl* pMtl, Control* pCtrl, cgltf_interp
 }
 
 //======================================================================
+// Set Iridescence Factor controller
 //======================================================================
 void glTFImporter_Core::SetIridescenceFactorController(Mtl* pMtl, Control* pCtrl, cgltf_interpolation_type InterpType, TimeValue start)
 {
@@ -1075,7 +1103,9 @@ void glTFImporter_Core::SetIridescenceFactorController(Mtl* pMtl, Control* pCtrl
 		return;
 	}
 }
+
 //======================================================================
+// Set Iridescence IOR controller
 //======================================================================
 void glTFImporter_Core::SetIridescenceIorController(Mtl* pMtl, Control* pCtrl, cgltf_interpolation_type InterpType, TimeValue start)
 {
@@ -1109,14 +1139,15 @@ void glTFImporter_Core::SetIridescenceIorController(Mtl* pMtl, Control* pCtrl, c
 	else if (pMtl->ClassID() == OpenPBRMaterialID) {
 	}
 
-
 	IParamBlock2* pBlock = NULL;
 	GetCustAttrPBlock(pMtl, tstring(_T("Iridescence")), pBlock);
 	if (pBlock) {
 		pBlock->SetControllerByID(3, 0, pCtrl);
 	}
 }
+
 //======================================================================
+// Set Iridescence max controller
 //======================================================================
 void glTFImporter_Core::SetIridescenceMaxController(Mtl* pMtl, Control* pCtrl, cgltf_interpolation_type InterpType, TimeValue start)
 {
@@ -1158,7 +1189,9 @@ void glTFImporter_Core::SetIridescenceMaxController(Mtl* pMtl, Control* pCtrl, c
 		pBlock->SetControllerByID(5, 0, pCtrl);
 	}
 }
+
 //======================================================================
+// Set Iridescence min controller
 //======================================================================
 void glTFImporter_Core::SetIridescenceMinController(Mtl* pMtl, Control* pCtrl, cgltf_interpolation_type InterpType, TimeValue start)
 {
@@ -1391,7 +1424,6 @@ void glTFImporter_Core::SetDispersionController(Mtl* pMtl, Control* pCtrl, cgltf
 	}
 	else if (pMtl->ClassID() == OpenPBRMaterialID) {
 	}
-
 }
 
 //======================================================================
@@ -1835,7 +1867,7 @@ void glTFImporter_Core::SetUVRotateController(Mtl* pMtl, Control* pRotWC, cgltf_
 }
 
 //======================================================================
-// スケールコントローラのキーフレームリストを作る
+// Create Key Frame List of scale controller
 //======================================================================
 void glTFImporter_Core::GetSclAnimKeyFrameList(cgltf_animation_sampler *sampler, std::map<TimeValue, AnimKeyInfo> &SclKeyList)
 {
@@ -1881,8 +1913,8 @@ void glTFImporter_Core::GetSclAnimKeyFrameList(cgltf_animation_sampler *sampler,
 }
 
 //======================================================================
-// アニメーション割り当て
-// ※親階層からアニメーション割り当て
+// Assign animation
+// Set animation from parent hierachey
 //======================================================================
 void glTFImporter_Core::SetAnimationRec(INode *pNode, int animIdx)
 {
@@ -1890,9 +1922,6 @@ void glTFImporter_Core::SetAnimationRec(INode *pNode, int animIdx)
 	std::map<TimeValue, AnimKeyInfo> RotKeyList;
 	std::map<TimeValue, AnimKeyInfo> SclKeyList;
 	std::map<TimeValue, std::vector<float> > WeightKeyList;
-	//std::vector<tangentInfo> PosTanList;
-	//std::vector<tangentInfo> RotTanList;
-	//std::vector<tangentInfo> SclTanList;
 
 	cgltf_interpolation_type ScaleInterpType = cgltf_interpolation_type_linear;
 	cgltf_interpolation_type RotInterpType = cgltf_interpolation_type_linear;
@@ -2027,6 +2056,7 @@ void glTFImporter_Core::GetAnimatedNodeTable(void)
 }
 
 //======================================================================
+// float controller to color cohntroller
 //======================================================================
 Control* ConvertFloatToColorController(Control* pSrcC, UINT ch)
 {

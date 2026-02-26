@@ -26,8 +26,8 @@ cgltf_accessor* findTargetAttrAccesor(cgltf_morph_target *pr, const char *str)
 	return NULL;
 }
 //======================================================================
-// Weightコントローラのキーフレームリストを作る
-//======================================================================
+// Create Key Frame List of Weight controller
+//=====================================================================
 void glTFImporter_Core::GetWeightAnimKeyFrameList(cgltf_animation_sampler *sampler, std::map<TimeValue, std::vector<float> > &WeightKeyList, int weightCount)
 {
 	std::vector<float> KeyFrames;
@@ -180,17 +180,7 @@ void glTFImporter_Core::SetMorph(void)
 		}
 
 		MorphR3* pMorph = (MorphR3*)AddModifier(pNode, MR3_CLASS_ID);
-		//pMorph->markerName.AddName(_T("Ishani's Marker"));
-#if 0
-		int ss = pMorph->chanBank.size();
-		pMorph->Add100Channels();
-		for (int i = 0; i < targetNum; i++) {
-			INode *pTargetNode = morphTargetNode.at(i);
-			int refIDOffset = pMorph->GetRefIDOffset(i);
-			pMorph->ReplaceReference(101 + (i % 100) + refIDOffset, pTargetNode);
-			pMorph->chanBank[i].buildFromNode(pTargetNode);
-		}
-#else
+
 		GetCOREInterface()->SelectNode(pNode);
 		for (int i = 0; i < targetNum; i++) {
 			INode *pTargetNode = morphTargetNode.at(i);
@@ -207,7 +197,6 @@ void glTFImporter_Core::SetMorph(void)
 			ExecuteMAXScriptScript(ComStr);
 #endif;
 		}
-#endif
 
 		int wc = node->mesh->weights_count;
 		for (int i = 0; i < wc; i++) {
@@ -238,8 +227,7 @@ void glTFImporter_Core::SetMorph(void)
 
 
 //====================================================================
-// ベースメッシュの変形形状と一致するターゲット座標を調べてベース-ターゲットメッシュ面のマッピングを取り
-// 法線を設定する
+// Find the target position matches the base mesh shape and then set the normal of base target mesh
 //====================================================================
 #define EPS 0.0001f
 void CreateMorphVertMapTable(Modifier* pMorphMod, Mesh* pBaseMesh, MeshNormalSpec* pBaseNrmSpec, std::vector<std::vector<Point3> >& morphNormalMapList)
@@ -261,9 +249,6 @@ void CreateMorphVertMapTable(Modifier* pMorphMod, Mesh* pBaseMesh, MeshNormalSpe
 
 		INode* pTargetNode = mc.GetMorphTarget();
 		Mesh* pTargetMesh = &((TriObject*)(pTargetNode->GetObjectRef()))->mesh;
-		//BOOL deleteIt;
-		//TriObject* pTri = GetTriObjectFromNode(pTargetNode, 0, deleteIt);
-		//Mesh* pTargetMesh = &pTri->mesh;
 
 		std::map<int, Point3> normalMap;
 		normalMap.clear();

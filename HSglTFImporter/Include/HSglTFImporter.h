@@ -61,7 +61,9 @@ extern std::string UTF8toSjis(std::string srcUTF8);
 extern void LogOutput(const std::string& str, int pcs = 0);
 extern BOOL IsLogOut(void);
 
-#include "cgltf.h"
+#include <cgltf/cgltf-1.12b/cgltf.h>
+
+
 
 #define HS_APP_CODE 200
 

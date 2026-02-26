@@ -11,13 +11,28 @@
 #define KTX_API_STATIC // 静的ライブラリであることを明示
 #define KTX_API
 
-#include <ktx.h>
-#include <vkformat_enum.h>
+#include <KTX2/ktx.h>
+#include <KTX2/vkformat_enum.h>
 
-#pragma comment(lib, "ktx.lib")
-
-
-
+#if _MSC_VER >= 1930    // Visual Studio 2022 (v143)
+#ifdef NDEBUG
+#pragma comment(lib, "KTX2/lib/vs2022/Release/ktx.lib")
+#else
+#pragma comment(lib, "KTX2/lib/vs2022/Debug/ktx.lib")
+#endif
+#elif _MSC_VER >= 1920    // Visual Studio 2019 (v142)
+#ifdef NDEBUG
+#pragma comment(lib, "KTX2/lib/vs2019/Release/ktx.lib")
+#else
+#pragma comment(lib, "KTX2/lib/vs2019/Debug/ktx.lib")
+#endif
+#else    //
+#ifdef NDEBUG
+#pragma comment(lib, "KTX2/lib/vs2017/Release/ktx.lib")
+#else
+#pragma comment(lib, "KTX2/lib/vs2017/Debug/ktx.lib")
+#endif
+#endif
 
 //======================================================================
 //======================================================================

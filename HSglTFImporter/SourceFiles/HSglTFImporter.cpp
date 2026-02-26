@@ -1307,8 +1307,8 @@ BOOL glTFImporter_Core::ImportScene(void)
 }
 
 //======================================================================
-// accessorで指定されるデータ列を構築
-//======================================================================
+// Create data list specified by the accesor
+// =====================================================================
 void glTFImporter_Core::SetSparseData(std::vector<float>& retVal, cgltf_accessor* acc)
 {
 	if (!acc) return;
@@ -1410,7 +1410,7 @@ void glTFImporter_Core::SetSparseData(std::vector<float>& retVal, cgltf_accessor
 }
 
 //======================================================================
-// sparseで指定されるデータサイズに変換
+// Chane data size specified by the sparse
 //======================================================================
 BOOL glTFImporter_Core::GetDataList(std::vector<float>& retVal, cgltf_accessor* acc)
 {
@@ -1538,88 +1538,12 @@ BOOL glTFImporter_Core::GetDataList(std::vector<float>& retVal, cgltf_accessor* 
 		}
 	}
 
-/*
-	for (auto index: idx) {
-		float data[3];
-		memcpy(data, ptr, sizeof(float)*3);
-		dataList[index*3+0] = data[0];
-		dataList[index*3+1] = data[1];
-		dataList[index*3+2] = data[2];
-		ptr += sizeof(float) * 3;
-	}
-	*/
-
 	return TRUE;
 }
 
-
-
-
-#if 0
 //======================================================================
-// 指定Bitmapを持つBitmapTexを作成する
-//======================================================================
-BitmapTex *glTFImporter_Core::GetBitmapTex(const aiString &path)
-{
-	std::wstring fname;
-
-	// 埋め込み型(glb)の場合、ビットマップイメージをscneasset\imageフォルダにイメージファイル出力
-	const aiTexture *pTex = m_scene->GetEmbeddedTexture(path.C_Str());
-	if (pTex) {
-		int index = std::atoi(path.C_Str() + 1);
-		std::wstring imagePath = GetCOREInterface()->GetDir(APP_IMAGE_DIR);
-		std::wstring texFilePath = imagePath + _T("\\") + std::wstring(m_fullpath.stem()) + std::to_wstring(index);
-		if (pTex->mHeight == 0) {
-			unsigned int size = pTex->mWidth;
-			aiTexel *ptr = pTex->pcData;
-			std::wstring ext = StringToWString(pTex->achFormatHint);
-			fname = texFilePath + _T(".") + ext;
-
-			FILE *fp = _tfopen(fname.c_str(), _T("wb"));
-			fwrite(ptr, sizeof(char), size, fp);
-			fclose(fp);
-		}
-		else {
-			unsigned int h = pTex->mHeight;
-			unsigned int w = pTex->mWidth;
-			unsigned int size = h*w;
-			aiTexel *ptr = pTex->pcData;
-			std::wstring ext = StringToWString(pTex->achFormatHint);
-			fname = texFilePath + _T(".") + ext;
-
-			FILE *fp = _tfopen(fname.c_str(), _T("wb"));
-			fwrite(ptr, sizeof(char), size, fp);
-			fclose(fp);
-		}
-	}
-	else {
-		std::wstring texFilePath = StringToWString(path.C_Str());
-
-		fname = m_fullpath.parent_path().c_str() + std::wstring(_T("\\")) + texFilePath;
-	}
-
-
-	BitmapTex *pBitmap = NewDefaultBitmapTex();
-	pBitmap->GetUVGen()->SetCoordMapping(UVMAP_SCREEN_ENV);
-	pBitmap->GetUVGen()->SetTextureTiling(U_WRAP| V_WRAP);
-	pBitmap->GetUVGen()->InitSlotType(MAPSLOT_TEXTURE);
-	pBitmap->SetMapName(fname.c_str());
-	pBitmap->SetMtlFlag(MTL_TEX_DISPLAY_ENABLED, TRUE);
-	pBitmap->ActivateTexDisplay(TRUE);
-
-	return pBitmap;
-}
-
-//*******************************************************************
-//
-//
-//*******************************************************************
-
-#endif
-
-//======================================================================
-// モデファイアの割り当て
-//======================================================================
+// Attache the modfier
+// =====================================================================
 Modifier *AddModifier(INode* pNode, const Class_ID &CID)
 {
 	IDerivedObject *pDobj = NULL;
@@ -1640,6 +1564,7 @@ Modifier *AddModifier(INode* pNode, const Class_ID &CID)
 	return pMod;
 }
 //======================================================================
+// Attache the modfier
 //======================================================================
 void AddModifier(INode* pNode, Modifier* pMod)
 {
@@ -1659,8 +1584,7 @@ void AddModifier(INode* pNode, Modifier* pMod)
 
 }
 //======================================================================
-// 指定したモデファイアの取り出し
-// かかっていたらそのモデファイアを返す
+// Get specified modifier
 //======================================================================
 int FindModifier(INode* pNode, const Class_ID &CID, Modifier **pMod)
 {
@@ -1668,10 +1592,8 @@ int FindModifier(INode* pNode, const Class_ID &CID, Modifier **pMod)
 	Object* pObj = pNode->GetObjectRef();
 	if (!pObj) return NULL;
 
-	// 参照先が派生オブジェクトならばモデファイアあり
 	if (pObj->SuperClassID() == GEN_DERIVOB_CLASS_ID) {
 		IDerivedObject *pDerivedObject = static_cast<IDerivedObject*>(pObj);
-		// モデファイアスタック分ループ
 		for (int i = 0; i < pDerivedObject->NumModifiers(); i++) {
 			*pMod = pDerivedObject->GetModifier(i);
 			if ((*pMod)->ClassID() == CID) return i;
@@ -1777,7 +1699,7 @@ bool decode_unicode_escape_to_utf8(const std::string& src, std::string& dst) {
 }
 
 //======================================================================
-//	wstringをstringへ変換
+//	wstring to string
 //======================================================================
 std::string WStringToString(std::wstring oWString, int code)
 {
@@ -1809,13 +1731,10 @@ std::string UTF8toSjis(std::string srcUTF8)
 	//UTF8からUnicodeへ変換
 	MultiByteToWideChar(CP_UTF8, 0, srcUTF8.c_str(), srcUTF8.size() + 1, bufUnicode, lenghtUnicode);
 
-	//ShiftJISへ変換後の文字列長を得る
 	int lengthSJis = WideCharToMultiByte(CP_ACP, 0, bufUnicode, -1, NULL, 0, NULL, NULL);
 
-	//必要な分だけShiftJIS文字列のバッファを確保
 	char* bufShiftJis = new char[lengthSJis];
 
-	//UnicodeからShiftJISへ変換
 	WideCharToMultiByte(CP_ACP, 0, bufUnicode, lenghtUnicode + 1, bufShiftJis, lengthSJis, NULL, NULL);
 
 	std::string strSJis(bufShiftJis);
@@ -1827,7 +1746,7 @@ std::string UTF8toSjis(std::string srcUTF8)
 }
 
 //======================================================================
-//	stringをwstringへ変換
+//	string to wstring
 //======================================================================
 std::wstring StringToWString(const char *oStringOrg, int code)
 {
@@ -1858,35 +1777,16 @@ std::wstring StringToWString(const char *oStringOrg, int code)
 
 	return(oRet);
 }
-/*
-INode *CreateDummyNode(const TSTR &name)
-{
-	DummyObject *pObj = (DummyObject*)GetCOREInterface()->CreateInstance(HELPER_CLASS_ID, Class_ID(DUMMY_CLASS_ID, 0));
-	pObj->SetBox(Box3(Point3(-10, -10, -10), Point3(10, 10, 10)));
 
-	INode *pNode = GetCOREInterface()->CreateObjectNode(pObj);
-
-	Matrix3 tm(1);
-	pNode->SetNodeTM(0, tm);
-	pNode->Hide(TRUE);
-	pNode->SetName(name);
-
-	return pNode;
-}
-*/
 //---------------------------------------------------------
-// Node より TriObject を返す
+// Get TriObject form Node
 //---------------------------------------------------------
 TriObject* GetTriObjectFromNode(INode *pNode, TimeValue t, int &deleteIt)
 {
 	deleteIt = FALSE;
-	// ノードよりオブジェクトを取り出す
 	Object *pObj = pNode->EvalWorldState(t).obj;
-	// このオブジェクトが TriObject に変換可能か調べる(幾何オブジェクトは通常変換可能)
 	if (pObj->CanConvertToType(Class_ID(TRIOBJ_CLASS_ID, 0))) {
 		TriObject *pTri = (TriObject *)pObj->ConvertToType(t, Class_ID(TRIOBJ_CLASS_ID, 0));
-		// このオブジェクト(pObj)と ConvertToType() のオブジェクトのポインタ(pTri)が
-		// 等しくない場合は使用後に pTri は削除すること
 		if (pObj != pTri) deleteIt = TRUE;
 		return pTri;
 	}
@@ -1896,14 +1796,12 @@ TriObject* GetTriObjectFromNode(INode *pNode, TimeValue t, int &deleteIt)
 }
 
 //======================================================================
-// 指定されたスクリプトファイルを実行
-//======================================================================
+// Execute script
+//=====================================================================
 BOOL LaunchScript(tstring &script)
 {
 	std::filesystem::path fullpath = script;
 
-	//TCHAR comStr[1000];
-	//_stprintf_s(comStr, 1000, _T("fileIn @\"%s\""), script.c_str());
 	TSTR comStr;
 	comStr.printf(_T("fileIn @\"%s\""), script.c_str());
 #if MAX_RELEASE >= 24000
@@ -1916,7 +1814,7 @@ BOOL LaunchScript(tstring &script)
 }
 
 //======================================================================
-// pAnimのidx番目のIParamBlockを返す
+// Get idx-th IParamBlock from pAnim
 //======================================================================
 IParamBlock* GetParamBlock(Animatable* pAnim, int idx)
 {
@@ -1935,7 +1833,7 @@ IParamBlock* GetParamBlock(Animatable* pAnim, int idx)
 }
 
 //================================================================
-// 環境マップを設定
+// Set Environment Map
 //================================================================
 void SetEnvironmentMap(const tstring& mapName)
 {
@@ -1954,7 +1852,7 @@ void SetEnvironmentMap(const tstring& mapName)
 }
 
 //================================================================
-// File選択ダイアログを表示
+// File open dialog
 //================================================================
 BOOL GetFileName(HWND hWnd, tstring &ret, FileType type)
 {
@@ -1997,7 +1895,7 @@ BOOL GetFileName(HWND hWnd, tstring &ret, FileType type)
 }
 
 //================================================================
-//16進数文字からchar型に変換
+// HexToChar
 //================================================================
 TCHAR HexToChar(TCHAR first, TCHAR second)
 {
@@ -2026,7 +1924,7 @@ TCHAR HexToChar(TCHAR first, TCHAR second)
 }
 
 //================================================================
-//URLをデコードする
+// Decod the URL string
 //================================================================
 tstring urlDecode(tstring str)
 {
@@ -2065,4 +1963,3 @@ tstring urlDecode(tstring str)
 
 	return retStr;
 }
-

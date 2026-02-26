@@ -7,18 +7,33 @@
 
 #ifdef DRACO_ENABLED
 
-#pragma comment(lib, "draco.lib")
-
 #undef max
 #undef min
-//#include <cinttypes>
-//#include "draco/core/decoder_buffer.h"
-//#include "draco/compression/config/compression_shared.h"
 #include "draco/compression/decode.h"
-//#include "draco/compression/mesh/mesh_decoder.h"
+
+#if _MSC_VER >= 1930    // Visual Studio 2022 (v143)
+#ifdef NDEBUG
+#pragma comment(lib, "draco/lib/vs2022/Release/draco.lib")
+#else
+#pragma comment(lib, "draco/lib/vs2022/Debug/draco.lib")
+#endif
+#elif _MSC_VER >= 1920    // Visual Studio 2019 (v142)
+#ifdef NDEBUG
+#pragma comment(lib, "draco/lib/vs2019/Release/draco.lib")
+#else
+#pragma comment(lib, "draco/lib/vs2019/Debug/draco.lib")
+#endif
+#else    //
+#ifdef NDEBUG
+#pragma comment(lib, "draco/lib/vs2017/Release/draco.lib")
+#else
+#pragma comment(lib, "draco/lib/vs2017/Debug/draco.lib")
+#endif
+#endif
+
 
 //=======================================================================
-// 圧縮バッファよりメッシュを取り出し、構成面より頂点IDリストを作る
+// Create vertex ID list from compressed buffer
 //=======================================================================
 void GetDracoMeshIndexList(cgltf_buffer_view* bufferView, std::vector<float> &tbl)
 {

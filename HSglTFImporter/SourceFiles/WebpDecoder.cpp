@@ -1,17 +1,38 @@
+//===================================================================
+//
+//===================================================================
+
 #include "HSglTFImporter.h"
 #include <iostream>
 #include <fstream>
 
 #include "webp/decode.h"
-//#include <gamma.h>
 
-#pragma comment(lib, "libwebpdecoder.lib")
+#if _MSC_VER >= 1930    // Visual Studio 2022 (v143)
+#ifdef NDEBUG
+#pragma comment(lib, "webp/lib/vs2022/Release/libwebpdecoder.lib")
+#else
+#pragma comment(lib, "webp/lib/vs2022/Debug/libwebpdecoder.lib")
+#endif
+#elif _MSC_VER >= 1920    // Visual Studio 2019 (v142)
+#ifdef NDEBUG
+#pragma comment(lib, "webp/lib/vs2019/Release/libwebpdecoder.lib")
+#else
+#pragma comment(lib, "webp/lib/vs2019/Debug/libwebpdecoder.lib")
+#endif
+#else    //
+#ifdef NDEBUG
+#pragma comment(lib, "webp/lib/vs2017/Release/libwebpdecoder.lib")
+#else
+#pragma comment(lib, "webp/lib/vs2017/Debug/libwebpdecoder.lib")
+#endif
+#endif
+
 
 //===================================================================
 //===================================================================
 BOOL glTFImporter_Core::WebpDecode(const tstring &fname, tstring &retname)
 {
-    //uint8_t* data;
     size_t data_size;
     int width;
     int height;
@@ -24,7 +45,6 @@ BOOL glTFImporter_Core::WebpDecode(const tstring &fname, tstring &retname)
         , (std::istreambuf_iterator< char >())
     );
     file.close();
-
 
     int ret = WebPGetInfo(data.data(), data.size(), &width, &height);
 
