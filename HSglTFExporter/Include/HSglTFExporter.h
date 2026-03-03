@@ -1,17 +1,25 @@
-﻿#pragma once
+﻿/*
+ * Copyright (c) 2024-2026 The Khronos Group Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+ //**************************************************************************/
+ // AUTHOR: Satoshi Hayashi 
+ //***************************************************************************/
+
+#pragma once
 #pragma warning( disable: 4828 )
 
-//**************************************************************************/
-// Copyright (c) 1998-2018 Autodesk, Inc.
-// All rights reserved.
-// 
-//  Use of this software is subject to the terms of the Autodesk license 
-//  agreement provided at the time of installation or download, or which 
-//  otherwise accompanies this software in either electronic or hard copy form.
-//**************************************************************************/
-// DESCRIPTION: Includes for Plugins
-// AUTHOR: 
-//***************************************************************************/
 
 #ifndef NOMINMAX
 #define NOMINMAX
@@ -71,7 +79,7 @@
 //using namespace tinygltf;
 
 
-#define HS_GLTF_EXPORTER_VER (_T("1.56"))
+#define HS_GLTF_EXPORTER_VER (_T("1.57"))
 
 #define HSglTFExporter_CLASS_ID		Class_ID(0x38586030, 0x1b315b3e)
 #define HSglTF2Exporter_CLASS_ID	Class_ID(0x56337879, 0x5a732c12)

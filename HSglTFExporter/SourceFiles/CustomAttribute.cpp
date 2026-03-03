@@ -1,6 +1,23 @@
-﻿
-#include "HSglTFExporter.h"
+﻿/*
+ * Copyright (c) 2024-2026 The Khronos Group Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+ //**************************************************************************/
+ // AUTHOR: Satoshi Hayashi 
+ //***************************************************************************/
 
+#include "HSglTFExporter.h"
 
 int CheckValType(const std::string& str);
 
@@ -190,76 +207,6 @@ BOOL glTFExporter_Core::SetIridescenceParams(MtlBase *pMtl, IridescenceStruct &s
 	if (pC) if (pC->IsAnimated()) animated = TRUE;
 
 	return TRUE;
-
-
-
-/*
-	ICustAttribContainer* pContainer = pMtl->GetCustAttribContainer();
-	if (!pContainer) return FALSE;
-
-	BOOL found = FALSE;
-	for (int i = 0; i < pContainer->GetNumCustAttribs(); i++) {
-		CustAttrib* pAttr = pContainer->GetCustAttrib(i);
-		TSTR nn = pAttr->GetName();
-		if (pAttr->GetName() != TSTR(_T("Custom_Attributes"))) continue;
-
-		IParamBlock2* pParamBlk = pAttr->GetParamBlockByID(0);
-		if (pParamBlk == NULL) continue;
-		if (pParamBlk->GetParameterType(0) != TYPE_STRING) continue;
-		TCHAR* s = (TCHAR*)pParamBlk->GetStr(0, m_time);
-		if (tstring(s) != _T("Iridescence")) continue;
-
-		found = TRUE;
-		for (int x = 1; x < pParamBlk->NumParams(); x++) {
-			try {	// GetParamDef()、GetLocalName() でエラーになる場合があります
-				ParamID id = pParamBlk->IndextoID(x);
-				ParamDef def = pParamBlk->GetParamDef(id);
-				tstring s(pParamBlk->GetLocalName(id).data());
-				if (s == _T("enabled")) {
-					int val;
-					pParamBlk->GetValue(id, m_time, val, FOREVER);
-					if (val == 0) {
-						found = FALSE;
-						break;
-					}
-				}
-				if (s == _T("iridescenceFactor")) {
-					float val;
-					pParamBlk->GetValue(id, m_time, val, FOREVER);
-					str.factor = val;
-				}
-				if (s == _T("iridescenceIor")) {
-					float val;
-					pParamBlk->GetValue(id, m_time, val, FOREVER);
-					str.ior = val;
-				}
-				if (s == _T("iridescenceThicknessMinimum")) {
-					float val;
-					pParamBlk->GetValue(id, m_time, val, FOREVER);
-					str.minimum = val;
-				}
-				if (s == _T("iridescenceThicknessMaximum")) {
-					float val;
-					pParamBlk->GetValue(id, m_time, val, FOREVER);
-					str.maximum = val;
-				}
-				if (s == _T("iridescenceTexture")) {
-					Texmap* s = pParamBlk->GetTexmap(id, m_time);
-					str.texture = s;
-				}
-				if (s == _T("iridescenceThicknessTexture")) {
-					Texmap* s = pParamBlk->GetTexmap(id, m_time);
-					str.thicknessTexture = s;
-				}
-
-			}
-			catch (...) {}
-		}
-		break;
-	}
-
-	return found;
-*/
 }
 
 //==========================================================
@@ -691,7 +638,7 @@ BOOL glTFExporter_Core::CheckIfTextureIsUsed(MtlBase* pMtl)
 }
 
 //==========================================================
-// 文字列分割
+// Strung division
 //==========================================================
 std::vector<tstring> StripString(const tstring &s, TCHAR delim)
 {

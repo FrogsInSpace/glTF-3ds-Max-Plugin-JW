@@ -1,4 +1,21 @@
-﻿
+﻿/*
+ * Copyright (c) 2024-2026 The Khronos Group Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+ //**************************************************************************/
+ // AUTHOR: Satoshi Hayashi 
+ //***************************************************************************/
 
 #include "HSglTFExporter.h"
 #include <gamma.h>
@@ -322,12 +339,18 @@ int glTFExporter_Core::findTextureIndex(Texmap* pTex, const TSTR& fname, BOOL KT
 				texture.sampler = SetSampler(pTex);
 
 			if (mapName.find(_T(".webp")) != std::string::npos) {
+				texture.source = idx;
+				SetName(&texture, mapName.c_str());
+
 				tinygltf::Value::Object obj;
 				obj.insert(std::make_pair("source", tinygltf::Value((int)idx)));
 				tinygltf::Value val(obj);
 				texture.extensions.insert(std::make_pair("EXT_texture_webp", val));
 			}
 			else if (mapName.find(_T(".ktx2")) != std::string::npos) {
+				texture.source = idx;
+				SetName(&texture, mapName.c_str());
+
 				tinygltf::Value::Object obj;
 				obj.insert(std::make_pair("source", tinygltf::Value((int)idx)));
 				tinygltf::Value val(obj);

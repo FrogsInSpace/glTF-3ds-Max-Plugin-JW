@@ -1,21 +1,24 @@
-﻿
+﻿/*
+ * Copyright (c) 2024-2026 The Khronos Group Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+ //**************************************************************************/
+ // AUTHOR: Satoshi Hayashi 
+ //***************************************************************************/
+
 #include "HSglTFImporter.h"
-
-
-
-/*
-#define IDS_MATCACLASSNAME              10
-#define IDS_SIMPLE_CLASSNAME            13
-#define IDS_SIMPLECA                    15
-#define IDS_SWATCHCA                    16
-#define IDS_SWATCH_CLASSNAME            17
-#define IDS_NODECA                      20
-#define IDS_NODE_CLASSNAME              21
-#include "casample.h"
-*/
-
 #include "jsmn.h"
-
 
 bool isNumber(const char* str)
 {
@@ -25,27 +28,7 @@ bool isNumber(const char* str)
 	}
 	return true;
 }
-/*
-//======================================================================
-// 指定した名前を持つカスタムアトリビュートのインデクスを返す
-//======================================================================
-int GetNodeAttrIdxByBName(INode *pNode, const tstring &str)
-{
-	ICustAttribContainer* pContainer = pNode->GetObjectRef()->GetCustAttribContainer();
-	if (!pContainer) return -1;
 
-	for (int i = 0; i < pContainer->GetNumCustAttribs(); i++) {
-		CustAttrib* pAttr = pContainer->GetCustAttrib(i);
-#if MAX_RELEASE > 26000
-		TCHAR *name = pAttr->GetName(FALSE);
-#else
-		const TCHAR *name = pAttr->GetName();
-#endif
-		if (tstring(name) == str) return i;
-	}
-	return -1l;
-}
-*/
 //==========================================================
 //==========================================================
 int glTFImporter_Core::GetCustAttrPBlock(ReferenceTarget* pRef, tstring& AttName, IParamBlock2* &pBlock)

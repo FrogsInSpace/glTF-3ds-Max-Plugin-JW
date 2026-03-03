@@ -1,5 +1,22 @@
 ﻿
-//**************************************************************************/
+/*
+ * Copyright (c) 2024-2026 The Khronos Group Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+ //**************************************************************************/
+ // AUTHOR: Satoshi Hayashi 
+ //***************************************************************************/
 
 
 //#include "maxscript/maxscript.h"
@@ -58,7 +75,6 @@ static BOOL s_USDMtlEnable = FALSE;
 static BOOL s_gltfMtlEnable = FALSE;
 static BOOL s_VRayMtlEnable = FALSE;
 static BOOL s_CoronaMtlEnable = FALSE;
-static BOOL s_PencilMtlEnable = FALSE;
 static BOOL s_OpenPBRMtlEnable = FALSE;
 static tstring s_ScriptString;
 static tstring s_ImageFileString;
@@ -410,7 +426,7 @@ INT_PTR CALLBACK HSglTFImporterOptionsDlgProc(HWND hWnd,UINT message,WPARAM wPar
 		EnableWindow(GetDlgItem(hWnd, IDC_MTL_RADIO6), s_USDMtlEnable);
 		EnableWindow(GetDlgItem(hWnd, IDC_MTL_RADIO7), s_VRayMtlEnable);
 		EnableWindow(GetDlgItem(hWnd, IDC_MTL_RADIO8), s_CoronaMtlEnable);
-		EnableWindow(GetDlgItem(hWnd, IDC_MTL_RADIO9), s_PencilMtlEnable);
+		EnableWindow(GetDlgItem(hWnd, IDC_MTL_RADIO9), FALSE);
 		EnableWindow(GetDlgItem(hWnd, IDC_MTL_RADIO10), s_OpenPBRMtlEnable);
 		if (!s_ArnoldMtlEnable && HH_MtlMode == 4) HH_MtlMode = 0;
 		if (!s_USDMtlEnable && HH_MtlMode == 5) HH_MtlMode = 0;
@@ -740,8 +756,8 @@ BOOL glTFImporter_Core::ImportPreProcess(const TCHAR* filename, BOOL suppressPro
 	if (idx >= 0) s_CoronaMtlEnable = TRUE;
 	idx = subList->FindClass(USDMaterialID);
 	if (idx >= 0) s_USDMtlEnable = TRUE;
-	idx = subList->FindClass(Pencil4MaterialID);
-	if (idx >= 0) s_PencilMtlEnable = TRUE;
+	//idx = subList->FindClass(Pencil4MaterialID);
+	//if (idx >= 0) s_PencilMtlEnable = TRUE;
 	idx = subList->FindClass(OpenPBRMaterialID);
 	if (idx >= 0) s_OpenPBRMtlEnable = TRUE;
 
@@ -1063,7 +1079,6 @@ BOOL glTFImporter_Core::ImportScene(void)
 	case 5: CreateUSDMaterial();		break;
 	case 6: CreateVRayMaterial();		break;
 	case 7: CreateCoronaMaterial();		break;
-	case 8: CreatePencilMaterial();		break;
 	case 9: CreateOpenPBRMaterial();	break;
 	default:CreateScanlineMaterial();	break;
 	}

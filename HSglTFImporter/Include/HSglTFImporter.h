@@ -1,17 +1,23 @@
-#pragma once
-#pragma warning( disable: 4828 )
+/*
+ * Copyright (c) 2024-2026 The Khronos Group Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+ //**************************************************************************/
+ // AUTHOR: Satoshi Hayashi 
+ //***************************************************************************/
 
-//**************************************************************************/
-// Copyright (c) 1998-2018 Autodesk, Inc.
-// All rights reserved.
-// 
-//  Use of this software is subject to the terms of the Autodesk license 
-//  agreement provided at the time of installation or download, or which 
-//  otherwise accompanies this software in either electronic or hard copy form.
-//**************************************************************************/
-// DESCRIPTION: Includes for Plugins
-// AUTHOR: 
-//***************************************************************************/
+#pragma once
 
 #pragma warning( disable : 4101 )
 #pragma warning( disable : 4267 )
@@ -120,7 +126,7 @@ extern BOOL IsLogOut(void);
 #define CoronaColorID				Class_ID(0x68426dca, 0x372362d4)
 #define CoronaSelectMtlID			Class_ID(0xc74e9f94, 0xc319f213)
 #define USDMaterialID				Class_ID(0x6afa4933, 0x4787f1c7)
-#define Pencil4MaterialID			Class_ID(0x20160205, 0x81454de)
+//#define Pencil4MaterialID			Class_ID(0x20160205, 0x81454de)
 #define OpenPBRMaterialID			Class_ID(0xf1551e33, 0x37fb1337)
 
 #define OSL_UnSupport		0
@@ -434,7 +440,6 @@ public:
 	void CreateCoronaMaterial(void);
 	void CreateUSDMaterial(void);
 	void CreateOpenPBRMaterial(void);
-	void CreatePencilMaterial(void);
 	void CreateVRayExtAttr(Mtl* pMtl, const vrayExtStruct& vray, BOOL enabled=TRUE);
 	void CreateSelectabilityAttr(INode* pNode, const SelectabilityStruct &str, BOOL enabled);
 	void CreateHoverabilityAttr(INode* pNode, const HoverabilityStruct& str, BOOL enabled);

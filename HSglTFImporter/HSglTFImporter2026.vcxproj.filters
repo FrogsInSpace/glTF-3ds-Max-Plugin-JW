@@ -7,9 +7,6 @@
     <ClCompile Include="SourceFiles\Camera.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="SourceFiles\CoronaMaterial.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="SourceFiles\CustomAttribute.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -67,9 +64,6 @@
     <ClCompile Include="SourceFiles\PBRSpecGlossMaterial.cpp">
       <Filter>Source Files\Materials</Filter>
     </ClCompile>
-    <ClCompile Include="SourceFiles\PencilMaterial.cpp">
-      <Filter>Source Files\Materials</Filter>
-    </ClCompile>
     <ClCompile Include="SourceFiles\PhysicalMaterial.cpp">
       <Filter>Source Files\Materials</Filter>
     </ClCompile>
@@ -93,6 +87,9 @@
     </ClCompile>
     <ClCompile Include="SourceFiles\gltfx_reference.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SourceFiles\CoronaMaterial.cpp">
+      <Filter>Source Files\Materials</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

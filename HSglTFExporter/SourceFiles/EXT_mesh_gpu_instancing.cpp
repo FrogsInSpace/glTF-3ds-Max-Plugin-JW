@@ -1,3 +1,21 @@
+/*
+ * Copyright (c) 2024-2026 The Khronos Group Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+ //**************************************************************************/
+ // AUTHOR: Satoshi Hayashi 
+ //***************************************************************************/
 
 #include "HSglTFExporter.h"
 #include <iInstanceMgr.h>
@@ -118,6 +136,7 @@ int glTFExporter_Core::CreateInstanceRotationSection(std::vector<Quat>& rot)
 
 	return m_model.accessors.size() - 1;
 }
+
 int glTFExporter_Core::CreateInstanceScaleSection(std::vector<Point3>& scl)
 {
 	tinygltf::Accessor accOut;
@@ -144,4 +163,3 @@ int glTFExporter_Core::CreateInstanceScaleSection(std::vector<Point3>& scl)
 	return m_model.accessors.size() - 1;
 }
 
-//InstanceMgr* GetInstanceMgr();

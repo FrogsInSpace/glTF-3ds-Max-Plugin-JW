@@ -179,7 +179,6 @@
     <ClCompile Include="SourceFiles\OSLmanager.cpp" />
     <ClCompile Include="SourceFiles\PBRMetalMaterial.cpp" />
     <ClCompile Include="SourceFiles\PBRSpecGlossMaterial.cpp" />
-    <ClCompile Include="SourceFiles\PencilMaterial.cpp" />
     <ClCompile Include="SourceFiles\PhysicalMaterial.cpp" />
     <ClCompile Include="SourceFiles\ProgressDialog.cpp" />
     <ClCompile Include="SourceFiles\ScanlineMaterial.cpp" />

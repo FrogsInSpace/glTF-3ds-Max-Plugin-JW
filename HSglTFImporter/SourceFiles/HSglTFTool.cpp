@@ -359,8 +359,7 @@ void SetAttributes(Mtl* pSmat, ULONG flag, BOOL enableFlag)
 	}
 	else  if (pSmat->ClassID() == CoronaMaterialID) {
 	}
-	else  if (pSmat->ClassID() == Pencil4MaterialID) {
-	}
+
 
 	for (int i = 0; i < pSmat->NumSubTexmaps(); i++) {
 		Texmap* pTex = pSmat->GetSubTexmap(i);

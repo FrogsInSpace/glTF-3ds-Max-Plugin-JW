@@ -1,20 +1,46 @@
-﻿
-//**************************************************************************/
-// Copyright (c) 1998-2018 Autodesk, Inc.
-// All rights reserved.
-// 
-// Use of this software is subject to the terms of the Autodesk license 
-// agreement provided at the time of installation or download, or which 
-// otherwise accompanies this software in either electronic or hard copy form.
-//**************************************************************************/
-// DESCRIPTION: Appwizard generated plugin
-// AUTHOR: 
-//***************************************************************************/
-//#pragma warning( disable : 4819 )
+﻿/*
+ * Copyright (c) 2024-2026 The Khronos Group Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+ //**************************************************************************/
+ // AUTHOR: Satoshi Hayashi 
+ //***************************************************************************/
+/*
+ * Copyright (c) 2024-2026 The Khronos Group Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+ //**************************************************************************/
+ // AUTHOR: Satoshi Hayashi 
+ //***************************************************************************/
+
+ //#pragma warning( disable : 4819 )
 //#pragma warning( disable : 4828 )
 //#pragma warning( disable : 4267 )
 //#pragma comment(lib, "F:\\devel\\3ds Max 2021 SDK\\maxsdk\\lib\\x64\\Release\\bonesDef.lib")
 // Define these only in *one* .cc file.
+
 #define TINYGLTF_IMPLEMENTATION
 #define STB_IMAGE_IMPLEMENTATION
 #define STB_IMAGE_WRITE_IMPLEMENTATION
@@ -89,6 +115,7 @@ glTFExporter_Core theExporterCore;
 
 BOOL LogExport = TRUE;
 tstring LogFileName = _T("f:\\HSExportLog.txt");
+
 //======================================================================
 //======================================================================
 void LogInit(const tstring &output)
@@ -137,14 +164,7 @@ const tstring ExportFolder(void)
 {
 	return theExporterCore.ExportFolder();
 }
-/*
-//======================================================================
-//======================================================================
-BitmapTex* GetBitmapTexFromName(const TSTR& name)
-{
-	return (BitmapTex*)theExporterCore.m_TextureTable[theExporterCore.findTextureIndex(NULL, name)];
-}
-*/
+
 //======================================================================
 //======================================================================
 IPoint2 GetBitmapSize(void)
@@ -261,13 +281,11 @@ const TCHAR* HSglTF2Exporter::CopyrightMessage()
 
 const TCHAR* HSglTF2Exporter::OtherMessage1()
 {
-	//TODO: Return Other message #1 if any
 	return _T("");
 }
 
 const TCHAR* HSglTF2Exporter::OtherMessage2()
 {
-	//TODO: Return other message #2 in any
 	return _T("");
 }
 
@@ -322,7 +340,7 @@ DWORD WINAPI StatusBarFn(LPVOID arg)
 	return(0);
 }
 //======================================================================
-// パラメータ設定ダイアログ CallBack
+// Parameter Setting Dialog CallBack
 //======================================================================
 INT_PTR CALLBACK HSglTFRapidCompOptionsDlgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) 
 {
@@ -390,7 +408,7 @@ INT_PTR CALLBACK HSglTFRapidCompOptionsDlgProc(HWND hWnd, UINT message, WPARAM w
 }
 
 //======================================================================
-// パラメータ設定ダイアログ CallBack
+// Parameter Setting Dialog CallBack
 //======================================================================
 INT_PTR CALLBACK HSglTFExporterOptionsDlgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
 
@@ -399,15 +417,8 @@ INT_PTR CALLBACK HSglTFExporterOptionsDlgProc(HWND hWnd, UINT message, WPARAM wP
 
 	switch (message) {
 	case WM_INITDIALOG:
-		//SetWindowText(hWnd, s_TitleString.c_str());
-
 		exp = (HSglTFExporter*)lParam;
-		//pSpin = GetISpinner(::GetDlgItem(hWnd, IDC_SPIN));
-		//pSpin->SetLimits(0, 10, TRUE);
-		//pSpin->SetAutoScale(TRUE);
-		//pSpin->SetScale(1);
-		//pSpin->LinkToEdit(::GetDlgItem(hWnd, IDC_EDIT), EDITTYPE_INT);
-		//pSpin->SetValue(HH_EncodeSpeed, FALSE);
+
 
 #ifndef ENABLE_BUILD_WITH_DRACO
 		ShowWindow(GetDlgItem(hWnd, IDC_DRACO_CHECK), FALSE);
@@ -787,7 +798,6 @@ int HSglTFExporter::DoExport(const TCHAR* filename, ExpInterface* exporterInt, I
 	int ret = theExporterCore.ExportPreProcess(filename, suppressPrompts, 1);
 	return ret;
 }
-
 
 // -----------------------------------------------------------
 // -----------------------------------------------------------
@@ -1385,8 +1395,7 @@ void glTFExporter_Core::CreateInteractiveLayerTable(void)
 			m_InteractiveLayerTable.push_back(pLayer);
 		}
 	}
-	//ILayer *pLayer = pLayerMan->GetLayer(InteractiveLayerName);
-	//m_pInteractiveGraphLayer = pLayer;
+
 }
 
 
@@ -1463,23 +1472,6 @@ BOOL UVGenAnimated(StdUVGen* pUVGen)
 	return FALSE;
 }
 
-/*
-#include "bonesdef.h"
-//----------------------------------------------------------
-//----------------------------------------------------------
-static BonesDefMod* get_bonedef_mod(Modifier *mod)
-{
-	BonesDefMod *bmod = (BonesDefMod*)mod;
-	return bmod;
-}
-
-float getVertexWeight_cf(Modifier *pMod, INode *pBone, int vindex, int subindex)
-{
-	BonesDefMod* bmod = (BonesDefMod*)pMod;
-//	Tab<VertexListClass*> vertTbl = bmod->VertexData;
-	return 0.0f;
-}
-*/
 //======================================================================
 //	wstringをstringへ変換
 //======================================================================

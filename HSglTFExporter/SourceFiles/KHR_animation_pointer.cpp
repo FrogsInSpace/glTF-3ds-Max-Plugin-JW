@@ -1,3 +1,22 @@
+/*
+ * Copyright (c) 2024-2026 The Khronos Group Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+ //**************************************************************************/
+ // AUTHOR: Satoshi Hayashi 
+ //***************************************************************************/
+
 
 #include "HSglTFExporter.h"
 #include <Shaders.h>
@@ -43,20 +62,6 @@ void glTFExporter_Core::CreateAnimationPointer(void)
 				Control* pC = pBlock->GetControllerByID(0);
 				CreateAlphaCutOffAnimation(pC, m.second);
 			}
-			/*
-			VolumeStruct str;
-			BOOL animated = FALSE;
-			if (SetVolumeParams(pMtl, str, animated)) {
-				IParamBlock2 *pBlock = GetCustAttrPBlock(pMtl, tstring(_T("Volume")));
-				pC = pBlock->GetControllerByIndex(2);
-				CreateThicknessFactorAnimation(pC, m.second);
-				pC = pBlock->GetControllerByID(3);
-				CreateAttenuationDistanceAnimation(pC, m.second);
-				pC = pBlock->GetControllerByID(4);
-				CreateAttenuationColorAnimation(pC, m.second);
-				if (animated)m_AnimationPointer_Used = TRUE;
-			}
-			*/
 		}
 		else if (pMtl->ClassID() == PBRMetalMtlID) {
 			IParamBlock2* pBlock = pMtl->GetParamBlockByID(1);
@@ -564,136 +569,6 @@ void glTFExporter_Core::CreateAnimationPointer(void)
 
 	}
 
-/*
-	for (auto m : m_MaterialMap) {
-		MtlBase* pMtl = m.first;
-		if (pMtl->ClassID() == ScanLineMtlID) {
-			Texmap *pTex = pMtl->GetSubTexmap(ID_DI);
-			CreateUVAnimation(pTex, m.second, BaseColor);
-
-			BaseShader* pShader = GetShader(pMtl);
-			IParamBlock2* pBlock = pShader->GetParamBlockByID(0);
-			Control* pC = pBlock->GetControllerByID(1);
-			CreateBaseColorAnimation(pC, m.second, FALSE);
-
-			pTex = pMtl->GetSubTexmap(ID_OP);
-			if (GetOSLMapType(pTex) == OSL_CutOff) {
-				IParamBlock2* pBlock = pTex->GetParamBlock(1);
-				Control* pC = pBlock->GetControllerByID(0);
-				CreateAlphaCutOffAnimation(pC, m.second);
-			}
-		}
-		else if (pMtl->ClassID() == PBRMetalMtlID) {
-			IParamBlock2* pBlock = pMtl->GetParamBlockByID(1);
-			Texmap* pTex = pBlock->GetTexmap(pbr_base_color_map);
-			CreateUVAnimation(pTex, m.second, BaseColor);
-
-			Control* pC = pBlock->GetControllerByID(pbr_base_color);
-			CreateBaseColorAnimation(pC, m.second, TRUE);
-
-			pBlock = pMtl->GetParamBlock(0);
-			pTex = pBlock->GetTexmap(pbr_opacity_map, 0);
-			if (GetOSLMapType(pTex) == OSL_CutOff) {
-				IParamBlock2* pBlock = pTex->GetParamBlock(1);
-				Control* pC = pBlock->GetControllerByID(0);
-				CreateAlphaCutOffAnimation(pC, m.second);
-			}
-		}
-		else if (pMtl->ClassID() == PBRSpecGlossMtlID) {
-		}
-		else if (pMtl->ClassID() == PHYSICALMATERIAL_CLASS_ID) {
-			IParamBlock2* pBlock = pMtl->GetParamBlockByID(1);
-			Texmap* pTex = pBlock->GetTexmap(fm_base_color_map);
-			CreateUVAnimation(pTex, m.second, BaseColor);
-
-			Control* pC = pBlock->GetControllerByID(fm_base_color);
-			CreateBaseColorAnimation(pC, m.second, TRUE);
-
-			pBlock = pMtl->GetParamBlock(0);
-			pTex = pBlock->GetTexmap(fm_cutout_map, 0);
-			if (GetOSLMapType(pTex) == OSL_CutOff) {
-				IParamBlock2* pBlock = pTex->GetParamBlock(1);
-				Control* pC = pBlock->GetControllerByID(0);
-				CreateAlphaCutOffAnimation(pC, m.second);
-			}
-		}
-		else  if (pMtl->ClassID() == Class_ID(DMTL_CLASS_ID, 0)) {
-		}
-		else  if (pMtl->ClassID() == glTFMaterialID) {
-			int onoff;
-			IParamBlock2* pBlock = pMtl->GetParamBlockByID(0);
-			Texmap* pTex = pBlock->GetTexmap(glTF_baseColorMap);
-			CreateUVAnimation(pTex, m.second, BaseColor);
-
-			pTex = pBlock->GetTexmap(glTF_emissionMap);
-			CreateUVAnimation(pTex, m.second, Emissive);
-
-			Control* pC = pBlock->GetControllerByID(glTF_baseColor);
-			CreateBaseColorAnimation(pC, m.second, TRUE);
-
-			pC = pBlock->GetControllerByID(glTF_alphaCutoff);
-			CreateAlphaCutOffAnimation(pC, m.second);
-
-			pC = pBlock->GetControllerByID(glTF_metalness);
-			CreateMetalicFactorAnimation(pC, m.second);
-
-			pC = pBlock->GetControllerByID(glTF_roughness);
-			CreateRoughnessFactorAnimation(pC, m.second);
-
-			pC = pBlock->GetControllerByID(glTF_normal);
-			CreateNormalScaleAnimation(pC, m.second);
-
-			pC = pBlock->GetControllerByID(glTF_ambientOcclusion);
-			CreateOcclusionStrengthAnimation(pC, m.second);
-
-			pC = pBlock->GetControllerByID(glTF_emissionColor);
-			pC = ConvertColorToFloatController(pC, 0);
-			CreateEmissiveStrengthAnimation(pC, m.second);
-
-			pBlock = pMtl->GetParamBlockByID(1);
-			onoff = pBlock->GetInt(glTF_enableTransmission);
-			if (onoff) {
-				pC = pBlock->GetControllerByID(glTF_transmission);
-				CreateTransmissionAnimation(pC, m.second);
-			}
-			onoff = pBlock->GetInt(glTF_enableIndexOfRefraction);
-			if (onoff) {
-				pC = pBlock->GetControllerByID(glTF_indexOfRefraction);
-				CreateIORAnimation(pC, m.second);
-			}
-			onoff = pBlock->GetInt(glTF_enableVolume);
-			if (onoff) {
-				pC = pBlock->GetControllerByID(glTF_volumeThickness);
-				CreateThicknessFactorAnimation(pC, m.second);
-				pC = pBlock->GetControllerByID(glTF_volumeDistance);
-				CreateAttenuationDistanceAnimation(pC, m.second);
-				pC = pBlock->GetControllerByID(glTF_volumeColor);
-				CreateAttenuationColorAnimation(pC, m.second);
-			}
-		}
-		else  if (pMtl->ClassID() == USDMaterialID) {
-		}
-		else  if (pMtl->ClassID() == Arnold_StandardSufaceID) {
-			IParamBlock2* pBlock = pMtl->GetParamBlockByID(1);
-			Texmap* pTex = pBlock->GetTexmap(an_sf_base_color_shader);
-			CreateUVAnimation(pTex, m.second, BaseColor);
-
-			Control* pC = pBlock->GetControllerByID(an_sf_base_color);
-			CreateBaseColorAnimation(pC, m.second, TRUE);
-		}
-		else  if (pMtl->ClassID() == VRayMaterialID) {
-			IParamBlock2* pBlock = pMtl->GetParamBlock(4);
-			Texmap* pTex = pBlock->GetTexmap(100);
-			CreateUVAnimation(pTex, m.second, BaseColor);
-
-			pBlock = pMtl->GetParamBlock(0);
-			Control* pC = pBlock->GetControllerByID(vr_diffuse);
-			CreateBaseColorAnimation(pC, m.second, TRUE);
-		}
-		else  if (pMtl->ClassID() == CoronaMaterialID) {
-		}
-	}
-*/
 	for (auto n : m_LightMap) {
 
 		GenLight* pLightObj = n.first;

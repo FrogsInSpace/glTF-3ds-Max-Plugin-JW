@@ -1,14 +1,29 @@
-﻿#include "HSglTFExporter.h"
+﻿/*
+ * Copyright (c) 2024-2026 The Khronos Group Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+ //**************************************************************************/
+ // AUTHOR: Satoshi Hayashi 
+ //***************************************************************************/
+
+#include "HSglTFExporter.h"
 #include <iostream>
 #include <fstream>
 #include <string>
 #include <algorithm>
 
-//#ifdef KTX_API
-//#undef KTX_API
-//#endif
-
-#define KTX_API_STATIC // 静的ライブラリであることを明示
+#define KTX_API_STATIC
 #define KTX_API
 
 #include <KTX2/ktx.h>
@@ -164,7 +179,6 @@ BOOL glTFExporter_Core::KTX2Encode(Texmap* pTex, KTX2TextureStruct& toKTX)
     }
 
 
-
     {
         std::string fname = WStringToString(retname);
         if (ktxTexture_WriteToNamedFile(ktxTexture(texture), fname.c_str()) != KTX_SUCCESS) {
@@ -177,8 +191,3 @@ BOOL glTFExporter_Core::KTX2Encode(Texmap* pTex, KTX2TextureStruct& toKTX)
 
     return TRUE;
 }
-
-
-
-
-

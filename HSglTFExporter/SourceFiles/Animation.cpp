@@ -1,3 +1,21 @@
+/*
+ * Copyright (c) 2024-2026 The Khronos Group Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+ //**************************************************************************/
+ // AUTHOR: Satoshi Hayashi 
+ //***************************************************************************/
 
 #include "HSglTFExporter.h"
 #include <wM3.h>
@@ -178,7 +196,6 @@ void glTFExporter_Core::CreateKeyFrameList(Control* pCtrl, std::list<TimeValue>&
 	}
 }
 
-
 //======================================================================
 //======================================================================
 void glTFExporter_Core::CreateAnimationRec(INode *pNode)
@@ -186,55 +203,6 @@ void glTFExporter_Core::CreateAnimationRec(INode *pNode)
 	AffineParts parts;
 	Control *pC = pNode->GetTMController();
 	if (pC->IsAnimated() || m_FullFrame) {
-		/*
-		std::vector<TimeValue> PosFrameList;
-		std::vector<TimeValue> RotFrameList;
-		std::vector<TimeValue> SclFrameList;
-		PosFrameList.clear();
-		RotFrameList.clear();
-		SclFrameList.clear();
-
-		Control *pPosC = pC->GetPositionController();
-		Control *pRotC = pC->GetRotationController();
-		Control *pSclC = pC->GetScaleController();
-		IKeyControl *pIk = GetKeyControlInterface(pPosC);
-		if (pIk) {
-			GetKeyFrameList(pIk, PosFrameList);
-		}
-		else {
-			Control *pXC = pPosC->GetXController();
-			pIk=GetKeyControlInterface(pXC);
-			GetKeyFrameList(pIk, PosFrameList);
-			Control *pYC = pPosC->GetYController();
-			GetKeyFrameList(GetKeyControlInterface(pYC), PosFrameList);
-			Control *pZC = pPosC->GetZController();
-			GetKeyFrameList(GetKeyControlInterface(pZC), PosFrameList);
-		}
-		pIk = GetKeyControlInterface(pRotC);
-		if (pIk) {
-			GetKeyFrameList(pIk, RotFrameList);
-		}
-		else {
-			Control *pXC = pRotC->GetXController();
-			GetKeyFrameList(GetKeyControlInterface(pXC), RotFrameList);
-			Control *pYC = pRotC->GetYController();
-			GetKeyFrameList(GetKeyControlInterface(pYC), RotFrameList);
-			Control *pZC = pRotC->GetZController();
-			GetKeyFrameList(GetKeyControlInterface(pZC), RotFrameList);
-		}
-		pIk = GetKeyControlInterface(pSclC);
-		if (pIk) {
-			GetKeyFrameList(pIk, SclFrameList);
-		}
-		else {
-			Control *pXC = pSclC->GetXController();
-			GetKeyFrameList(GetKeyControlInterface(pXC), SclFrameList);
-			Control *pYC = pSclC->GetYController();
-			GetKeyFrameList(GetKeyControlInterface(pYC), SclFrameList);
-			Control *pZC = pSclC->GetZController();
-			GetKeyFrameList(GetKeyControlInterface(pZC), SclFrameList);
-		}
-		*/
 		Tab<TimeValue> PosFrameList;
 		Tab<TimeValue> RotFrameList;
 		Tab<TimeValue> SclFrameList;
@@ -606,18 +574,3 @@ void glTFExporter_Core::CreateAnimationRec(INode *pNode)
 		CreateAnimationRec(pNode->GetChildNode(i));
 	}
 }
-
-/*
-void GetKeyFrameList(IKeyControl *pIkCtrl, std::vector<TimeValue> &ret)
-{
-	if (!pIkCtrl) return;
-
-	int cnt = pIkCtrl->GetNumKeys();
-	for (int i = 0; i < cnt; i++) {
-		IKey key;
-		pIkCtrl->GetKey(i, &key);
-		ret.push_back(key.time);
-	}
-
-}
-*/

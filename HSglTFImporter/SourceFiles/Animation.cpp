@@ -1,6 +1,21 @@
-﻿//======================================================================
-//
-//======================================================================
+﻿/*
+ * Copyright (c) 2024-2026 The Khronos Group Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+ //**************************************************************************/
+ // AUTHOR: Satoshi Hayashi 
+ //***************************************************************************/
 
 #include "HSglTFImporter.h"
 #include <istdplug.h>
@@ -494,17 +509,6 @@ void glTFImporter_Core::SetBaseColorController(Mtl* pMtl, Control* pCtrl, cgltf_
 	else if (pMtl->ClassID() == USDMaterialID) {
 		IParamBlock2* pBlock = pMtl->GetParamBlock(1);
 		pBlock->SetControllerByID(usd_diffuseColor, 0, pCtrl);
-	}
-	else if (pMtl->ClassID() == Pencil4MaterialID) {
-		IParamBlock2* pBlock0 = pMtl->GetParamBlock(0);
-		Mtl* pBaseMtl = pBlock0->GetMtl(pen_basicMaterial);
-		Shader* pShader = ((StdMat2*)pBaseMtl)->GetShader();
-		ReferenceTarget* pZone0;
-		ReferenceTarget* pZone1;
-		pBlock0->GetValue(pen_Zones, m_time, pZone0, FOREVER, 0);
-		pBlock0->GetValue(pen_Zones, m_time, pZone1, FOREVER, 1);
-		IParamBlock2* pZoneBlock0 = pZone0->GetParamBlock(0);
-		IParamBlock2* pZoneBlock1 = pZone1->GetParamBlock(0);
 	}
 	else if (pMtl->ClassID() == OpenPBRMaterialID) {
 		IParamBlock2* pBlock = pMtl->GetParamBlockByID(0);
