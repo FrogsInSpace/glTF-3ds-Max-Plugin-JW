@@ -490,7 +490,6 @@ public:
 	void VRayMaterial(MtlBase *pMtl, tinygltf::Material &material);
 	void CoronaMaterial(MtlBase *pMtl, tinygltf::Material &material);
 	void USDMaterial(MtlBase *pMtl, tinygltf::Material &material);
-	void PencilMaterial(MtlBase* pMtl, tinygltf::Material& material);
 
 	void CreateKeyFrameList(Control* pCtrl, Tab<TimeValue>& KeyFrameList, BOOL Clear=TRUE);
 	void CreateKeyFrameList(Control* pCtrl, std::list<TimeValue>& KeyFrameList, BOOL Clear=TRUE);

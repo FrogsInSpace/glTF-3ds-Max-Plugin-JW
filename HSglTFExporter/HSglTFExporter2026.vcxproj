@@ -61,7 +61,7 @@
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>.\;.\include;$(ADSK_3DSMAX_SDK_2026)\include;$(ADSK_3DSMAX_SDK_2026)\modifiers\bonesdef;$(ADSK_3DSMAX_SDK_2026)\include\geom;$(ADSK_3DSMAX_SDK_2026)\samples\modifiers\morpher;..\3rd_Party_Products;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\;.\include;.\Resource;$(ADSK_3DSMAX_SDK_2026)\include;$(ADSK_3DSMAX_SDK_2026)\modifiers\bonesdef;$(ADSK_3DSMAX_SDK_2026)\include\geom;$(ADSK_3DSMAX_SDK_2026)\samples\modifiers\morpher;..\3rd_Party_Products;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_WINDOWS;_DEBUG;ENABLE_BUILD_WITH_DRACO;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
@@ -90,7 +90,7 @@
       <OutputFile>C:\Program Files\Autodesk\3ds Max 2026\Plugins\HSglTFExporter.dle</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <AdditionalLibraryDirectories>$(ADSK_3DSMAX_SDK_2026)\lib\x64\Release;$(ADSK_3DSMAX_SDK_2026)\samples\modifiers\morpher\Lib\x64\Release;..\3rd_Party_Products;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <ModuleDefinitionFile>.\HSglTFExporter.def</ModuleDefinitionFile>
+      <ModuleDefinitionFile>.\SourceFiles\HSglTFExporter.def</ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>.\Hybrid2026/HSglTFExporter.pdb</ProgramDatabaseFile>
       <SubSystem>Windows</SubSystem>
@@ -116,7 +116,7 @@
     <ClCompile>
       <AdditionalOptions>/LD  %(AdditionalOptions)</AdditionalOptions>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
-      <AdditionalIncludeDirectories>.\;.\include;$(ADSK_3DSMAX_SDK_2026)\include;$(ADSK_3DSMAX_SDK_2026)\modifiers\bonesdef;$(ADSK_3DSMAX_SDK_2026)\include\geom;$(ADSK_3DSMAX_SDK_2026)\samples\modifiers\morpher;..\3rd_Party_Products;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\;.\include;.\Resource;$(ADSK_3DSMAX_SDK_2026)\include;$(ADSK_3DSMAX_SDK_2026)\modifiers\bonesdef;$(ADSK_3DSMAX_SDK_2026)\include\geom;$(ADSK_3DSMAX_SDK_2026)\samples\modifiers\morpher;..\3rd_Party_Products;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>NDEBUG;_WINDOWS;_USRDLL;ENABLE_BUILD_WITH_DRACO;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
@@ -142,7 +142,7 @@
       <OutputFile>C:\Program Files\Autodesk\3ds Max 2026\Plugins\HSglTFExporter.dle</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <AdditionalLibraryDirectories>$(ADSK_3DSMAX_SDK_2026)\lib\x64\Release;$(ADSK_3DSMAX_SDK_2026)\samples\modifiers\morpher\Lib\x64\Release;..\3rd_Party_Products;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <ModuleDefinitionFile>.\HSglTFExporter.def</ModuleDefinitionFile>
+      <ModuleDefinitionFile>.\SourceFiles\HSglTFExporter.def</ModuleDefinitionFile>
       <ProgramDatabaseFile>.\Release2026/HSglTFExporter.pdb</ProgramDatabaseFile>
       <SubSystem>Windows</SubSystem>
       <SetChecksum>true</SetChecksum>
@@ -183,7 +183,6 @@
     <ClCompile Include="SourceFiles\OpenPBRMaterial.cpp" />
     <ClCompile Include="SourceFiles\PBRMaterial.cpp" />
     <ClCompile Include="SourceFiles\PBRSpecGlossMaterial.cpp" />
-    <ClCompile Include="SourceFiles\pencilMaterial.cpp" />
     <ClCompile Include="SourceFiles\PhysicalMaterial.cpp" />
     <ClCompile Include="SourceFiles\PostProcess.cpp" />
     <ClCompile Include="SourceFiles\ScanlineMaterial.cpp" />
@@ -203,7 +202,7 @@
     <None Include="HSglTFExporter.def" />
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="HSglTFExporter.rc" />
+    <ResourceCompile Include="Resource\HSglTFExporter.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

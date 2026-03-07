@@ -11,23 +11,23 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectName>HSglTFImporter2026</ProjectName>
-    <ProjectGuid>{4DCC8EB2-9C05-48F9-B619-34A40F7D84C1}</ProjectGuid>
+    <ProjectName>HSglTFImporter2024</ProjectName>
+    <ProjectGuid>{E78A561C-2DC4-4F88-9FEE-66F9AA62B75A}</ProjectGuid>
     <RootNamespace>Test</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.19041.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseOfMfc>false</UseOfMfc>
-    <PlatformToolset>v143</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Hybrid|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseOfMfc>false</UseOfMfc>
     <CharacterSet>Unicode</CharacterSet>
-    <PlatformToolset>v143</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -43,8 +43,8 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
     <_ProjectFileVersion>10.0.40219.1</_ProjectFileVersion>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Hybrid|x64'">.\Hybrid2026</OutDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='Hybrid|x64'">.\Hybrid2026</IntDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Hybrid|x64'">.\Hybrid2024</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Hybrid|x64'">.\Hybrid2024</IntDir>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Hybrid|x64'">true</LinkIncremental>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(Platform)\$(Configuration)\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(Platform)\$(Configuration)\</IntDir>
@@ -61,14 +61,14 @@
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>.\;.\include;.\Resource;$(ADSK_3DSMAX_SDK_2026)\include;$(ADSK_3DSMAX_SDK_2026)\include\Geom;$(ADSK_3DSMAX_SDK_2026)\samples\modifiers\bonesdef;$(ADSK_3DSMAX_SDK_2026)\samples\modifiers\morpher;$(ADSK_3DSMAX_SDK_2026)\howto\utilities\customattribute;..\3rd_Party_Products</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_WINDOWS;_DEBUG;DRACO_ENABLED;EXT_PROP_ANIM;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>.\;.\include;.\Resource;$(ADSK_3DSMAX_SDK_2024)\include;$(ADSK_3DSMAX_SDK_2024)\include\Geom;$(ADSK_3DSMAX_SDK_2024)\samples\modifiers\bonesdef;$(ADSK_3DSMAX_SDK_2024)\samples\modifiers\morpher;$(ADSK_3DSMAX_SDK_2024)\howto\utilities\customattribute;..\3rd_Party_Products</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_WINDOWS;_DEBUG;DRACO_ENABLED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <PrecompiledHeaderOutputFile>.\Hybrid2026/HSglTFImporter.pch</PrecompiledHeaderOutputFile>
-      <AssemblerListingLocation>.\Hybrid2026/</AssemblerListingLocation>
-      <ObjectFileName>.\Hybrid2026/</ObjectFileName>
-      <ProgramDataBaseFileName>.\Hybrid2026/</ProgramDataBaseFileName>
+      <PrecompiledHeaderOutputFile>.\Hybrid2024/HSglTFImporter.pch</PrecompiledHeaderOutputFile>
+      <AssemblerListingLocation>.\Hybrid2024/</AssemblerListingLocation>
+      <ObjectFileName>.\Hybrid2024/</ObjectFileName>
+      <ProgramDataBaseFileName>.\Hybrid2024/</ProgramDataBaseFileName>
       <WarningLevel>Level3</WarningLevel>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -87,17 +87,17 @@
     </ResourceCompile>
     <Link>
       <AdditionalDependencies>odbc32.lib;odbccp32.lib;comctl32.lib;shlwapi.lib;bmm.lib;core.lib;geom.lib;gfx.lib;mesh.lib;maxutil.lib;maxscrpt.lib;gup.lib;paramblk2.lib;MNMath.lib;bonesDef.lib;assetmanagement.lib;Morpher.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>C:\Program Files\Autodesk\3ds Max 2026\Plugins\HSglTFImporter.dli</OutputFile>
+      <OutputFile>C:\Program Files\Autodesk\3ds Max 2024\Plugins\HSglTFImporter.dli</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>$(ADSK_3DSMAX_SDK_2026)\lib\x64\Release;$(ADSK_3DSMAX_SDK_2025)\samples\modifiers\morpher\Lib\x64\Release;..\3rd_Party_Products</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ADSK_3DSMAX_SDK_2024)\lib\x64\Release;$(ADSK_3DSMAX_SDK_2024)\samples\modifiers\morpher\Lib\x64\Release;..\3rd_Party_Products</AdditionalLibraryDirectories>
       <ModuleDefinitionFile>.\SourceFiles\HSglTFImporter.def</ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <ProgramDatabaseFile>.\Hybrid2026/HSglTFImporter.pdb</ProgramDatabaseFile>
+      <ProgramDatabaseFile>.\Hybrid2024/HSglTFImporter.pdb</ProgramDatabaseFile>
       <SubSystem>Windows</SubSystem>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <DataExecutionPrevention>
       </DataExecutionPrevention>
-      <ImportLibrary>.\Hybrid2026/HSglTFImporter.lib</ImportLibrary>
+      <ImportLibrary>.\Hybrid2024/HSglTFImporter.lib</ImportLibrary>
       <TargetMachine>MachineX64</TargetMachine>
     </Link>
     <PostBuildEvent>
@@ -116,17 +116,17 @@
     <ClCompile>
       <AdditionalOptions>/LD  %(AdditionalOptions)</AdditionalOptions>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
-      <AdditionalIncludeDirectories>.\;.\include;.\Resource;$(ADSK_3DSMAX_SDK_2026)\include;$(ADSK_3DSMAX_SDK_2025)\include\Geom;$(ADSK_3DSMAX_SDK_2025)\samples\modifiers\bonesdef;$(ADSK_3DSMAX_SDK_2025)\samples\modifiers\morpher;$(ADSK_3DSMAX_SDK_2025)\howto\utilities\customattribute;..\3rd_Party_Products</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\;.\include;.\Resource;$(ADSK_3DSMAX_SDK_2024)\include;$(ADSK_3DSMAX_SDK_2024)\include\Geom;$(ADSK_3DSMAX_SDK_2024)\samples\modifiers\bonesdef;$(ADSK_3DSMAX_SDK_2024)\samples\modifiers\morpher;$(ADSK_3DSMAX_SDK_2024)\howto\utilities\customattribute;..\3rd_Party_Products</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>NDEBUG;_WINDOWS;_USRDLL;DRACO_ENABLED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <PrecompiledHeader>
       </PrecompiledHeader>
-      <PrecompiledHeaderOutputFile>.\Release2026/HSglTFImporter.pch</PrecompiledHeaderOutputFile>
-      <AssemblerListingLocation>.\Release2026/</AssemblerListingLocation>
-      <ObjectFileName>.\Release2026/</ObjectFileName>
-      <ProgramDataBaseFileName>.\Release2026/</ProgramDataBaseFileName>
+      <PrecompiledHeaderOutputFile>.\Release2024/HSglTFImporter.pch</PrecompiledHeaderOutputFile>
+      <AssemblerListingLocation>.\Release2024/</AssemblerListingLocation>
+      <ObjectFileName>.\Release2024/</ObjectFileName>
+      <ProgramDataBaseFileName>.\Release2024/</ProgramDataBaseFileName>
       <WarningLevel>Level3</WarningLevel>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <CompileAs>Default</CompileAs>
@@ -138,17 +138,17 @@
     </ResourceCompile>
     <Link>
       <AdditionalDependencies>odbc32.lib;odbccp32.lib;comctl32.lib;shlwapi.lib;bmm.lib;core.lib;geom.lib;gfx.lib;mesh.lib;maxutil.lib;maxscrpt.lib;gup.lib;paramblk2.lib;MNMath.lib;bonesDef.lib;assetmanagement.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>C:\Program Files\Autodesk\3ds Max 2026\Plugins\HSglTFImporter.dli</OutputFile>
+      <OutputFile>C:\Program Files\Autodesk\3ds Max 2024\Plugins\HSglTFImporter.dli</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>$(ADSK_3DSMAX_SDK_2026)\lib\x64\Release;$(ADSK_3DSMAX_SDK_2025)\samples\modifiers\morpher\Lib\x64\Release;..\3rd_Party_Products</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ADSK_3DSMAX_SDK_2024)\lib\x64\Release;$(ADSK_3DSMAX_SDK_2024)\samples\modifiers\morpher\Lib\x64\Release;..\3rd_Party_Products</AdditionalLibraryDirectories>
       <ModuleDefinitionFile>.\SourceFiles\HSglTFImporter.def</ModuleDefinitionFile>
-      <ProgramDatabaseFile>.\Release2026/HSglTFImporter.pdb</ProgramDatabaseFile>
+      <ProgramDatabaseFile>.\Release2024/HSglTFImporter.pdb</ProgramDatabaseFile>
       <SubSystem>Windows</SubSystem>
       <SetChecksum>true</SetChecksum>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <DataExecutionPrevention>
       </DataExecutionPrevention>
-      <ImportLibrary>.\Release2026/HSglTFImporter.lib</ImportLibrary>
+      <ImportLibrary>.\Release2024/HSglTFImporter.lib</ImportLibrary>
       <TargetMachine>MachineX64</TargetMachine>
     </Link>
     <PostBuildEvent>

@@ -1712,11 +1712,7 @@ void glTFExporter_Core::CreateMaterialMapRec(MtlBase *pOrgMtl, BOOL VariantPart)
 		m_model.materials.push_back(material);
 		idx = m_model.materials.size() - 1;
 	}
-	else  if (pMtl->ClassID() == Pencil4MaterialID) {
-		PencilMaterial(pMtl, material);
-		m_model.materials.push_back(material);
-		idx = m_model.materials.size() - 1;
-	}
+
 
 	if (idx>=0) {
 		SetName(&m_model.materials[idx], tstring(pMtl->GetName()));
