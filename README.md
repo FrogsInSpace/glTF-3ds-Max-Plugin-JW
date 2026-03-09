@@ -1,6 +1,6 @@
-# glTF™ Importer/Exporter for Autodesk 3ds Max®
+# glTF? Importer/Exporter for Autodesk 3ds MaxR
 
-This project adds glTF™ (2.0) file access capabilities to Autodesk 3ds Max®, providing a seamless workflow for importing and exporting 3D content in the glTF format.
+This project adds glTF? (2.0) file access capabilities to Autodesk 3ds MaxR, providing a seamless workflow for importing and exporting 3D content in the glTF format.
 
 ---
 
@@ -31,7 +31,7 @@ This project consists of two main plug-in build projects:
 * **Compression**: Draco compression supported
 * **Materials**: 
     * 3ds Max Standard Materials (Scanline, PBR, Physical, glTF, Arnold)
-    * V-Ray® and Chaos Corona materials
+    * V-RayR and Chaos Corona materials
 * **Animation**: Object TRS, Morph weight, `KHR_animation_pointer`
 * **Vertex Deformation**: Skin, Morph
 * **Custom Attributes**: Scene, Node, and Material data (stored in `extras`)
@@ -42,7 +42,7 @@ This project consists of two main plug-in build projects:
 * **Compression**: Draco compression supported
 * **Supported Materials**:
     * 3ds Max Standard Materials (Scanline, PBR, Physical, glTF, Arnold)
-    * V-Ray® and Chaos Corona materials
+    * V-RayR and Chaos Corona materials
 * **Animation**: Object TRS, Morph weight, `KHR_animation_pointer`
 * **Vertex Deformation**: Skin, Morph
 * **Custom Attributes**: Exports Scene, Node, and Material custom attributes (stored in `extras`)
@@ -60,6 +60,17 @@ To build or use this project, the following environment is required:
 
 ### Required SDK
 * **Autodesk 3ds Max SDK**: Provided by Autodesk.
+Environment VariablesYou must set an environment variable pointing to the installation path of the SDK.
+Use the variable name corresponding to your specific 3ds Max version:
+3ds Max Version	Environment Variable Name
+2020			ADSK_3DSMAX_SDK_2020
+2021			ADSK_3DSMAX_SDK_2021
+2022			ADSK_3DSMAX_SDK_2022
+2023			ADSK_3DSMAX_SDK_2023
+2024			ADSK_3DSMAX_SDK_2024
+2025			ADSK_3DSMAX_SDK_2025
+2026			ADSK_3DSMAX_SDK_2026
+
 
 ### 3rd Party Libraries
 This project incorporates the following open-source libraries:
@@ -87,6 +98,11 @@ Once built, the following plug-in files are generated:
 2. `HSglTFExporter.dlo`
 
 Copy these files into the `Plugins` folder of your 3ds Max installation directory.
+
+Khronos PBR Neutral Tone Mapping
+This importer includes a feature to switch the color map to Khronos PBR Neutral Tone when loading glTF files.
+To enable this feature (3ds Max 2024 and later):
+Copy the tone map file located in the Packages folder into your 3dsMax installation directory.
 
 ---
 

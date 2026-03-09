@@ -1,0 +1,53 @@
+ocio_profile_version: 2
+
+description: |
+  OCIO config for glTF PBR Neutral Tone Mapper using LUT
+
+roles:
+  default: sRGB
+  scene_linear: linear_rec709
+  rendering: linear_rec709
+
+colorspaces:
+  - !<ColorSpace>
+    name: linear_rec709
+    bitdepth: 32f
+    description: Scene-linear Rec.709 (sRGB primaries)
+    isdata: false
+    encoding: scene-linear
+
+  - !<ColorSpace>
+    name: sRGB
+    bitdepth: 8ui
+    description: sRGB display
+    isdata: false
+    encoding: sdr-video
+    from_reference: !<GroupTransform>
+      children:
+        - !<ExponentWithLinearTransform> {gamma: 2.2, offset: 0.0, direction: inverse}
+        - !<RangeTransform> {min_in_value: 0.0, max_in_value: 1.0, min_out_value: 0.0, max_out_value: 1.0}
+
+  - !<ColorSpace>
+    name: Raw
+    bitdepth: 32f
+    description: Raw (unmodified data)
+    isdata: true
+    encoding: data
+
+view_transforms:
+  - !<ViewTransform>
+    name: gltf_neutral_tonemap_lut
+    from_scene_reference: !<FileTransform>
+      src: gltf_neutral_tonemap.cube
+      interpolation: linear
+      direction: forward
+
+shared_views:
+  - !<View>
+    name: glTF Neutral (LUT)
+    view_transform: gltf_neutral_tonemap_lut
+    display_colorspace: sRGB
+
+displays:
+  sRGB:
+    - !<Views> [glTF Neutral (LUT)]
