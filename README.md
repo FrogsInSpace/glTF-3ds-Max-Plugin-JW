@@ -62,14 +62,16 @@ To build or use this project, the following environment is required:
 * **Autodesk 3ds Max SDK**: Provided by Autodesk.
 Environment VariablesYou must set an environment variable pointing to the installation path of the SDK.
 Use the variable name corresponding to your specific 3ds Max version:
-3ds Max Version	Environment Variable Name
-  2020               ADSK_3DSMAX_SDK_2020
-  2021               ADSK_3DSMAX_SDK_2021
-  2022			      ADSK_3DSMAX_SDK_2022
-  2023			      ADSK_3DSMAX_SDK_2023
-  2024   		      ADSK_3DSMAX_SDK_2024
-  2025			      ADSK_3DSMAX_SDK_2025
-  2026			      ADSK_3DSMAX_SDK_2026
+
+3ds Max Version    Environment Variable Name
+
+  2020 -------------- ADSK_3DSMAX_SDK_2020  
+  2021 -------------- ADSK_3DSMAX_SDK_2021  
+  2022 -------------- ADSK_3DSMAX_SDK_2022  
+  2023 -------------- ADSK_3DSMAX_SDK_2023  
+  2024 -------------- ADSK_3DSMAX_SDK_2024  
+  2025 -------------- ADSK_3DSMAX_SDK_2025  
+  2026 -------------- ADSK_3DSMAX_SDK_2026  
 
 ### 3rd Party Libraries
 This project incorporates the following open-source libraries:
