@@ -79,7 +79,7 @@
 //using namespace tinygltf;
 
 
-#define HS_GLTF_EXPORTER_VER (_T("1.57"))
+#define HS_GLTF_EXPORTER_VER (_T("1.57a"))
 
 #define HSglTFExporter_CLASS_ID		Class_ID(0x38586030, 0x1b315b3e)
 #define HSglTF2Exporter_CLASS_ID	Class_ID(0x56337879, 0x5a732c12)

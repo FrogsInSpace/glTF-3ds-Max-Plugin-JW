@@ -423,11 +423,17 @@ INT_PTR CALLBACK HSglTFImporterOptionsDlgProc(HWND hWnd,UINT message,WPARAM wPar
 		EnableWindow(GetDlgItem(hWnd, IDC_SETBMP_BTN), HH_EnableBkColor);
 
 		EnableWindow(GetDlgItem(hWnd, IDC_MTL_RADIO5), s_ArnoldMtlEnable);
+		if(!s_ArnoldMtlEnable) CheckDlgButton(hWnd, IDC_MTL_RADIO5, FALSE);
 		EnableWindow(GetDlgItem(hWnd, IDC_MTL_RADIO6), s_USDMtlEnable);
+		if (!s_USDMtlEnable) CheckDlgButton(hWnd, IDC_MTL_RADIO6, FALSE);
 		EnableWindow(GetDlgItem(hWnd, IDC_MTL_RADIO7), s_VRayMtlEnable);
+		if (!s_VRayMtlEnable) CheckDlgButton(hWnd, IDC_MTL_RADIO7, FALSE);
 		EnableWindow(GetDlgItem(hWnd, IDC_MTL_RADIO8), s_CoronaMtlEnable);
+		if (!s_CoronaMtlEnable) CheckDlgButton(hWnd, IDC_MTL_RADIO8, FALSE);
 		EnableWindow(GetDlgItem(hWnd, IDC_MTL_RADIO9), FALSE);
 		EnableWindow(GetDlgItem(hWnd, IDC_MTL_RADIO10), s_OpenPBRMtlEnable);
+		if (!s_OpenPBRMtlEnable) CheckDlgButton(hWnd, IDC_MTL_RADIO10, FALSE);
+
 		if (!s_ArnoldMtlEnable && HH_MtlMode == 4) HH_MtlMode = 0;
 		if (!s_USDMtlEnable && HH_MtlMode == 5) HH_MtlMode = 0;
 		if (!s_VRayMtlEnable && HH_MtlMode == 6) HH_MtlMode = 0;

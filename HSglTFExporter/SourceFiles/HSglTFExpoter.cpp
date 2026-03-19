@@ -173,7 +173,7 @@ IPoint2 GetBitmapSize(void)
 }
 
 //======================================================================
-// エクスポーター クラス定義
+// Exportee class declaration
 //======================================================================
 class HSglTFExporter : public SceneExport
 {
@@ -309,7 +309,7 @@ int HSglTF2Exporter::DoExport(const TCHAR* filename, ExpInterface* exporterInt, 
 }
 #endif
 //======================================================================
-// プラグイン記述子
+// Plugin description
 //======================================================================
 class HSglTFExporterClassDesc : public ClassDesc2 
 {
@@ -355,7 +355,7 @@ INT_PTR CALLBACK HSglTFRapidCompOptionsDlgProc(HWND hWnd, UINT message, WPARAM w
 		HWND hLink = GetDlgItem(hWnd, IDC_HYPERLINK_STATIC);
 		//SetWindowText(hLink, L"Click here to visit Google");
 
-		// 下線付きのフォントを作成
+		// Undeline font
 		HFONT hFont = (HFONT)SendMessage(hLink, WM_GETFONT, 0, 0);
 		LOGFONT lf;
 		GetObject(hFont, sizeof(lf), &lf);
@@ -498,13 +498,7 @@ INT_PTR CALLBACK HSglTFExporterOptionsDlgProc(HWND hWnd, UINT message, WPARAM wP
 		ShowWindow(GetDlgItem(hWnd, IDC_WM_CHK), Open_InstanceWithMtl);
 		SetWindowText(GetDlgItem(hWnd, IDCLICENSE_EDIT), pLicenseStr);
 		//CenterWindow(hWnd, GetParent(hWnd));
-#ifndef _DEBUG
-		ShowWindow(GetDlgItem(hWnd, IDC_PHYSQ_CHK), FALSE);
-		ShowWindow(GetDlgItem(hWnd, IDC_REFERENCE_CHK), FALSE);
-		EnableWindow(GetDlgItem(hWnd, IDC_INTERACT_CHK), FALSE);
-		EnableWindow(GetDlgItem(hWnd, IDC_INTERACT_COMBO), FALSE);
-		EnableWindow(GetDlgItem(hWnd, IDC_CAMERA_COMBO), FALSE);
-#endif
+
 		CheckDlgButton(hWnd, IDC_REFERENCE_CHK, HH_ReferenceFileMode);
 
 		if (theExporterCore.m_InteractiveLayerTable.size()) {
@@ -628,7 +622,7 @@ INT_PTR CALLBACK HSglTFExporterOptionsDlgProc(HWND hWnd, UINT message, WPARAM wP
 }
 
 //======================================================================
-// メインダイアログ CallBack
+// Main Dialog CallBack
 //======================================================================
 INT_PTR CALLBACK HSglTFExporterMainDlgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
@@ -1072,9 +1066,7 @@ void glTFExporter_Core::ExportScene(int ver)
 	tstring stem = m_fullpath.stem();
 	tstring ext = m_fullpath.extension();
 	std::transform(ext.cbegin(), ext.cend(), ext.begin(), tolower);
-	//std::string FormatId;
-	//if (ext == _T(".gltf")) FormatId = "gltf";
-	//if (ext == _T(".glb")) FormatId = "glb";
+
 	if (m_ExportFileType == 3) {
 		m_fullpath = tstring(m_fullpath.parent_path()) + tstring(_T("\\")) + stem + tstring(_T(".glb"));
 	}
@@ -1400,9 +1392,9 @@ void glTFExporter_Core::CreateInteractiveLayerTable(void)
 
 
 //----------------------------------------------------------
-// 指定したモデファイアの取り出し
-// かかっていたらそのモデファイアを返す
-//----------------------------------------------------------
+// Retrieve the specified modifier
+// Returns the modifier instance if found, otherwise returns null
+// //----------------------------------------------------------
 int FindModifier(INode* pNode, const Class_ID &CID, Modifier **pMod)
 {
 	*pMod = NULL;
@@ -1446,7 +1438,7 @@ IParamBlock* GetParamBlock(Animatable* pAnim, int idx)
 
 
 //======================================================================
-// テクスチャUVがアニメーションしているか
+// If the texture UV is animated
 //======================================================================
 BOOL UVGenAnimated(StdUVGen* pUVGen)
 {
@@ -1473,7 +1465,7 @@ BOOL UVGenAnimated(StdUVGen* pUVGen)
 }
 
 //======================================================================
-//	wstringをstringへ変換
+//	wstring to string
 //======================================================================
 std::string WStringToString(std::wstring oWString)
 {
@@ -1491,7 +1483,7 @@ std::string WStringToString(std::wstring oWString)
 	return(oRet);
 }
 //======================================================================
-//	stringをwstringへ変換
+//	string to wstring
 //======================================================================
 std::wstring StringToWString(const char *oString)
 {
@@ -1512,7 +1504,7 @@ std::wstring StringToWString(const char *oString)
 }
 
 //================================================================
-// 小数点以下を指定した桁数まで切り捨てる関数
+// Truncate to the specified decimal places.
 //================================================================
 double truncateDecimal(float value) 
 {

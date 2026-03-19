@@ -73,7 +73,7 @@ extern BOOL IsLogOut(void);
 
 #define HS_APP_CODE 200
 
-#define HS_GLTF_IMPORTER_VER (_T("1.67"))
+#define HS_GLTF_IMPORTER_VER (_T("1.67a"))
 
 #define HS_UV_MODE 1
 

@@ -1142,20 +1142,24 @@ void glTFImporter_Core::CorrectBitmapGamma(BitmapTex*& pBmpTex, float gamma, BOO
 			if (gamma == 1.0f) {
 
 				Bitmap* pBmp = pBmpTex->GetBitmap(0);
-				if (!pBmp) return;
 				BitmapInfo* bi = &pBmp->GetBitmapInfo();
 
-				MaxSDK::ColorManagement::IColorPipelineMgr* cpm = (MaxSDK::ColorManagement::IColorPipelineMgr*)GetCOREInterface(COLORPIPELINEMGR_INTERFACE);
-
-				auto settings = cpm->Settings();
-				if (settings->IsOCIOBased())
 				{
-					BitmapInfo bmi(*bi);
-					auto ret = bmi.SetRequestedColorSpace(settings->GetDataColorSpaceName(), MaxSDK::ColorManagement::ColSpaceSource::User);
-					bmi.SetName(pBmpTex->GetMapName());
-					bmi.ResetCustomFlag(BMM_CUSTOM_FILEGAMMA);
-					bmi.SetCustomFlag(BMM_CUSTOM_GAMMA);
-					bmi.SetCustomGamma(gamma);
+					//auto cpm = MaxSDK::ColorManagement::IColorPipelineMgr::GetInstance();
+					MaxSDK::ColorManagement::IColorPipelineMgr* cpm = (MaxSDK::ColorManagement::IColorPipelineMgr*)GetCOREInterface(COLORPIPELINEMGR_INTERFACE);
+
+					auto settings = cpm->Settings();
+					if (settings->IsOCIOBased())
+					{
+						BitmapInfo bmi(*bi);
+						auto ret = bmi.SetRequestedColorSpace(settings->GetDataColorSpaceName(), MaxSDK::ColorManagement::ColSpaceSource::User);
+						bmi.SetName(pBmpTex->GetMapName());
+						bmi.ResetCustomFlag(BMM_CUSTOM_FILEGAMMA);
+						bmi.SetCustomFlag(BMM_CUSTOM_GAMMA);
+						bmi.SetCustomGamma(gamma);
+						pBmpTex->SetBitmapInfo(bmi);
+					}
+
 				}
 			}
 #else
