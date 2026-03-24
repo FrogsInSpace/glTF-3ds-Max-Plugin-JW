@@ -432,7 +432,7 @@ Texmap *glTFImporter_Core::BitmapTexToCoronaBitmap(BitmapTex *pBmpTex, float gam
 #define Corona_MapScale		105
 #define Corona_MapOffset	106
 #define Corona_MapTileU		108
-#define Corona_MapTileU		109
+#define Corona_MapTileV		109
 #define Corona_AlphaSource	115
 
 #define Corona_MapGamma		125

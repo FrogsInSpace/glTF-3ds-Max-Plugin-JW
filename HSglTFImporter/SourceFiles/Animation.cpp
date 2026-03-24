@@ -33,7 +33,7 @@ BOOL glTFImporter_Core::FindAnimationChannels(cgltf_node *node, cgltf_animation 
 	size_t ChannelCnt = animation->channels_count;
 	for (size_t i = 0; i < ChannelCnt; i++) {
 		cgltf_animation_channel *ch = &animation->channels[i];
-		if (!ch)continue;
+		//if (!ch)continue;
 		if (node == ch->target_node) {
 			ChannelList.push_back(i);
 		}
@@ -61,7 +61,7 @@ BOOL glTFImporter_Core::FindMtlAnimationChannels(cgltf_material* mtl, cgltf_anim
 
 		char type[MAX_PATH], dmy[MAX_PATH];
 		int target;
-		sscanf("/%s/%d/%s", type, &target, dmy);
+		if (sscanf(extensions->data, "/%255s/%d/%255s", type, &target, dmy) != 3) continue;
 		if (strcmp(type, "materials")) continue;
 
 		if (mtl == &m_glTF_data->materials[target]) {
@@ -86,7 +86,7 @@ void glTFImporter_Core::GetPosAnimKeyFrameList(cgltf_animation_sampler *sampler,
 	AnimKeyInfo keyInfo;
 	PosKeyList.clear();
 	if (sampler->interpolation == cgltf_interpolation_type_cubic_spline) {
-		// CubicSpline[InTan/OutTan]は未実装
+		// CubicSpline is not yet implemented
 		std::vector<float>::iterator p = AnimationList.begin();
 		for (auto key : KeyFrames) {
 			float ix = *(p + 0);
@@ -399,6 +399,8 @@ Control* glTFImporter_Core::CreateColorController(const std::map<TimeValue, Anim
 void glTFImporter_Core::SetXYZController(Control *pCtrl, cgltf_interpolation_type InterpType, TimeValue start)
 {
 	IKeyControl *pIkeyXCrl = GetKeyControlInterface(pCtrl->GetXController());
+	if (!pIkeyXCrl) return;
+
 	for (int i = 0; i < pIkeyXCrl->GetNumKeys(); i++) {
 		IBezFloatKey Key;
 		pIkeyXCrl->GetKey(i, &Key);
@@ -417,6 +419,8 @@ void glTFImporter_Core::SetXYZController(Control *pCtrl, cgltf_interpolation_typ
 		pIkeyXCrl->SetKey(i, &Key);
 	}
 	IKeyControl *pIkeyYCrl = GetKeyControlInterface(pCtrl->GetYController());
+	if (!pIkeyYCrl) return;
+
 	for (int i = 0; i < pIkeyYCrl->GetNumKeys(); i++) {
 		IBezFloatKey Key;
 		pIkeyYCrl->GetKey(i, &Key);
@@ -435,6 +439,8 @@ void glTFImporter_Core::SetXYZController(Control *pCtrl, cgltf_interpolation_typ
 		pIkeyYCrl->SetKey(i, &Key);
 	}
 	IKeyControl *pIkeyZCrl = GetKeyControlInterface(pCtrl->GetZController());
+	if (!pIkeyZCrl) return;
+
 	for (int i = 0; i < pIkeyZCrl->GetNumKeys(); i++) {
 		IBezFloatKey Key;
 		pIkeyZCrl->GetKey(i, &Key);
@@ -1741,6 +1747,8 @@ void glTFImporter_Core::SetUVOffsetController(Mtl* pMtl, Control* pUC, Control* 
 	IParamBlock* pBlock = GetParamBlock(pUVGen, 0);
 
 	IKeyControl* pIkeyCrl = GetKeyControlInterface(pUC);
+	if (!pIkeyCrl) return;
+
 	for (int i = 0; i < pIkeyCrl->GetNumKeys(); i++) {
 		IBezFloatKey key;
 		pIkeyCrl->GetKey(i, &key);
@@ -2068,6 +2076,8 @@ Control* ConvertFloatToColorController(Control* pSrcC, UINT ch)
 
 	Control* pDstC = (Control*)GetCOREInterface()->CreateInstance(CTRL_POINT4_CLASS_ID, Class_ID(0x2013, 0x0));
 	IKeyControl* ikeys = GetKeyControlInterface(pSrcC);
+	if (!ikeys) return NULL;
+
 	for (int i = 0; i < ikeys->GetNumKeys(); i++) {
 		IBezFloatKey key;
 		ikeys->GetKey(i, &key);

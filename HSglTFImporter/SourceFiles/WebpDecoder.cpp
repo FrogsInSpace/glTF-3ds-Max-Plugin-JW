@@ -64,6 +64,7 @@ BOOL glTFImporter_Core::WebpDecode(const tstring &fname, tstring &retname)
     int ret = WebPGetInfo(data.data(), data.size(), &width, &height);
 
     uint8_t *buf = WebPDecodeRGBA(data.data(), data.size(), &width, &height);
+    if (!buf) return FALSE;
 
     std::filesystem::path destname(fname);
     retname = m_WorkImageFolder + tstring(destname.stem()) + _T(".png");
@@ -77,7 +78,7 @@ BOOL glTFImporter_Core::WebpDecode(const tstring &fname, tstring &retname)
 
     Bitmap* pBmp = TheManager->Create(&bi);
     uint8_t* p = buf;
-    float rate = 0xffff / 0xff;
+    float rate = 65535.0f / 255.0f;;
 
     for (int h = 0; h < height;h++) {
         for (int w = 0; w < width; w++) {
@@ -86,12 +87,13 @@ BOOL glTFImporter_Core::WebpDecode(const tstring &fname, tstring &retname)
             col.r = static_cast<uint16_t>(*p++ * rate);
             col.g = static_cast<uint16_t>(*p++ * rate);
             col.b = static_cast<uint16_t>(*p++ * rate);
+            col.a = static_cast<uint16_t>(*p++ * rate);
 
-            pix.r = static_cast<uint16_t>(pow(static_cast<float>(col.r) / 65535.0f, 2.2f) * 65535.0f + 0.5f);
-            pix.g = static_cast<uint16_t>(pow(static_cast<float>(col.g) / 65535.0f, 2.2f) * 65535.0f + 0.5f);
-            pix.b = static_cast<uint16_t>(pow(static_cast<float>(col.b) / 65535.0f, 2.2f) * 65535.0f + 0.5f);
+            //pix.r = static_cast<uint16_t>(pow(static_cast<float>(col.r) / 65535.0f, 2.2f) * 65535.0f + 0.5f);
+            //pix.g = static_cast<uint16_t>(pow(static_cast<float>(col.g) / 65535.0f, 2.2f) * 65535.0f + 0.5f);
+            //pix.b = static_cast<uint16_t>(pow(static_cast<float>(col.b) / 65535.0f, 2.2f) * 65535.0f + 0.5f);
 
-            pix.a = *p++;
+            pix = col;
 
             pBmp->PutPixels(w, h, 1, &pix);
         }

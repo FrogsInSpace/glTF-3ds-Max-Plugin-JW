@@ -24,6 +24,7 @@ bool isNumber(const char* str)
 {
 	for (const char* c = str;*c ; c++) {
 		if (*c == '.') continue;
+		if (*c == '-') continue;
 		if (isdigit(*c) == 0) return false;
 	}
 	return true;
@@ -69,6 +70,7 @@ void glTFImporter_Core::CreateParamTableFromExtras(cgltf_extras &extras, cgltf_s
 	jsmn_init(&p);
 	size_t tokenNum = jsmn_parse(&p, extras_buffer, size, NULL, (size_t)0);
 	//size_t tokenNum = 10;
+	if (tokenNum <= 0) { delete[] extras_buffer; return; }
 
 	//jsmntok_t tokens[10] = { (jsmntype_t)0 };
 	jsmntok_t* tokens = new jsmntok_t[tokenNum];// { (jsmntype_t)0 };
@@ -83,8 +85,8 @@ void glTFImporter_Core::CreateParamTableFromExtras(cgltf_extras &extras, cgltf_s
 		char buf[10000];
 		jsmntok_t tok = tokens[i];
 		if (tok.type == JSMN_STRING) {
-			memset(buf, 0, sizeof buf);
-			strncpy(buf, extras_buffer + tok.start, tok.end - tok.start);
+			memset(buf, 0, sizeof(buf));
+			strncpy_s(buf, sizeof(buf), extras_buffer + tok.start, tok.end - tok.start);
 			if (TitleFlag) {
 				param.name = buf;
 				TitleFlag = FALSE;
@@ -93,7 +95,7 @@ void glTFImporter_Core::CreateParamTableFromExtras(cgltf_extras &extras, cgltf_s
 			else if (ParamFlag) {
 				if (isNumber(buf)) {
 					param.type = TYPE_FLOAT;
-					param.fParam = atof(buf);
+					param.fParam = (float)atof(buf);
 					param.fminParam = -100000000.0f;
 					param.fmaxParam = 100000000.0f;
 				}
@@ -106,9 +108,9 @@ void glTFImporter_Core::CreateParamTableFromExtras(cgltf_extras &extras, cgltf_s
 				attrTbl.push_back(param);
 			}
 		}
-		if (tok.type == JSMN_PRIMITIVE) {
-			memset(buf, 0, sizeof buf);
-			strncpy(buf, extras_buffer + tok.start, tok.end - tok.start);
+		else if (tok.type == JSMN_PRIMITIVE) {
+			memset(buf, 0, sizeof(buf));
+			strncpy_s(buf, sizeof(buf), extras_buffer + tok.start, tok.end - tok.start);
 			if (strchr(buf, '.')) {
 				param.type = TYPE_FLOAT;
 				param.fParam = (float)atof(buf);
@@ -130,8 +132,8 @@ void glTFImporter_Core::CreateParamTableFromExtras(cgltf_extras &extras, cgltf_s
 				i++;
 				for (int xx = 0; xx < tok.size; xx++) {
 					jsmntok_t tk = tokens[i++];
-					memset(buf, 0, sizeof buf);
-					strncpy(buf, extras_buffer + tk.start, tk.end - tk.start);
+					memset(buf, 0, sizeof(buf));
+					strncpy_s(buf, sizeof(buf), extras_buffer + tk.start, tk.end - tk.start);
 					param.sParam = std::string(buf);
 					param.type = TYPE_STRING;
 					TitleFlag = TRUE;
@@ -147,8 +149,8 @@ void glTFImporter_Core::CreateParamTableFromExtras(cgltf_extras &extras, cgltf_s
 				int ss = tok.size > 4 ? 4 : tok.size;
 				for (int xx = 0; xx < ss; xx++) {
 					jsmntok_t tk = tokens[i++];
-					memset(buf, 0, sizeof buf);
-					strncpy(buf, extras_buffer + tk.start, tk.end - tk.start);
+					memset(buf, 0, sizeof(buf));
+					strncpy_s(buf, sizeof(buf), extras_buffer + tk.start, tk.end - tk.start);
 					val[xx] = (float)atof(buf);
 				}
 				param.type = TYPE_RGBA;
@@ -176,6 +178,7 @@ void glTFImporter_Core::CreateTargetListFromExtras(cgltf_extras& extras, cgltf_s
 	jsmn_parser p;
 	jsmn_init(&p);
 	size_t tokenNum = jsmn_parse(&p, extras_buffer, size, NULL, (size_t)0);
+	if (tokenNum <= 0) { delete[] extras_buffer; return; }
 
 	jsmntok_t* tokens = new jsmntok_t[tokenNum];// { (jsmntype_t)0 };
 	jsmn_init(&p);
@@ -186,8 +189,8 @@ void glTFImporter_Core::CreateTargetListFromExtras(cgltf_extras& extras, cgltf_s
 		char buf[1000];
 		jsmntok_t tok = tokens[i];
 		if (tok.type == JSMN_STRING) {
-			memset(buf, 0, sizeof buf);
-			strncpy(buf, extras_buffer + tok.start, tok.end - tok.start);
+			memset(buf, 0, sizeof(buf));
+			strncpy_s(buf, sizeof(buf), extras_buffer + tok.start, tok.end - tok.start);
 			if (!strcmp(buf, "targetNames")) {
 				index = i;
 				break;
@@ -201,8 +204,8 @@ void glTFImporter_Core::CreateTargetListFromExtras(cgltf_extras& extras, cgltf_s
 			for (int xx = 0; xx < tok.size; xx++) {
 				char buf[1000];
 				jsmntok_t tk = tokens[index++];
-				memset(buf, 0, sizeof buf);
-				strncpy(buf, extras_buffer + tk.start, tk.end - tk.start);
+				memset(buf, 0, sizeof(buf));
+				strncpy_s(buf, sizeof(buf), extras_buffer + tk.start, tk.end - tk.start);
 				tbl.push_back(StringToWString(buf));
 			}
 		}
@@ -351,8 +354,8 @@ Class_ID glTFImporter_Core::AttacheCustAttr(Animatable* pAnim, std::vector<custA
 #endif
 
 	if (fpv.type == TYPE_INT64_TAB) {
-		ret.SetPartA((*fpv.i64_tab)[0]);
-		ret.SetPartB((*fpv.i64_tab)[1]);
+		ret.SetPartA((ulong)(*fpv.i64_tab)[0]);
+		ret.SetPartB((ulong)(*fpv.i64_tab)[1]);
 	}
 	m_CustAttrMap[ret] = AttrName;
 
@@ -432,7 +435,7 @@ void glTFImporter_Core::CreateIridescenceAttr(Mtl *pMtl, cgltf_iridescence* irid
 
 	BitmapTex* pBmpTex1 = NULL;
 	cgltf_texture_view *texInfo1 = &iridescence->iridescence_texture;
-	if (texInfo1) {
+	if (texInfo1->texture) {
 		pBmpTex1 = GetBitmapTexFromglTexture(texInfo1->texture);
 		SetTextureUVoffset(pBmpTex1, texInfo1);
 		param.name = std::string("iridescenceTexture");
@@ -442,7 +445,7 @@ void glTFImporter_Core::CreateIridescenceAttr(Mtl *pMtl, cgltf_iridescence* irid
 	}
 	BitmapTex* pBmpTex2 = NULL;
 	cgltf_texture_view* texInfo2 = &iridescence->iridescence_thickness_texture;
-	if (texInfo2) {
+	if (texInfo2->texture) {
 		pBmpTex2 = GetBitmapTexFromglTexture(texInfo2->texture);
 		SetTextureUVoffset(pBmpTex2, texInfo2);
 		param.name = std::string("iridescenceThicknessTexture");
@@ -570,7 +573,7 @@ void glTFImporter_Core::CreateVolumeAttr(Mtl* pMtl, cgltf_volume* volume, BOOL e
 
 	BitmapTex* pBmpTex1 = NULL;
 	cgltf_texture_view* texInfo1 = &volume->thickness_texture;
-	if (texInfo1) {
+	if (texInfo1->texture) {
 		pBmpTex1 = GetBitmapTexFromglTexture(texInfo1->texture);
 		SetTextureUVoffset(pBmpTex1, texInfo1);
 		param.name = std::string("thicknessTexture");
@@ -580,6 +583,7 @@ void glTFImporter_Core::CreateVolumeAttr(Mtl* pMtl, cgltf_volume* volume, BOOL e
 	}
 
 	Class_ID retID = AttacheCustAttr(pMtl, attrTbl, _T("Volume"));
+	if (retID == Class_ID(0, 0)) return;
 
 	ICustAttribContainer* pContainer = pMtl->GetCustAttribContainer();
 	for (int i = 0; i < pContainer->GetNumCustAttribs(); i++) {
@@ -615,7 +619,7 @@ void glTFImporter_Core::CreateSheenAttr(Mtl* pMtl, cgltf_sheen* sheen, BOOL enab
 
 	BitmapTex* pBmpTex1 = NULL;
 	cgltf_texture_view* texInfo1 = &sheen->sheen_color_texture;
-	if (texInfo1) {
+	if (texInfo1->texture) {
 		pBmpTex1 = GetBitmapTexFromglTexture(texInfo1->texture);
 		SetTextureUVoffset(pBmpTex1, texInfo1);
 		param.name = std::string("sheenColorTexture");
@@ -633,9 +637,9 @@ void glTFImporter_Core::CreateSheenAttr(Mtl* pMtl, cgltf_sheen* sheen, BOOL enab
 
 	BitmapTex* pBmpTex2 = NULL;
 	cgltf_texture_view* texInfo2 = &sheen->sheen_roughness_texture;
-	if (texInfo2) {
-		pBmpTex1 = GetBitmapTexFromglTexture(texInfo2->texture);
-		SetTextureUVoffset(pBmpTex2, texInfo1);
+	if (texInfo2->texture) {
+		pBmpTex2 = GetBitmapTexFromglTexture(texInfo2->texture);
+		SetTextureUVoffset(pBmpTex2, texInfo2);
 		param.name = std::string("sheenRoughnessTexture");
 		param.type = TYPE_TEXMAP;
 		param.pParam = pBmpTex2;
@@ -684,7 +688,7 @@ void glTFImporter_Core::CreateClearcoatAttr(Mtl* pMtl, cgltf_clearcoat* clearcoa
 
 	BitmapTex* pBmpTex1 = NULL;
 	cgltf_texture_view* texInfo1 = &clearcoat->clearcoat_texture;
-	if (texInfo1) {
+	if (texInfo1->texture) {
 		pBmpTex1 = GetBitmapTexFromglTexture(texInfo1->texture);
 		SetTextureUVoffset(pBmpTex1, texInfo1);
 		param.name = std::string("clearcoatTexture");
@@ -702,8 +706,8 @@ void glTFImporter_Core::CreateClearcoatAttr(Mtl* pMtl, cgltf_clearcoat* clearcoa
 
 	BitmapTex* pBmpTex2 = NULL;
 	cgltf_texture_view* texInfo2 = &clearcoat->clearcoat_roughness_texture;
-	if (texInfo2) {
-		pBmpTex1 = GetBitmapTexFromglTexture(texInfo2->texture);
+	if (texInfo2->texture) {
+		pBmpTex2 = GetBitmapTexFromglTexture(texInfo2->texture);
 		SetTextureUVoffset(pBmpTex2, texInfo2);
 		param.name = std::string("clearcoatRoughnessTexture");
 		param.type = TYPE_TEXMAP;
@@ -713,7 +717,7 @@ void glTFImporter_Core::CreateClearcoatAttr(Mtl* pMtl, cgltf_clearcoat* clearcoa
 
 	BitmapTex* pBmpTex3 = NULL;
 	cgltf_texture_view* texInfo3 = &clearcoat->clearcoat_normal_texture;
-	if (texInfo3) {
+	if (texInfo3->texture) {
 		pBmpTex3 = GetBitmapTexFromglTexture(texInfo3->texture);
 		SetTextureUVoffset(pBmpTex3, texInfo3);
 		param.name = std::string("clearcoatNormalTexture");
@@ -738,7 +742,7 @@ void glTFImporter_Core::CreateClearcoatAttr(Mtl* pMtl, cgltf_clearcoat* clearcoa
 			pParamBlk->SetValueByName(_T("clearcoatRoughnessTexture"), pBmpTex2, 0);
 		}
 		if (pBmpTex3) {
-			pParamBlk->SetValueByName(_T("clearcoatNormalTexture"), pBmpTex2, 0);
+			pParamBlk->SetValueByName(_T("clearcoatNormalTexture"), pBmpTex3, 0);
 		}
 	}
 }
@@ -767,7 +771,7 @@ void glTFImporter_Core::CreateTransmissionAttr(Mtl* pMtl, cgltf_transmission* tr
 
 	BitmapTex* pBmpTex1 = NULL;
 	cgltf_texture_view* texInfo1 = &transmission->transmission_texture;
-	if (texInfo1) {
+	if (texInfo1->texture) {
 		pBmpTex1 = GetBitmapTexFromglTexture(texInfo1->texture);
 		SetTextureUVoffset(pBmpTex1, texInfo1);
 		param.name = std::string("transmissionTexture");
@@ -847,7 +851,7 @@ void glTFImporter_Core::CreateAnisotropyAttr(Mtl* pMtl, cgltf_anisotropy* anisot
 
 	BitmapTex* pBmpTex1 = NULL;
 	cgltf_texture_view* texInfo1 = &anisotropy->anisotropy_texture;
-	if (texInfo1) {
+	if (texInfo1->texture) {
 		pBmpTex1 = GetBitmapTexFromglTexture(texInfo1->texture);
 		SetTextureUVoffset(pBmpTex1, texInfo1);
 		param.name = std::string("anisotropyTexture");
@@ -900,7 +904,7 @@ void glTFImporter_Core::CreateDiffuseTransmissionAttr(Mtl* pMtl, cgltf_diffuse_t
 
 	BitmapTex* pBmpTex1 = NULL;
 	cgltf_texture_view* texInfo1 = &diffuse_transmission->diffuseTransmissionColorTexture;
-	if (texInfo1) {
+	if (texInfo1->texture) {
 		pBmpTex1 = GetBitmapTexFromglTexture(texInfo1->texture);
 		SetTextureUVoffset(pBmpTex1, texInfo1);
 		param.name = std::string("diffuseTransmissionColorTexture");
@@ -911,7 +915,7 @@ void glTFImporter_Core::CreateDiffuseTransmissionAttr(Mtl* pMtl, cgltf_diffuse_t
 
 	BitmapTex* pBmpTex2 = NULL;
 	cgltf_texture_view* texInfo2 = &diffuse_transmission->diffuseTransmissionTexture;
-	if (texInfo2) {
+	if (texInfo2->texture) {
 		pBmpTex2 = GetBitmapTexFromglTexture(texInfo2->texture);
 		SetTextureUVoffset(pBmpTex2, texInfo2);
 		param.name = std::string("diffuseTransmissionTexture");
@@ -961,7 +965,7 @@ void glTFImporter_Core::CreateSpecularAttr(Mtl* pMtl, cgltf_specular* specular, 
 
 	BitmapTex* pBmpTex1 = NULL;
 	cgltf_texture_view* texInfo1 = &specular->specular_texture;
-	if (texInfo1) {
+	if (texInfo1->texture) {
 		pBmpTex1 = GetBitmapTexFromglTexture(texInfo1->texture);
 		SetTextureUVoffset(pBmpTex1, texInfo1);
 		param.name = std::string("specularTexture");
@@ -977,7 +981,7 @@ void glTFImporter_Core::CreateSpecularAttr(Mtl* pMtl, cgltf_specular* specular, 
 
 	BitmapTex* pBmpTex2 = NULL;
 	cgltf_texture_view* texInfo2 = &specular->specular_color_texture;
-	if (texInfo2) {
+	if (texInfo2->texture) {
 		pBmpTex2 = GetBitmapTexFromglTexture(texInfo2->texture);
 		SetTextureUVoffset(pBmpTex2, texInfo2);
 		param.name = std::string("specularColorTexture");
@@ -1175,6 +1179,7 @@ DWORD glTFImporter_Core::CreateInteractivityAttr(ReferenceTarget* pRef, const In
 	if (!p) return FALSE;
 	if (GetCustAttrPBlock(p, tstring(_T("Interactivity")), pBlock) >= 0) {
 		const MCHAR *val = pBlock->GetStr(1, m_time, FOREVER);
+		if (!val) return 0;
 		return std::stoul(tstring(val));
 	}
 
@@ -1209,6 +1214,7 @@ BOOL glTFImporter_Core::GetInteractivityPointerID(ReferenceTarget* pRef, DWORD &
 	}
 	if (GetCustAttrPBlock(p, tstring(_T("Interactivity")), pBlock) >= 0) {
 		const MCHAR* val = pBlock->GetStr(1, m_time, FOREVER);
+		if (!val) return FALSE;
 		id = std::stoul(tstring(val));
 		return TRUE;
 	}

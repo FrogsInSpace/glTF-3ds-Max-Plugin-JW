@@ -120,6 +120,8 @@ BOOL glTFImporter_Core::gltfx_reference(const TCHAR* filename)
 	TCHAR buf[MAX_PATH];
 	_stprintf_s(buf, MAX_PATH, _T("%d"), (int)(m_scale * 1000.0f));
 	MaxSDK::Util::WritePrivateProfileString(_T("ImpSettings"), _T("scale"), buf, profle);
+
+	return TRUE;
 }
 
 //======================================================================

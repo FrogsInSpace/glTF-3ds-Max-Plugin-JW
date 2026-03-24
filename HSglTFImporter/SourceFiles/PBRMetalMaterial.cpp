@@ -221,7 +221,7 @@ void glTFImporter_Core::CreatePBRMetalMaterial(void)
 			pBlock1->SetValue(pbr_bump_map_amt, m_time, nrmTexInfo->scale);
 		}
 
-		Color EmissiveColor(0.0f);
+		Color EmissiveColor(0.0f, 0.0f, 0.0f);
 		float* emissive = mtl->emissive_factor;
 		if (emissive) {
 			EmissiveColor = Color(emissive[0], emissive[1], emissive[2]);

@@ -123,8 +123,8 @@ BOOL glTFExporter_Core::WebpEncode(Texmap* pTex, WebpTextureStruct &str)
 		else {
 			size = WebPEncodeRGBA(in.data(), width, height, stride, str.QualityFactor, &data);
 		}
+		if (!data || size == 0) return FALSE;
 
-		//MessageBox(NULL, (std::to_wstring(size)).c_str(), _T(""), MB_OK);
 		
 		//write_file(retname);
 		std::ofstream o(retname, std::ios::binary);

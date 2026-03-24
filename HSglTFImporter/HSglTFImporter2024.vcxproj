@@ -62,7 +62,7 @@
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>.\;.\include;.\Resource;$(ADSK_3DSMAX_SDK_2024)\include;$(ADSK_3DSMAX_SDK_2024)\include\Geom;$(ADSK_3DSMAX_SDK_2024)\samples\modifiers\bonesdef;$(ADSK_3DSMAX_SDK_2024)\samples\modifiers\morpher;$(ADSK_3DSMAX_SDK_2024)\howto\utilities\customattribute;..\3rd_Party_Products;..\3rd_Party_Products\KTX2</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_WINDOWS;_DEBUG;DRACO_ENABLED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_WINDOWS;_DEBUG;NOMINMAX;MAX_SILENCE_DEPRECATED_MATRIX_BOOL_CTOR;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderOutputFile>.\Hybrid2024/HSglTFImporter.pch</PrecompiledHeaderOutputFile>
@@ -80,6 +80,8 @@
       <UseFullPaths>true</UseFullPaths>
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <ExceptionHandling>Async</ExceptionHandling>
+      <DisableSpecificWarnings>4819</DisableSpecificWarnings>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -117,7 +119,7 @@
       <AdditionalOptions>/LD  %(AdditionalOptions)</AdditionalOptions>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
       <AdditionalIncludeDirectories>.\;.\include;.\Resource;$(ADSK_3DSMAX_SDK_2024)\include;$(ADSK_3DSMAX_SDK_2024)\include\Geom;$(ADSK_3DSMAX_SDK_2024)\samples\modifiers\bonesdef;$(ADSK_3DSMAX_SDK_2024)\samples\modifiers\morpher;$(ADSK_3DSMAX_SDK_2024)\howto\utilities\customattribute;..\3rd_Party_Products;..\3rd_Party_Products\KTX2</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>NDEBUG;_WINDOWS;_USRDLL;DRACO_ENABLED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;_WINDOWS;_USRDLL;NOMINMAX;MAX_SILENCE_DEPRECATED_MATRIX_BOOL_CTOR;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
@@ -131,6 +133,8 @@
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <CompileAs>Default</CompileAs>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <ExceptionHandling>Async</ExceptionHandling>
+      <DisableSpecificWarnings>4819</DisableSpecificWarnings>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>

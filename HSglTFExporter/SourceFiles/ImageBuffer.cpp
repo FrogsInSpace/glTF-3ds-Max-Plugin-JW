@@ -52,8 +52,9 @@ void glTFExporter_Core::CreateImageBuffer(void)
 		int size = stbuf.st_size;
 
 		char *buf = (char*)malloc(size);
-		FILE *pFp = fopen(fname.c_str(), "rb");
-		if (!pFp) continue;
+		FILE* pFp = nullptr;
+		errno_t err = fopen_s(&pFp, fname.c_str(), "rb");
+		if (err) continue;
 
 		fread(buf, sizeof(char), size, pFp);
 		fclose(pFp);
@@ -96,8 +97,9 @@ tstring GetURILFromFile(std::string &f)
 	int size = stbuf.st_size;
 
 	unsigned char *data = (unsigned char*)malloc(size);
-	FILE *pFp = _tfopen(fname.c_str(), _T("rb"));
-	if (!pFp) return tstring(_T(""));
+	FILE* pFp = nullptr;
+	errno_t err = _tfopen_s(&pFp, fname.c_str(), _T("rb"));
+	if (err) return tstring(_T(""));
 	fread(data, sizeof(unsigned char), size, pFp);
 	fclose(pFp);
 

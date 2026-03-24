@@ -16,24 +16,6 @@
  //**************************************************************************/
  // AUTHOR: Satoshi Hayashi 
  //***************************************************************************/
-/*
- * Copyright (c) 2024-2026 The Khronos Group Inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
- //**************************************************************************/
- // AUTHOR: Satoshi Hayashi 
- //***************************************************************************/
 
  //#pragma warning( disable : 4819 )
 //#pragma warning( disable : 4828 )
@@ -113,8 +95,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.\r\n"
 
 glTFExporter_Core theExporterCore;
 
-BOOL LogExport = TRUE;
-tstring LogFileName = _T("f:\\HSExportLog.txt");
+static BOOL LogExport = TRUE;
+static tstring LogFileName;
 
 //======================================================================
 //======================================================================
@@ -128,6 +110,8 @@ void LogInit(const tstring &output)
 }
 void LogOutput(const std::wstring& str, int pcs)
 {
+	if (!LogExport) return;
+
 	GetCOREInterface()->ProgressUpdate(pcs, TRUE, str.c_str());
 
 #ifdef _DEBUG
@@ -138,7 +122,10 @@ void LogOutput(const std::wstring& str, int pcs)
 	std::wstring fname;
 	//fname = GetCOREInterface()->GetDir(APP_PLUGINS_DIR);
 
-	FILE* fp = _tfopen(LogFileName.c_str(), _T("a+"));
+	FILE* fp = nullptr;
+	errno_t err = _tfopen_s(&fp, LogFileName.c_str(), _T("a+"));
+	if (err) return;
+
 	_ftprintf(fp, _T("%s\n"), str.c_str());
 
 	//TSTR log;
@@ -783,9 +770,9 @@ void HSglTFExporter::ShowAbout(HWND /*hWnd*/)
 int HSglTFExporter::DoExport(const TCHAR* filename, ExpInterface* exporterInt, Interface* ip, BOOL suppressPrompts, DWORD options)
 {
 	LogInit(tstring(filename));
-	if (LogExport) LogOutput(_T("DoExport Start."));
+	LogOutput(_T("DoExport Start."));
 
-	if (LogExport) LogOutput(_T("DoExport End."));
+	LogOutput(_T("DoExport End."));
 
 	exportSelected = (options & SCENE_EXPORT_SELECTED) ? TRUE : FALSE;
 
@@ -1058,7 +1045,7 @@ BOOL glTFExporter_Core::ExportPreProcess(const TCHAR* filename, BOOL suppressPro
 // -----------------------------------------------------------
 void glTFExporter_Core::ExportScene(int ver)
 {
-	if(LogExport) LogOutput(_T("Start."));
+	LogOutput(_T("Start."));
 
 	m_pIGameScene = GetIGameInterface();
 	m_pIGameScene->InitialiseIGame(GetCOREInterface()->GetRootNode());
@@ -1168,11 +1155,12 @@ void glTFExporter_Core::ExportScene(int ver)
 
 	}
 
-	if (LogExport) LogOutput(_T("Create Material Table."));
-	CreateMaterialMap(exportSelected);
-	if (LogExport) LogOutput(_T("Create Material Table->Finish."));
+	LogOutput(_T("Create Material Table."));
 
-	if (LogExport) LogOutput(_T("Create Scene Table.\n"));
+	CreateMaterialMap(exportSelected);
+
+	LogOutput(_T("Create Material Table->Finish."));
+	LogOutput(_T("Create Scene Table.\n"));
 
 	m_model.defaultScene = 0;
 	if (m_MultiScene==1) {
@@ -1211,26 +1199,31 @@ void glTFExporter_Core::ExportScene(int ver)
 		SetSceneExtras(scene);
 		m_model.scenes.push_back(scene);
 	}
-	if (LogExport) LogOutput(_T("Create Scene Table->Finish."));
 
-	if (LogExport) LogOutput(_T("Create Skin Table."));
+	LogOutput(_T("Create Scene Table->Finish."));
+	LogOutput(_T("Create Skin Table."));
+
 	for (auto tbl: m_skinNodeTable) {
 		CreateSkin(tbl.first, tbl.second);
 	}
-	if (LogExport) LogOutput(_T("Create Skin Table->Finish."));
 
-	if (LogExport) LogOutput(_T("Create Image Buffer."));
+	LogOutput(_T("Create Skin Table->Finish."));
+	LogOutput(_T("Create Image Buffer."));
+
 	if (m_ExportFileType == 3) {
 		CreateImageBuffer();
 	}
-	if (LogExport) LogOutput(_T("Create Image Buffer->Finish."));
+
+	LogOutput(_T("Create Image Buffer->Finish."));
 
 	if (m_ExportAnimation) {
-		if (LogExport) LogOutput(_T("Create Animation.\n"));
+		LogOutput(_T("Create Animation.\n"));
+		
 		CreateAnimation();
 		if(HH_AnimPointer)
 			CreateAnimationPointer();
-		if (LogExport) LogOutput(_T("Create Animation->Finish."));
+
+		LogOutput(_T("Create Animation->Finish."));
 	}
 
 	std::vector<std::string> interactiveExtensionList;
@@ -1246,13 +1239,13 @@ void glTFExporter_Core::ExportScene(int ver)
 
 	SetSceneExtensions();
 
-	if (LogExport) LogOutput(_T("Create Data Buffer."));
+	LogOutput(_T("Create Data Buffer."));
 
 	if(m_animation.channels.size()>0)
 		m_model.animations.push_back(m_animation);
 	m_model.buffers.push_back(buffer);
 
-	if (LogExport) LogOutput(_T("Create Data Buffer->Finish."));
+	LogOutput(_T("Create Data Buffer->Finish."));
 
 	if (m_MtlTransmission_Used)		m_model.extensionsUsed.push_back("KHR_materials_transmission");
 	if (m_MtlVolume_Used)			m_model.extensionsUsed.push_back("KHR_materials_volume");
@@ -1306,7 +1299,7 @@ void glTFExporter_Core::ExportScene(int ver)
 
 	std::string fname = WStringToString(m_fullpath);
 
-	if (LogExport) LogOutput(_T("Export File."));
+	LogOutput(_T("Export File."));
 
 	tinygltf::TinyGLTF gltf;
 	gltf.SetImageWriter(nullptr, nullptr);
@@ -1316,8 +1309,8 @@ void glTFExporter_Core::ExportScene(int ver)
 		true, // pretty print
 		(m_ExportFileType == 3)); // write binary
 
-	if (LogExport) LogOutput(_T("Export File->Finish."));
-	if (LogExport) LogOutput(_T("Copy Image File."));
+	LogOutput(_T("Export File->Finish."));
+	LogOutput(_T("Copy Image File."));
 
 	if (m_CopyImage && (m_ExportFileType == 1)) {
 		for (auto tbl : m_imagePathTable) {
@@ -1334,7 +1327,7 @@ void glTFExporter_Core::ExportScene(int ver)
 		}
 	}
 
-	if (LogExport) LogOutput(_T("Copy Image File->Finish."));
+	LogOutput(_T("Copy Image File->Finish."));
 
 	FreeSceneData();
 
@@ -1342,7 +1335,7 @@ void glTFExporter_Core::ExportScene(int ver)
 
 	if (HH_PostProcess) PostProcess(m_fullpath);
 
-	if (LogExport) LogOutput(_T("End."));
+	LogOutput(_T("End."));
 }
 
 

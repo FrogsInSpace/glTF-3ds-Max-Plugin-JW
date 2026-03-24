@@ -187,7 +187,7 @@ BitmapTex* CreateBitmapTex(const tstring& texFilePath, Texmap* pTex, const IPoin
 	return pBmpTex;
 }
 //===================================================
-// 依存関係を列挙するプロシージャクラス
+// Procedure class for enumerating dependency relationships
 //===================================================
 class HSMMDepEnumProc : public DependentEnumProc {
 	ReferenceMaker *m_pRef;
@@ -229,7 +229,7 @@ UINT glTFExporter_Core::CreateImage(const TCHAR *uri)
 	}
 	tinygltf::Image image;// = new tinygltf::Image;
 	tstring buf;
-	// glb +bin の場合、イメージファイルuriは相対パス（ファイル名のみ）にする
+	// For glb + bin format, the image file URI should be a relative path (filename only)
 	if (m_ExportFileType == 1) {
 		std::filesystem::path path(uri);
 		buf = path.filename();
@@ -1648,7 +1648,8 @@ void glTFExporter_Core::CreateMaterialMapRec(MtlBase *pOrgMtl, BOOL VariantPart)
 			material.name = n;
 		}
 	}
-	if (LogExport) LogOutput(tstring(_T("Mtl:")) + tstring(pMtl->GetName().data()));
+
+	LogOutput(tstring(_T("Mtl:")) + tstring(pMtl->GetName().data()));
 
 	{
 		tinygltf::Value::Object params;

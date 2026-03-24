@@ -31,6 +31,8 @@
 #include "ColorManagement\IColorPipelineMgr.h"
 #endif
 
+#include <filesystem>
+namespace fs = std::filesystem;
 
 //=============================================================================
 //=============================================================================
@@ -53,6 +55,7 @@ tstring glTFImporter_Core::CreateTextureFileName(cgltf_texture* tex, tstring &or
 			if (!strcmp(name, "EXT_texture_webp")) {
 				char* data = tex->extensions[i].data;
 				char* ptr = strchr(data, ':');
+				if (!ptr) break;
 				ptr++;
 				int idx = atoi(ptr);
 				image = &m_glTF_data->images[idx];
@@ -72,14 +75,14 @@ tstring glTFImporter_Core::CreateTextureFileName(cgltf_texture* tex, tstring &or
 		if (strncmp(uri, "data:", 5) == 0) {
 			const char* p = strchr(uri, ';');
 			char buf[MAX_PATH];
-			strncpy(buf, uri + 5, p - (uri + 5));
+			strncpy_s(buf, MAX_PATH, uri + 5, p - (uri + 5));
 			buf[p - (uri + 5)] = '\0';
 			const char* type = MimeTypes::getExtension(buf);
 			int outlength;
 			p = strchr(p, ',') + 1;
 			const char* endp = strchr(p, '=');
-			int len1 = endp - p;
-			int len2 = strlen(p);
+			size_t len1 = endp - p;
+			size_t len2 = strlen(p);
 			if (len1 <= 0) len1 = len2;
 			int CharSize = (len1 < len2) ? len1 : len2; //endp - p;
 			int ByteSize = (CharSize * 3) / 4;
@@ -90,22 +93,33 @@ tstring glTFImporter_Core::CreateTextureFileName(cgltf_texture* tex, tstring &or
 			cgltf_result ret = cgltf_load_buffer_base64(&options, ByteSize, p, &out_data);
 
 			char base_name[MAX_PATH];
-			if (image->name) 	strcpy(base_name, image->name);
-			else if (tex->name)	strcpy(base_name, tex->name);
-			else 				sprintf(base_name, "texture_%d.%s", (UINT)m_TextureMap.size(), type);
+			if (image->name) {
+				strncpy_s(base_name, MAX_PATH, image->name, MAX_PATH - 1);
+				base_name[MAX_PATH - 1] = '\0';
+			}
+			else if (tex->name) {
+				strncpy_s(base_name, MAX_PATH, tex->name, MAX_PATH - 1);
+				base_name[MAX_PATH - 1] = '\0';
+			}
+			else 
+				sprintf_s(base_name, MAX_PATH, "texture_%d.%s", (UINT)m_TextureMap.size(), type);
+
 			unsigned char* pp = (unsigned char*)base_name;
 			for (int i = 0; i < strlen(base_name); i++) {
 				if (!isalnum(*pp)) *pp = '_';
 				pp++;
 			}
 			if (!strchr(base_name, '.')) {
-				sprintf(buf, "%s_%d.%s", base_name, (UINT)m_TextureMap.size(), type);
-				strcpy(base_name, buf);
+				sprintf_s(buf, MAX_PATH, "%s_%d.%s", base_name, (UINT)m_TextureMap.size(), type);
+				strcpy_s(base_name, MAX_PATH, buf);
 			}
 			char name[MAX_PATH];
-			sprintf(name, "%s\\%s", WStringToString(m_WorkImageFolder).c_str(), base_name);
+			sprintf_s(name, MAX_PATH, "%s\\%s", WStringToString(m_WorkImageFolder).c_str(), base_name);
 
-			FILE* fp = fopen(name, "wb");
+			FILE* fp = nullptr;
+			errno_t err = fopen_s(&fp, name, "wb");
+			if (err) { delete[] out_data; return StringToWString(name); }
+
 			fwrite(out_data, ByteSize, 1, fp);
 			fclose(fp);
 			delete[] out_data;
@@ -113,37 +127,56 @@ tstring glTFImporter_Core::CreateTextureFileName(cgltf_texture* tex, tstring &or
 			m_EmbedFormat = TRUE;
 		}
 		else {
+			/*
 			//std::filesystem::path file(uri);
 			fname = urlDecode(StringToWString(uri));
 			fname = tstring(m_fullpath.parent_path()) + tstring(_T("\\")) + fname;
+			*/
+
+			tstring decodedUri = urlDecode(StringToWString(uri));
+
+			fs::path baseDir = m_fullpath.parent_path();
+			fs::path fullPath = baseDir / fs::path(decodedUri);
+
+			try {
+				fs::path canonicalPath = fs::weakly_canonical(fullPath);
+				fs::path canonicalBase = fs::canonical(baseDir);
+				auto rel = fs::relative(canonicalPath, canonicalBase);
+
+				// Check if the file is out of directory
+				if (rel.empty() || rel.string().find("..") != std::string::npos) {
+					// Seculity Error
+					fname = _T("");
+				}
+				else {
+					fname = canonicalPath.wstring();
+				}
+			}
+			catch (const std::exception& e) {
+				fname = _T("");
+			}
+
+
 		}
 	}
 	else if (strlen(image->mime_type) > 1) {
 		const char* type = MimeTypes::getExtension(image->mime_type);
 		cgltf_buffer_view* bufferview = image->buffer_view;
 		cgltf_buffer* buffer = bufferview->buffer;
-		int offset = bufferview->offset;
-		int size = bufferview->size;
+		size_t offset = bufferview->offset;
+		size_t size = bufferview->size;
 		void* ptr = (char*)(buffer->data) + offset;
 
 		char base_name[MAX_PATH];
 		//char buf[MAX_PATH];
 		if (image->name) {
-			strncpy(base_name, image->name, MAX_PATH);
+			strncpy_s(base_name, MAX_PATH, image->name, MAX_PATH);
 			char* ptr = strchr(base_name, '.');
 			if (ptr) *(ptr + 1) = 0;
-			strcat(base_name, type);
+			strcat_s(base_name, MAX_PATH, type);
 		}
-		else if (tex->name)	strncpy(base_name, tex->name, MAX_PATH);
-		else 				sprintf(base_name, "texture_%d.%s", (UINT)m_TextureMap.size(), type);
-
-		/*
-		unsigned char* pp = (unsigned char*)base_name;
-		for (int i = 0; i < strlen(base_name); i++) {
-			if (!isalnum(*pp)) *pp = '_';
-			pp++;
-		}
-		*/
+		else if (tex->name)	strncpy_s(base_name, MAX_PATH, tex->name, MAX_PATH);
+		else 				sprintf_s(base_name, MAX_PATH, "texture_%d.%s", (UINT)m_TextureMap.size(), type);
 
 		tstring str = StringToWString(base_name);
 		auto pos = str.rfind('\\');
@@ -153,15 +186,16 @@ tstring glTFImporter_Core::CreateTextureFileName(cgltf_texture* tex, tstring &or
 
 		if (str.rfind(_T(".")) == std::string::npos) {
 			TCHAR buf[1000];
-			_stprintf(buf, _T("%s_%d.%s"), str.c_str(), (UINT)m_TextureMap.size(), StringToWString(type).c_str());
+			_stprintf_s(buf, sizeof(buf), _T("%s_%d.%s"), str.c_str(), (UINT)m_TextureMap.size(), StringToWString(type).c_str());
 			str = tstring(buf);
 		}
 		//char name[MAX_PATH];
 		//sprintf(name, "%s\\%s", WStringToString(m_WorkImageFolder).c_str(), base_name);
 		fname = m_WorkImageFolder + tstring(_T("\\")) + str;
 
-		FILE* fp = _tfopen(fname.c_str(), _T("wb"));
-		if (fp) {
+		FILE* fp = nullptr;
+		errno_t err = _tfopen_s(&fp, fname.c_str(), _T("wb"));
+		if (err == 0) {
 			fwrite(ptr, size, 1, fp);
 			fclose(fp);
 		}
@@ -201,106 +235,6 @@ void glTFImporter_Core::CreateTextureTable(void)
 
 		tstring originalFname;
 		fname = CreateTextureFileName(tex, originalFname);
-		/*
-		const char *uri = image->uri;
-		//int size = image->buffer_view->size;
-		if (uri) {
-			if (strncmp(uri, "data:", 5) == 0) {
-				const char *p = strchr(uri, ';');
-				char buf[MAX_PATH];
-				strncpy(buf, uri+5, p-(uri + 5));
-				buf[p - (uri + 5)] = '\0';
-				const char *type = MimeTypes::getExtension(buf);
-				int outlength;
-				p = strchr(p, ',')+1;
-				const char *endp = strchr(p, '=');
-				int len1 = endp - p;
-				int len2 = strlen(p);
-				if (len1 <= 0) len1 = len2;
-				int CharSize = (len1 < len2) ? len1 : len2; //endp - p;
-				int ByteSize = (CharSize * 3)/4;
-				//if (CharSize % 4 != 0) ByteSize += 1;
-				cgltf_options options = { 0 };
-
-				void *out_data = new char [ByteSize];
-				cgltf_result ret = cgltf_load_buffer_base64(&options, ByteSize, p, &out_data);
-
-				char base_name[MAX_PATH];
-				if (image->name) 	strcpy(base_name, image->name);
-				else if (tex->name)	strcpy(base_name, tex->name);
-				else 				sprintf(base_name, "texture_%d.%s", (UINT)m_TextureMap.size(), type);
-				unsigned char* pp = (unsigned char*)base_name;
-				for (int i = 0; i < strlen(base_name); i++) {
-					if (!isalnum(*pp)) *pp = '_';
-					pp++;
-				}
-				if (!strchr(base_name, '.')) {
-					sprintf(buf, "%s_%d.%s", base_name, (UINT)m_TextureMap.size(), type);
-					strcpy(base_name, buf);
-				}
-				char name[MAX_PATH];
-				sprintf(name, "%s\\%s", WStringToString(m_WorkImageFolder).c_str(), base_name);
-
-				FILE* fp = fopen(name, "wb");
-				fwrite(out_data, ByteSize, 1, fp);
-				fclose(fp);
-				delete[] out_data;
-				fname = StringToWString(name);
-				m_EmbedFormat = TRUE;
-			}
-			else {
-				//std::filesystem::path file(uri);
-				fname = urlDecode(StringToWString(uri));
-				fname = tstring(m_fullpath.parent_path()) + tstring(_T("\\")) + fname;
-			}
-		}
-		else if (strlen(image->mime_type)>1) {
-			const char* type = MimeTypes::getExtension(image->mime_type);
-			cgltf_buffer_view* bufferview = image->buffer_view;
-			cgltf_buffer* buffer = bufferview->buffer;
-			int offset = bufferview->offset;
-			int size = bufferview->size;
-			void* ptr = (char*)(buffer->data) + offset;
-
-			char base_name[MAX_PATH];
-			//char buf[MAX_PATH];
-			if (image->name) 	strncpy(base_name, image->name, MAX_PATH);
-			else if (tex->name)	strncpy(base_name, tex->name, MAX_PATH);
-			else 				sprintf(base_name, "texture_%d.%s", (UINT)m_TextureMap.size(), type);
-
-
-			tstring str = StringToWString(base_name);
-			auto pos = str.rfind('\\');
-			if (pos != tstring::npos) {
-				str = str.substr(pos+1, str.size());
-			}
-
-			if (str.rfind(_T("."))== std::string::npos) {
-				TCHAR buf[1000];
-				_stprintf(buf, _T("%s_%d.%s"), str.c_str(), (UINT)m_TextureMap.size(), StringToWString(type).c_str());
-				str = tstring(buf);
-			}
-			//char name[MAX_PATH];
-			//sprintf(name, "%s\\%s", WStringToString(m_WorkImageFolder).c_str(), base_name);
-			fname = m_WorkImageFolder + tstring(_T("\\")) + str;
-
-			FILE* fp = _tfopen(fname.c_str(), _T("wb"));
-			if (fp) {
-				fwrite(ptr, size, 1, fp);
-				fclose(fp);
-			}
-			//fname = StringToWString(name);
-
-			m_EmbedFormat = TRUE;
-		}
-		*/
-		/*
-		if (tex->has_basisu) {
-			tstring retname;
-			KTX2ImageCreater(fname, retname);
-			fname = retname;
-		}
-		*/
 
 		BitmapTex* pBmpTex = NewDefaultBitmapTex();
 		pBmpTex->GetUVGen()->SetCoordMapping(UVMAP_SCREEN_ENV);

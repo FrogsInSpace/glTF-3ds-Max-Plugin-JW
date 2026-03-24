@@ -167,7 +167,7 @@ tinygltf::Node glTFExporter_Core::CreateNodeDataRec(INode *pNode, BOOL recursive
 
 	tinygltf::Node node;// = Create_glTFNode(pNode);
 
-	if (LogExport) LogOutput(tstring(_T("Node:")) + tstring(pNode->GetName()));
+	LogOutput(tstring(_T("Node:")) + tstring(pNode->GetName()));
 
 	SetName(&node, pNode->GetName());
 	node.name = WStringToString(pNode->GetName());

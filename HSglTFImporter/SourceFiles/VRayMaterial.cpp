@@ -251,7 +251,7 @@ void glTFImporter_Core::CreateVRayMaterial(void)
 			}
 		}
 
-		Color EmissiveColor(0.0f);
+		Color EmissiveColor(0.0f, 0.0f, 0.0f);
 		float* emissive = mtl->emissive_factor;
 		if (emissive) {
 			EmissiveColor = Color(emissive[0], emissive[1], emissive[2]);

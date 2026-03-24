@@ -38,7 +38,7 @@ cgltf_accessor* findTargetAttrAccesor(cgltf_morph_target *pr, const char *str)
 {
 	cgltf_attribute *attr = pr->attributes;
 	for (int i = 0; i < pr->attributes_count; i++, attr++) {
-		if (!stricmp(str, attr->name)) return attr->data;
+		if (!_stricmp(str, attr->name)) return attr->data;
 	}
 	return NULL;
 }
@@ -153,7 +153,7 @@ void glTFImporter_Core::SetMorph(void)
 				cgltf_attribute_type att_type;
 				std::vector<float> VertIdList;
 				if (mc) {
-					DracoTest(mc->buffer_view, VertIdList, DracoDecodeType::POSITION);
+					DracoDecodeProc(mc->buffer_view, VertIdList, DracoDecodeType::POSITION);
 				}
 				else {
 					GetDataList(VertIdList, findTargetAttrAccesor(target, "POSITION"));
@@ -171,7 +171,7 @@ void glTFImporter_Core::SetMorph(void)
 				// 頂点法線の設定
 				std::vector<float> NormalList;
 				if (mc) {
-					DracoTest(mc->buffer_view, NormalList, DracoDecodeType::NORMAL);
+					DracoDecodeProc(mc->buffer_view, NormalList, DracoDecodeType::NORMAL);
 				}
 				else {
 					GetDataList(NormalList, findTargetAttrAccesor(target, "NORMAL"));

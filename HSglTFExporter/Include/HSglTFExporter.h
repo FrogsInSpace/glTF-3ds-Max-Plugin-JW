@@ -389,7 +389,6 @@ struct vertPropFlag {
 
 extern HINSTANCE hInstance;
 extern BOOL exportSelected;
-extern BOOL LogExport;
 
 extern TCHAR *GetString(int id);
 extern BOOL IsGeometryObject(INode* pNode, TimeValue t = 0);

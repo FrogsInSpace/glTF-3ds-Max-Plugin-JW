@@ -207,7 +207,7 @@ void LogOutput(const std::string& str, int pcs)
 BOOL ISFlatHierarchy(void) {	return HH_FlatHierarchy;}
 
 //======================================================================
-// インポーター クラス定義
+// Define Importer class
 //======================================================================
 class HSglTFImporter : public SceneImport
 {
@@ -333,7 +333,7 @@ FPInterfaceDesc* HSglTFImporter::GetDesc() { return &HSglTFImpExtentActionsFP; }
 
 
 //======================================================================
-// パラメータ設定ダイアログ CallBack
+// Param setting dialog CallBack
 //======================================================================
 INT_PTR CALLBACK HSglTFImporterOptionsDlgProc(HWND hWnd,UINT message,WPARAM wParam, LPARAM lParam) {
 
@@ -532,7 +532,7 @@ INT_PTR CALLBACK HSglTFImporterOptionsDlgProc(HWND hWnd,UINT message,WPARAM wPar
 			if (IsDlgButtonChecked(hWnd, IDC_MTL_RADIO9)) HH_MtlMode = 8;
 			if (IsDlgButtonChecked(hWnd, IDC_MTL_RADIO10)) HH_MtlMode = 9;
 			if (IsDlgButtonChecked(hWnd, IDC_MTL_RADIO11)) HH_MtlMode = 10;
-			HH_UseQuatCtrl = SendMessage(GetDlgItem(hWnd, IDC_ROT_COMBO), CB_GETCURSEL, 0, (LPARAM)0);
+			HH_UseQuatCtrl = (BOOL)SendMessage(GetDlgItem(hWnd, IDC_ROT_COMBO), CB_GETCURSEL, 0, (LPARAM)0);
 			HH_ColorManagement = IsDlgButtonChecked(hWnd, IDC_CM_CHECK);
 
 			HH_LogOut = IsDlgButtonChecked(hWnd, IDC_LOG_CHK);
@@ -736,7 +736,7 @@ int HSglTF2Importer::DoImport(const TCHAR* filename, ImpInterface* importerInt, 
 }
 #endif
 //======================================================================
-// 読み込みコマンド実行
+// Execute import
 //======================================================================
 int HSglTFImporter::DoImport(const TCHAR* filename, ImpInterface* importerInt, Interface* ip, BOOL suppressPrompts)
 {
@@ -744,7 +744,7 @@ int HSglTFImporter::DoImport(const TCHAR* filename, ImpInterface* importerInt, I
 }
 
 //======================================================================
-// 読み込み処理本体部
+// Importer body
 //======================================================================
 BOOL glTFImporter_Core::ImportPreProcess(const TCHAR* filename, BOOL suppressPrompts, int ver)
 {
@@ -795,13 +795,13 @@ BOOL glTFImporter_Core::ImportPreProcess(const TCHAR* filename, BOOL suppressPro
 	HH_CorrectGamma = MaxSDK::Util::GetPrivateProfileInt(_T("ImpSettings"), _T("CorrectGamma"), 1, profle);
 	HH_ScaleLightIntensity = MaxSDK::Util::GetPrivateProfileInt(_T("ImpSettings"), _T("ScaleLightIntensity"), 1, profle);
 	HH_LaunchScript = MaxSDK::Util::GetPrivateProfileInt(_T("ImpSettings"), _T("LaunchScript"), 0, profle);
-	MaxSDK::Util::GetPrivateProfileString(_T("ImpSettings"), _T("ScriptString"), NULL, buf, MAX_PATH, profle);
+	MaxSDK::Util::GetPrivateProfileString(_T("ImpSettings"), _T("ScriptString"), _T(""), buf, MAX_PATH, profle);
 	s_ScriptString = buf;
 	HH_GammaValue =	MaxSDK::Util::GetPrivateProfileInt(_T("ImpSettings"), _T("GammaValue"), 100, profle);
 	HH_MapUnpackMode = MaxSDK::Util::GetPrivateProfileInt(_T("ImpSettings"), _T("UseOSLTex"), 0, profle);
 	HH_Instancing = MaxSDK::Util::GetPrivateProfileInt(_T("ImpSettings"), _T("Instancing"), 1, profle);
 	HH_EnableBkColor = MaxSDK::Util::GetPrivateProfileInt(_T("ImpSettings"), _T("EnableBkColor"), 0, profle);
-	MaxSDK::Util::GetPrivateProfileString(_T("ImpSettings"), _T("ImageFileString"), NULL, buf, MAX_PATH, profle);
+	MaxSDK::Util::GetPrivateProfileString(_T("ImpSettings"), _T("ImageFileString"), _T(""), buf, MAX_PATH, profle);
 	s_ImageFileString = buf;
 	HH_ExtraToCustAttr = MaxSDK::Util::GetPrivateProfileInt(_T("ImpSettings"), _T("ExtraToCustAttr"), 0, profle);
 	HH_ExtraToUserProp = MaxSDK::Util::GetPrivateProfileInt(_T("ImpSettings"), _T("ExtraToUserProp"), 0, profle);
@@ -880,7 +880,7 @@ BOOL glTFImporter_Core::ImportPreProcess(const TCHAR* filename, BOOL suppressPro
 #else
 		GetSystemUnitInfo(&type, &scale);
 #endif
-		scale /= scale;
+		//scale /= scale;
 		switch (type)
 		{
 		case UNITS_INCHES:		m_scale /= 0.0254f;		break;
@@ -990,7 +990,7 @@ BOOL glTFImporter_Core::ImportPreProcess(const TCHAR* filename, BOOL suppressPro
 }
 
 //======================================================================
-// ファイル読み込み→sceneオブジェクト
+// Read file→scene object
 //======================================================================
 BOOL glTFImporter_Core::ImportScene(void)
 {
@@ -1010,7 +1010,7 @@ BOOL glTFImporter_Core::ImportScene(void)
 
 	LogOutput(_T("Import:") + tstring(m_fullpath));
 
-#ifndef DRACO_ENABLED
+#if 0
 	for (int i = 0; i < m_glTF_data->extensions_used_count; i++) {
 		if (!strcmp(m_glTF_data->extensions_used[i], "KHR_draco_mesh_compression")) {
 			MessageBox(GetCOREInterface()->GetMAXHWnd(), _T("Draco compression is not supported."), _T(""), MB_OK);
@@ -1024,7 +1024,7 @@ BOOL glTFImporter_Core::ImportScene(void)
 	if (m_glTF_data->extensions_used_count>0) {
 		for (int i = 0; i < m_glTF_data->extensions_used_count;i++) {
 			char *ptr = m_glTF_data->extensions_used[i];
-			if(stricmp(ptr, "KHR_mesh_quantization")==0)	m_Quantization = TRUE;
+			if(_stricmp(ptr, "KHR_mesh_quantization")==0)	m_Quantization = TRUE;
 		}
 	}
 
@@ -1168,7 +1168,7 @@ BOOL glTFImporter_Core::ImportScene(void)
 
 #endif
 
-	// Skin割り当て
+	// Attache Skin
 	SetSkinImportStatus(0);
 	for (auto n : m_NodeMap) {
 		if (n.first->skin) {
@@ -1179,8 +1179,8 @@ BOOL glTFImporter_Core::ImportScene(void)
 
 	SetMorph();
 
-	// アニメーション割り当て
-	if(HH_Animation & (m_glTF_data->animations_count > 0)) {
+	// Animation
+	if(HH_Animation && (m_glTF_data->animations_count > 0)) {
 		SetAnimImportStatus(0);
 
 		m_StartTime = MAX_START_TIME;
@@ -1414,7 +1414,7 @@ void glTFImporter_Core::SetSparseData(std::vector<float>& retVal, cgltf_accessor
 			{
 				unsigned int v;
 				memcpy(&v, (ptr + j * size), sizeof(int));
-				retVal.push_back(v);
+				retVal.push_back(static_cast<float>(v));
 			}
 			break;
 			case cgltf_component_type_r_32f:
@@ -1545,7 +1545,7 @@ BOOL glTFImporter_Core::GetDataList(std::vector<float>& retVal, cgltf_accessor* 
 			{
 				unsigned int v;
 				memcpy(&v, (ptr + j * size), sizeof(int));
-				retVal[index * dataLen + j] = v;
+				retVal[index * dataLen + j] = static_cast<float>(v);
 			}
 			break;
 			case cgltf_component_type_r_32f:
@@ -1686,7 +1686,7 @@ bool decode_unicode_escape_to_utf8(const std::string& src, std::string& dst) {
 					sequence[0] = static_cast<char>(octet) & 0x7f;
 					result_index += 1;
 				}
-				else if (octet < 0x7ff) {
+				else if (octet < 0x7ff && octet <= 0xdbff) {
 					sequence[0] = (static_cast<char>(octet >> 6) & 0xdf) | 0xc0;
 					sequence[1] = (static_cast<char>(octet) & 0x3f) | 0x80;
 					result_index += 2;

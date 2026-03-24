@@ -22,7 +22,7 @@
 #include <vector>
 #include <iostream>
 
-// libktx をスタティックライブラリとして扱うための宣言
+// Declaration to treat libktx as a static library
 #ifndef KHRONOS_STATIC
 #define KHRONOS_STATIC
 #endif
@@ -53,7 +53,7 @@
 #endif
 
 //===================================================================
-// libktxで展開した生データ(RGBA)を3ds MaxのBitmapに変換する
+// Converts raw data (RGBA) decompressed by libktx into a 3ds Max Bitmap
 //===================================================================
 Bitmap* CreateMaxBitmapFromRawData(unsigned char* pRawData, int width, int height)
 {
@@ -72,7 +72,7 @@ Bitmap* CreateMaxBitmapFromRawData(unsigned char* pRawData, int width, int heigh
 		for (int x = 0; x < width; ++x) {
 			int offset = (y * width + x) * 4;
 
-			// 8bit(0-255) を 16bit(0-65535) に変換して格納
+			// Convert 8-bit (0–255) to 16-bit (0–65535) and store
 			row[x].r = (unsigned short)pRawData[offset] << 8;
 			row[x].g = (unsigned short)pRawData[offset + 1] << 8;
 			row[x].b = (unsigned short)pRawData[offset + 2] << 8;
@@ -87,21 +87,12 @@ Bitmap* CreateMaxBitmapFromRawData(unsigned char* pRawData, int width, int heigh
 
 //===================================================================
 //===================================================================
-ktxBasisParams getParamsFromTexture(ktxTexture2* texture) {
+ktxBasisParams getParamsFromTexture(ktxTexture2* texture)
+{
 	ktxBasisParams params = { 0 };
 	params.structSize = sizeof(params);
 
-	// 1. モードの判別
-	//params.uastc = texture->isUastc;
 
-	// 2. 法線マップ設定の推測
-	//void* pValue;
-	//ktx_uint32_t valueLen;
-	//if (ktxHashList_FindValue(&texture->kvDataHead, KTX_NORMAL_MAP_KEY, &valueLen, &pValue) == KTX_SUCCESS) {
-	//	params.normalMap = KTX_TRUE;
-	//}
-
-	// 3. 不明な項目は推奨値をセット
 	params.compressionLevel = 2;
 	params.qualityLevel = 128;
 
@@ -109,7 +100,7 @@ ktxBasisParams getParamsFromTexture(ktxTexture2* texture) {
 }
 
 //===================================================================
-// KTX2ファイルを読み込み、RGBA8888形式のバッファを返す関数
+ // Function that loads a KTX2 file and returns a buffer in RGBA8888 format
 //===================================================================
 bool LoadKTX2ToRawRGBA(const tstring& ktxfilename, const tstring &filename, IBitmapIO_Png* pPNG_BmpIO)
 {
@@ -120,7 +111,7 @@ bool LoadKTX2ToRawRGBA(const tstring& ktxfilename, const tstring &filename, IBit
 	result = ktxTexture2_CreateFromNamedFile(str.c_str(), KTX_TEXTURE_CREATE_LOAD_IMAGE_DATA_BIT, &kTexture);
 	if (result != KTX_SUCCESS) return false;
 
-	// 2. Basis Universal形式（圧縮）かどうかをチェックし、必要ならトランスコード
+	// Check if the data is Basis Universal compressed and transcode if necessary
 	if (ktxTexture2_NeedsTranscoding(kTexture)) {
 		result = ktxTexture2_TranscodeBasis(kTexture, KTX_TTF_RGBA32, 0);
 		if (result != KTX_SUCCESS) {
@@ -129,17 +120,17 @@ bool LoadKTX2ToRawRGBA(const tstring& ktxfilename, const tstring &filename, IBit
 		}
 	}
 
-	// 1. ミップマップレベル0（最大サイズ）のデータサイズのみを取得
+	// Retrieve only the data size for mipmap level 0 (largest size)
 	std::vector<unsigned char> outData;
 	ktx_size_t levelSize = ktxTexture_GetImageSize(ktxTexture(kTexture), 0);
 	outData.resize(levelSize);
 
-	// 2. レベル0のデータがメモリ上のどこにあるか（オフセット）を取得
+	// Obtain the memory offset indicating where the level 0 data resides
 	ktx_size_t offset = 0;
 	result = ktxTexture_GetImageOffset(ktxTexture(kTexture), 0, 0, 0, &offset);
 
+	// Get a pointer to the start of all data, then copy from the position advanced by the offset
 	if (result == KTX_SUCCESS) {
-		// 3. 全体データの先頭ポインタを取得し、オフセット分進めた位置からコピー
 		ktx_uint8_t* pAllData = ktxTexture_GetData(ktxTexture(kTexture));
 		memcpy(outData.data(), pAllData + offset, levelSize);
 	}
@@ -153,6 +144,7 @@ bool LoadKTX2ToRawRGBA(const tstring& ktxfilename, const tstring &filename, IBit
 	int width = kTexture->baseWidth;
 	int height = kTexture->baseHeight;
 	Bitmap* pBmp = CreateMaxBitmapFromRawData(outData.data(), width, height);
+	if (!pBmp) { ktxTexture_Destroy(ktxTexture(kTexture)); return false; }
 
 	BitmapInfo bi = pBmp->GetBitmapInfo();
 /*
@@ -179,7 +171,7 @@ bool LoadKTX2ToRawRGBA(const tstring& ktxfilename, const tstring &filename, IBit
 	pBmp->Close(&bi);
 	pBmp->DeleteThis();
 
-	// 5. 後片付け
+	// Clean up
 	ktxTexture_Destroy(ktxTexture(kTexture));
 
 	return true;

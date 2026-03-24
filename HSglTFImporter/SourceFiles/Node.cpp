@@ -23,20 +23,20 @@
 #include <MeshNormalSpec.h>
 #include <iMaterialViewportShading.h>
 #include <shape.h>
-#include <splshape.h>	// SplineShape に必要
-
+#include <splshape.h>	// Required  for SplineShape
+/*
 BOOL CheckBufferSize(cgltf_accessor *acc)
 {
 	if (!acc) return FALSE;
 
 	int dataSize = sizeof(float);
 	switch (acc->component_type) {
-	case cgltf_component_type_r_8:	dataSize = 1; break; /* BYTE */
-	case cgltf_component_type_r_8u:	dataSize = 1; break; /* UNSIGNED_BYTE */
-	case cgltf_component_type_r_16:	 dataSize = 2; break;  /* SHORT */
-	case cgltf_component_type_r_16u: dataSize = 2; break; /* UNSIGNED_SHORT */
-	case cgltf_component_type_r_32u: dataSize = 4; break;  /* UNSIGNED_INT */
-	case cgltf_component_type_r_32f: dataSize = 4; break;  /* FLOAT */
+	case cgltf_component_type_r_8:	dataSize = 1; break;	// BYTE
+	case cgltf_component_type_r_8u:	dataSize = 1; break;	// UNSIGNED_BYTE
+	case cgltf_component_type_r_16:	 dataSize = 2; break;  // SHORT
+	case cgltf_component_type_r_16u: dataSize = 2; break;	// UNSIGNED_SHORT
+	case cgltf_component_type_r_32u: dataSize = 4; break;  // UNSIGNED_INT
+	case cgltf_component_type_r_32f: dataSize = 4; break;  // FLOAT
 	}
 
 	int typeSize = 1;
@@ -63,7 +63,7 @@ BOOL CheckBufferSize(cgltf_accessor *acc)
 
 	return size <= bufferSize;
 }
-
+*/
 
 //======================================================================
 //======================================================================
@@ -101,7 +101,7 @@ cgltf_accessor* findAttrAccesor(cgltf_primitive *pr, const char *str)
 }
 
 //======================================================================
-// 実際のノードオブジェクトを作成
+// Create the actual node object
 //======================================================================
 INode* glTFImporter_Core::CreateMaxNode(cgltf_node* node, INode* pParent)
 {
@@ -112,7 +112,7 @@ INode* glTFImporter_Core::CreateMaxNode(cgltf_node* node, INode* pParent)
 	std::vector<Mtl*> mtlIdTable;
 
 	//size_t meshId;
-	// メッシュ情報を持たない場合、ダミーオブジェクト
+	//  If the node has no mesh data, create a dummy object
 	if (!node->mesh) {
 		DummyObject* pObj = (DummyObject*)GetCOREInterface()->CreateInstance(HELPER_CLASS_ID, Class_ID(DUMMY_CLASS_ID, 0));
 		pObj->SetBox(Box3(Point3(-10, -10, -10), Point3(10, 10, 10)));
@@ -283,7 +283,7 @@ INode* glTFImporter_Core::CreateMaxNode(cgltf_node* node, INode* pParent)
 				mId = mtlIdTable.size();
 			}
 			else {
-				mId = std::distance(mtlIdTable.begin(), itr) + 1;
+				mId = static_cast<int>(std::distance(mtlIdTable.begin(), itr) + 1);
 			}
 		}
 
@@ -291,7 +291,7 @@ INode* glTFImporter_Core::CreateMaxNode(cgltf_node* node, INode* pParent)
 		int attr_index;
 		std::vector<float> VertIdList;
 		if (mc) {
-			DracoTest(mc->buffer_view, VertIdList, DracoDecodeType::POSITION);
+			DracoDecodeProc(mc->buffer_view, VertIdList, DracoDecodeType::POSITION);
 		}
 		else {
 			GetDataList(VertIdList, findAttrAccesor(pr, "POSITION"));
@@ -338,9 +338,9 @@ INode* glTFImporter_Core::CreateMaxNode(cgltf_node* node, INode* pParent)
 				else {
 					int numf = NewMesh.numVerts / 3;
 					for (int i = 0; i < numf; i++) {
-						float v1 = i * 3 + 0 + VertOffset;
-						float v2 = i * 3 + 1 + VertOffset;
-						float v3 = i * 3 + 2 + VertOffset;
+						float v1 = static_cast<float>(i * 3 + 0 + VertOffset);
+						float v2 = static_cast<float>(i * 3 + 1 + VertOffset);
+						float v3 = static_cast<float>(i * 3 + 2 + VertOffset);
 						FaceIdList.push_back(v1);
 						FaceIdList.push_back(v2);
 						FaceIdList.push_back(v3);
@@ -353,9 +353,9 @@ INode* glTFImporter_Core::CreateMaxNode(cgltf_node* node, INode* pParent)
 				NewMesh.setNumFaces(FaceNum + FaceOffset, TRUE);
 				UINT fIdx = FaceOffset;
 				for (std::vector<float>::iterator f = FaceIdList.begin(); f != FaceIdList.end(); f += 3, fIdx++) {
-					NewMesh.faces[fIdx].v[0] = (int)*(f)+VertOffset;
-					NewMesh.faces[fIdx].v[1] = (int)*(f + 1) + VertOffset;
-					NewMesh.faces[fIdx].v[2] = (int)*(f + 2) + VertOffset;
+					NewMesh.faces[fIdx].v[0] = static_cast<int>(*(f + 0)) + VertOffset;
+					NewMesh.faces[fIdx].v[1] = static_cast<int>(*(f + 1)) + VertOffset;
+					NewMesh.faces[fIdx].v[2] = static_cast<int>(*(f + 2)) + VertOffset;
 					NewMesh.faces[fIdx].setEdgeVisFlags(EDGE_VIS, EDGE_VIS, EDGE_VIS);
 					NewMesh.faces[fIdx].setMatID(mId);
 					//NewMesh.faces[fIdx].setSmGroup(smGroupBit);
@@ -434,7 +434,7 @@ INode* glTFImporter_Core::CreateMaxNode(cgltf_node* node, INode* pParent)
 				}
 				else {
 					for (UINT vIdx = 0; vIdx < VertIdList.size()/3; vIdx++) {
-						KnotIdList.push_back(vIdx);
+						KnotIdList.push_back(static_cast<float>(vIdx));
 					}
 				}
 			}
@@ -442,8 +442,8 @@ INode* glTFImporter_Core::CreateMaxNode(cgltf_node* node, INode* pParent)
 			if (pr->type == cgltf_primitive_type_lines) {
 				for (int idx = 0; idx < KnotIdList.size(); idx += 2) {
 					Spline3D* pSpline = NewShape.NewSpline();
-					Point3 p1 = ShapePointVector[KnotIdList[idx]];
-					Point3 p2 = ShapePointVector[KnotIdList[idx + 1]];
+					Point3 p1 = ShapePointVector[static_cast<int>(KnotIdList[idx])];
+					Point3 p2 = ShapePointVector[static_cast<int>(KnotIdList[idx + 1])];
 					pSpline->AddKnot(SplineKnot(KTYPE_AUTO, LTYPE_LINE, p1, p1, p1));
 					pSpline->AddKnot(SplineKnot(KTYPE_AUTO, LTYPE_LINE, p2, p2, p2));
 					pSpline->SetClosed(0);			// こちらのスプラインは開曲線
@@ -479,7 +479,7 @@ INode* glTFImporter_Core::CreateMaxNode(cgltf_node* node, INode* pParent)
 		// 頂点法線の設定
 		std::vector<float> NormalList;
 		if (mc) {
-			DracoTest(mc->buffer_view, NormalList, DracoDecodeType::NORMAL);
+			DracoDecodeProc(mc->buffer_view, NormalList, DracoDecodeType::NORMAL);
 		}
 		else {
 			GetDataList(NormalList, findAttrAccesor(pr, "NORMAL"));
@@ -502,7 +502,7 @@ INode* glTFImporter_Core::CreateMaxNode(cgltf_node* node, INode* pParent)
 		cgltf_type val_type= cgltf_type_vec4;
 		float vcScale = 255.0f;
 		if (mc) {
-			DracoTest(mc->buffer_view, vClrList, DracoDecodeType::COLOR);
+			DracoDecodeProc(mc->buffer_view, vClrList, DracoDecodeType::COLOR);
 			cgltf_accessor* acc = findAttrAccesor(pr, "COLOR_0");
 			if (acc) {
 				if (acc->component_type == cgltf_component_type::cgltf_component_type_r_32f) vcScale = 1.0f;
@@ -552,12 +552,12 @@ INode* glTFImporter_Core::CreateMaxNode(cgltf_node* node, INode* pParent)
 		// 頂点UV1の設定
 		std::vector<float> texCoord1List;
 		if (mc) {
-			DracoTest(mc->buffer_view, texCoord1List, DracoDecodeType::TEX_COORD);
+			DracoDecodeProc(mc->buffer_view, texCoord1List, DracoDecodeType::TEX_COORD);
 		}
 		else {
 			cgltf_accessor* acc = findAttrAccesor(pr, "TEXCOORD_0");
-			if(CheckBufferSize(acc))
-				GetDataList(texCoord1List, acc);
+			//if(CheckBufferSize(acc))
+			GetDataList(texCoord1List, acc);
 		}
 
 		UINT tex1Num = texCoord1List.size() / 2;
@@ -624,8 +624,8 @@ INode* glTFImporter_Core::CreateMaxNode(cgltf_node* node, INode* pParent)
 		}
 		else {
 			cgltf_accessor* acc = findAttrAccesor(pr, "TEXCOORD_1");
-			if (CheckBufferSize(acc))
-				GetDataList(texCoord2List, acc);
+			//if (CheckBufferSize(acc))
+			GetDataList(texCoord2List, acc);
 		}
 		UINT tex2Num = texCoord2List.size() / 2;
 		if (tex2Num > 0) {
@@ -927,7 +927,7 @@ void glTFImporter_Core::CreateNodeInfosRec(cgltf_node *node, INode *targetParent
 		cgltf_mesh_gpu_instancing* inst = &node->mesh_gpu_instancing;
 		for (int xx = 0; xx < inst->attributes_count; xx++) {
 			cgltf_attribute* attr = &inst->attributes[xx];
-			if (!stricmp(attr->name, "TRANSLATION")) {
+			if (!_stricmp(attr->name, "TRANSLATION")) {
 				cgltf_accessor* acc = attr->data;
 				std::vector<float> tList;
 				GetDataList(tList, acc);
@@ -936,7 +936,7 @@ void glTFImporter_Core::CreateNodeInfosRec(cgltf_node *node, INode *targetParent
 					posList.push_back(p);
 				}
 			}
-			if (!stricmp(attr->name, "ROTATION")) {
+			if (!_stricmp(attr->name, "ROTATION")) {
 				cgltf_accessor* acc = attr->data;
 				std::vector<float> rList;
 				GetDataList(rList, acc);
@@ -945,7 +945,7 @@ void glTFImporter_Core::CreateNodeInfosRec(cgltf_node *node, INode *targetParent
 					rotList.push_back(p);
 				}
 			}
-			if (!stricmp(attr->name, "SCALE")) {
+			if (!_stricmp(attr->name, "SCALE")) {
 				cgltf_accessor* acc = attr->data;
 				std::vector<float> sList;
 				GetDataList(sList, acc);
@@ -988,7 +988,7 @@ void glTFImporter_Core::CreateNodeInfosRec(cgltf_node *node, INode *targetParent
 	for (int cnt = 0; cnt < node->extensions_count; cnt++, ext++) {
 		char* name = ext->name;
 		char* data = ext->data;
-		if (!stricmp(name, "KHR_physics_rigid_bodies"))
+		if (!_stricmp(name, "KHR_physics_rigid_bodies"))
 			CreateRigidTable(pNewObject, data);
 	}
 

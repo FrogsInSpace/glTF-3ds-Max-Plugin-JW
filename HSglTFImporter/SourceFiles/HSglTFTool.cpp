@@ -670,7 +670,7 @@ void SetNodeIndexListRec(INode* pNode)
 //=============================================================================
 void HSglTFTool::NodeIndexDlg(HWND hWnd)
 {
-	int ret = ::DialogBoxParam(hInstance, MAKEINTRESOURCE(IDD_NODEINDEX_DLG), hWnd, NodeIndexDlgProc, 0);
+	INT_PTR ret = ::DialogBoxParam(hInstance, MAKEINTRESOURCE(IDD_NODEINDEX_DLG), hWnd, NodeIndexDlgProc, 0);
 
 }
 
@@ -869,7 +869,7 @@ BOOL DeleteNodeIndex(HWND hWnd)
 
 		item.mask = LVIF_TEXT;
 		item.iSubItem = 1;
-		ListView_SetItemText(hListView, i, 1, _T(""), MAX_PATH);
+		ListView_SetItemText(hListView, i, 1, _T(""));
 	}
 
 	return TRUE;
@@ -888,7 +888,7 @@ void SetSelectability(HWND hWnd)
 	for (int i = 0; i < num; i++) {
 
 		UINT state = ListView_GetItemState(hListView, i, LVIS_SELECTED);
-		if (state & LVIS_SELECTED == 0) continue;
+		if ((state & LVIS_SELECTED) == 0) continue;
 
 		LVITEM item;
 		item.iItem = i;

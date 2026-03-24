@@ -19,8 +19,6 @@
 
 #include "HSglTFImporter.h"
 
-#ifdef DRACO_ENABLED
-
 #undef max
 #undef min
 #include "draco/compression/decode.h"
@@ -54,6 +52,8 @@ void GetDracoMeshIndexList(cgltf_buffer_view* bufferView, std::vector<float> &tb
 	tbl.clear();
 
 	cgltf_buffer *data = bufferView->buffer;
+	if (!data || !data->data) return;
+	if (bufferView->offset >= data->size) return;
 
 	draco::Decoder decoder;
 	draco::DecoderBuffer buffer;
@@ -61,7 +61,9 @@ void GetDracoMeshIndexList(cgltf_buffer_view* bufferView, std::vector<float> &tb
 	const draco::StatusOr<draco::EncodedGeometryType> geom_type = decoder.GetEncodedGeometryType(&buffer);
 	if (geom_type.value() == draco::TRIANGULAR_MESH) {
 		auto statusor = decoder.DecodeMeshFromBuffer(&buffer);
+		if (!statusor.ok()) { tbl.clear(); return; }
 		std::unique_ptr<draco::Mesh> in_mesh = std::move(statusor).value();
+
 		if (in_mesh) {
 			draco::Mesh *pMesh = in_mesh.get();
 			for (draco::FaceIndex i(0); i < pMesh->num_faces(); i++) {
@@ -77,7 +79,7 @@ void GetDracoMeshIndexList(cgltf_buffer_view* bufferView, std::vector<float> &tb
 //=======================================================================
 //
 //=======================================================================
-void DracoTest(cgltf_buffer_view *bufferView, std::vector<float> &tbl, DracoDecodeType type)
+void DracoDecodeProc(cgltf_buffer_view *bufferView, std::vector<float> &tbl, DracoDecodeType type)
 {
 	tbl.clear();
 
@@ -87,8 +89,11 @@ void DracoTest(cgltf_buffer_view *bufferView, std::vector<float> &tbl, DracoDeco
 	draco::DecoderBuffer buffer;
 	buffer.Init((char*)data->data+ bufferView->offset, data->size);
 	const draco::StatusOr<draco::EncodedGeometryType> geom_type = decoder.GetEncodedGeometryType(&buffer);
+	if (!geom_type.ok()) { tbl.clear(); return; }
+
 	if (geom_type.value() == draco::TRIANGULAR_MESH) {
 		auto statusor = decoder.DecodeMeshFromBuffer(&buffer);
+		if (!statusor.ok()) { tbl.clear(); return; }
 		std::unique_ptr<draco::Mesh> in_mesh = std::move(statusor).value();
 		if (in_mesh) {
 			draco::Mesh *pMesh = in_mesh.get();
@@ -246,7 +251,4 @@ void DracoTest(cgltf_buffer_view *bufferView, std::vector<float> &tbl, DracoDeco
 	}
 }
 
-#else
-void GetDracoMeshIndexList(cgltf_buffer_view* bufferView, std::vector<float>& tbl) {}
-void DracoTest(cgltf_buffer_view* bufferView, std::vector<float>& tbl, DracoDecodeType type){}
-#endif
+

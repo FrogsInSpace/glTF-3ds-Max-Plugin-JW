@@ -20,7 +20,7 @@
 #include "HSglTFImporter.h"
 #include "define.h"
 
-Control* CheckIfAlreadyExist(Mtl* pMtl);
+//Control* CheckIfAlreadyExist(Mtl* pMtl);
 
 //======================================================================
 //======================================================================
@@ -41,6 +41,7 @@ BOOL GetTargetPath(char* jsonStr, std::vector<std::string>& retPath)
 			continue;
 		}
 		*ptr2++ = *ptr1++;
+		if ((ptr2 - buf) >= MAX_PATH) break;
 	}
 	*--ptr2 = 0;
 
@@ -61,7 +62,7 @@ BOOL GetTargetPath(char* jsonStr, std::vector<std::string>& retPath)
 }
 //======================================================================
 //======================================================================
-void SplitPoint3ChannelList(std::map<TimeValue, AnimKeyInfo>& KeyList, std::map<TimeValue, AnimKeyInfo>& XKeyList, std::map<TimeValue, AnimKeyInfo>& YKeyList, std::map<TimeValue, AnimKeyInfo>ZKeyList)
+void SplitPoint3ChannelList(std::map<TimeValue, AnimKeyInfo>& KeyList, std::map<TimeValue, AnimKeyInfo>& XKeyList, std::map<TimeValue, AnimKeyInfo>& YKeyList, std::map<TimeValue, AnimKeyInfo>& ZKeyList)
 {
 	XKeyList.clear();
 	YKeyList.clear();
@@ -77,7 +78,7 @@ void SplitPoint3ChannelList(std::map<TimeValue, AnimKeyInfo>& KeyList, std::map<
 		keyInfo.f = key.second.pos.y;
 		YKeyList.insert(std::make_pair(t, keyInfo));
 
-		float z = key.second.pos.z;
+		keyInfo.f = key.second.pos.z;
 		ZKeyList.insert(std::make_pair(t, keyInfo));
 	}
 
@@ -126,13 +127,18 @@ void glTFImporter_Core::SetAnimationPointer(int animID)
 				cgltf_interpolation_type TransInterpType = cgltf_interpolation_type_linear;
 
 				//std::vector<size_t> ChannelList;
+				if (retPath.size() < 2) continue;
 				int idx = atoi(retPath[1].c_str());
+				if (idx < 0 || (size_t)idx >= m_glTF_data->nodes_count) continue;
 				cgltf_node* node = &m_glTF_data->nodes[idx];
 				INode* pNode = m_NodeMap[node];
+				if (!pNode) continue;
+
 				Matrix3 mtx(1);
 				if (pNode->GetParentNode()->IsRootNode())
 					mtx = YupTM;
 
+				if (retPath.size() < 3) continue;
 				if (retPath[2] == "translation") {
 					std::map<TimeValue, AnimKeyInfo> PosKeyList;
 					TransInterpType = sampler->interpolation;
@@ -147,8 +153,8 @@ void glTFImporter_Core::SetAnimationPointer(int animID)
 						if (m_StartTime > t) m_StartTime = t;
 						if (m_LastTime < t) m_LastTime = t;
 					}
-					SetXYZController(pPosC, TransInterpType, PosKeyList.begin()->first);
-
+					if (!PosKeyList.empty())
+						SetXYZController(pPosC, TransInterpType, PosKeyList.begin()->first);
 					//m_AnimationNodeTab.AppendNode(pNode);
 				}
 				else if (retPath[2] == "rotation") {
@@ -165,7 +171,8 @@ void glTFImporter_Core::SetAnimationPointer(int animID)
 						if (m_StartTime > t) m_StartTime = t;
 						if (m_LastTime < t) m_LastTime = t;
 					}
-					SetXYZController(pRotC, RotInterpType, RotKeyList.begin()->first);
+					if (!RotKeyList.empty())
+						SetXYZController(pRotC, RotInterpType, RotKeyList.begin()->first);
 
 				}
 				else if (retPath[2] == "scale") {
@@ -182,20 +189,26 @@ void glTFImporter_Core::SetAnimationPointer(int animID)
 						if (m_StartTime > t) m_StartTime = t;
 						if (m_LastTime < t) m_LastTime = t;
 					}
-					SetXYZController(pSclC, ScaleInterpType, SclKeyList.begin()->first);
+					if (!SclKeyList.empty())
+						SetXYZController(pSclC, ScaleInterpType, SclKeyList.begin()->first);
 				}
 				else if (retPath[2] == "weights") {
 					std::map<TimeValue, std::vector<float> > WeightKeyList;
-					GetWeightAnimKeyFrameList(sampler, WeightKeyList, node->mesh->weights_count);
+					if (node->mesh)
+						GetWeightAnimKeyFrameList(sampler, WeightKeyList, node->mesh->weights_count);
 					SetMorphWeightAnimation(pNode, WeightKeyList);
 				}
 			}
 
 			else if (retPath[0] == "materials") {
+				if (retPath.size() < 2) continue;
 				int idx = atoi(retPath[1].c_str());
+				if (idx < 0 || (size_t)idx >= m_glTF_data->materials_count) continue;
 				cgltf_material* mtl = &m_glTF_data->materials[idx];
 				Mtl* pMtl = m_MaterialMap[mtl];
+				if (!pMtl) continue;
 
+				if (retPath.size() < 3) continue;
 				if (retPath[2] == "emissiveFactor") {
 					std::map<TimeValue, AnimKeyInfo> ColorKeyList;
 					GetClr3AnimKeyFrameList(sampler, ColorKeyList);
@@ -204,6 +217,7 @@ void glTFImporter_Core::SetAnimationPointer(int animID)
 					SetEmissiveColorController(pMtl, pClrC, sampler->interpolation, 0);
 				}
 				else if (retPath[2] == "occlusionTexture") {
+					if (retPath.size() < 4) continue;
 					if (retPath[3] == "strength") {
 						std::map<TimeValue, AnimKeyInfo> FloatKeyList;
 						GetFloatAnimKeyFrameList(sampler, FloatKeyList);
@@ -219,6 +233,7 @@ void glTFImporter_Core::SetAnimationPointer(int animID)
 					SetAlphaCutOffController(pMtl, pFloatC, sampler->interpolation, 0);
 				}
 				else if (retPath[2] == "normalTexture") {
+					if (retPath.size() < 4) continue;
 					if (retPath[3] == "scale") {
 						std::map<TimeValue, AnimKeyInfo> FloatKeyList;
 						GetFloatAnimKeyFrameList(sampler, FloatKeyList);
@@ -226,8 +241,10 @@ void glTFImporter_Core::SetAnimationPointer(int animID)
 						Control* pFloatC = CreateFloatController(FloatKeyList);
 						SetNrmScaleController(pMtl, pFloatC, sampler->interpolation, 0);
 					}
-					if (retPath[3] == "extensions") {
+					else if (retPath[3] == "extensions") {
+						if (retPath.size() < 5) continue;
 						if (retPath[4] == "KHR_texture_transform") {
+							if (retPath.size() < 6) continue;
 							if (retPath[5] == "offset") {
 								std::map<TimeValue, AnimKeyInfo> Point2KeyList;
 								GetPoint2AnimKeyFrameList(sampler, Point2KeyList);
@@ -266,8 +283,8 @@ void glTFImporter_Core::SetAnimationPointer(int animID)
 						}
 					}
 				}
-
 				else if (retPath[2] == "pbrMetallicRoughness") {
+					if (retPath.size() < 4) continue;
 					if (retPath[3] == "baseColorFactor") {
 						std::map<TimeValue, AnimKeyInfo> ColorKeyList;
 						//TransInterpType = sampler->interpolation;
@@ -277,7 +294,7 @@ void glTFImporter_Core::SetAnimationPointer(int animID)
 						else if (type == cgltf_type_vec4) {
 							GetClr4AnimKeyFrameList(sampler, ColorKeyList);
 						}
-						Control* pOriginalClr = CheckIfAlreadyExist(pMtl);
+						//Control* pOriginalClr = CheckIfAlreadyExist(pMtl);
 						Control* pClrC = CreateColorController(ColorKeyList, type);
 						SetBaseColorController(pMtl, pClrC, sampler->interpolation, 0);
 					}
@@ -295,8 +312,11 @@ void glTFImporter_Core::SetAnimationPointer(int animID)
 						SetMetalScaleController(pMtl, pFloatC, sampler->interpolation, 0);
 					}
 					else if (retPath[3] == "baseColorTexture") {
+						if (retPath.size() < 5) continue;
 						if (retPath[4] == "extensions") {
+							if (retPath.size() < 6) continue;
 							if (retPath[5] == "KHR_texture_transform") {
+								if (retPath.size() < 7) continue;
 								if (retPath[6] == "scale") {
 									std::map<TimeValue, AnimKeyInfo> Point2KeyList;
 									GetPoint2AnimKeyFrameList(sampler, Point2KeyList);
@@ -310,7 +330,7 @@ void glTFImporter_Core::SetAnimationPointer(int animID)
 									Control* pVC = CreateFloatController(FloatYKeyList);
 									SetUVScaleController(pMtl, pUC, pVC, sampler->interpolation, 0, TargetTex::BaseColorMap);
 								}
-								if (retPath[6] == "offset") {
+								else if (retPath[6] == "offset") {
 									std::map<TimeValue, AnimKeyInfo> Point2KeyList;
 									GetPoint2AnimKeyFrameList(sampler, Point2KeyList);
 
@@ -329,45 +349,48 @@ void glTFImporter_Core::SetAnimationPointer(int animID)
 						}
 					}
 				}
-
 				else if (retPath[2] == "emissiveTexture") {
-					if (retPath[3] == "extensions") {
-						if (retPath[4] == "KHR_texture_transform") {
-							if (retPath[5] == "scale") {
-								std::map<TimeValue, AnimKeyInfo> Point2KeyList;
-								GetPoint2AnimKeyFrameList(sampler, Point2KeyList);
+				if (retPath.size() < 4) continue;
+				if (retPath[3] == "extensions") {
+					if (retPath.size() < 5) continue;
+					if (retPath[4] == "KHR_texture_transform") {
+						if (retPath.size() < 6) continue;
+						if (retPath[5] == "scale") {
+							std::map<TimeValue, AnimKeyInfo> Point2KeyList;
+							GetPoint2AnimKeyFrameList(sampler, Point2KeyList);
 
-								std::map<TimeValue, AnimKeyInfo> FloatXKeyList;
-								std::map<TimeValue, AnimKeyInfo> FloatYKeyList;
-								std::map<TimeValue, AnimKeyInfo> FloatZKeyList;
-								SplitPoint3ChannelList(Point2KeyList, FloatXKeyList, FloatYKeyList, FloatZKeyList);
+							std::map<TimeValue, AnimKeyInfo> FloatXKeyList;
+							std::map<TimeValue, AnimKeyInfo> FloatYKeyList;
+							std::map<TimeValue, AnimKeyInfo> FloatZKeyList;
+							SplitPoint3ChannelList(Point2KeyList, FloatXKeyList, FloatYKeyList, FloatZKeyList);
 
-								Control* pUC = CreateFloatController(FloatXKeyList);
-								Control* pVC = CreateFloatController(FloatYKeyList);
-								SetUVScaleController(pMtl, pUC, pVC, sampler->interpolation, 0, TargetTex::EmissiveMap);
-							}
-							if (retPath[5] == "offset") {
-								std::map<TimeValue, AnimKeyInfo> Point2KeyList;
-								GetPoint2AnimKeyFrameList(sampler, Point2KeyList);
+							Control* pUC = CreateFloatController(FloatXKeyList);
+							Control* pVC = CreateFloatController(FloatYKeyList);
+							SetUVScaleController(pMtl, pUC, pVC, sampler->interpolation, 0, TargetTex::EmissiveMap);
+						}
+						else if (retPath[5] == "offset") {
+							std::map<TimeValue, AnimKeyInfo> Point2KeyList;
+							GetPoint2AnimKeyFrameList(sampler, Point2KeyList);
 
-								std::map<TimeValue, AnimKeyInfo> FloatXKeyList;
-								std::map<TimeValue, AnimKeyInfo> FloatYKeyList;
-								std::map<TimeValue, AnimKeyInfo> FloatZKeyList;
-								SplitPoint3ChannelList(Point2KeyList, FloatXKeyList, FloatYKeyList, FloatZKeyList);
+							std::map<TimeValue, AnimKeyInfo> FloatXKeyList;
+							std::map<TimeValue, AnimKeyInfo> FloatYKeyList;
+							std::map<TimeValue, AnimKeyInfo> FloatZKeyList;
+							SplitPoint3ChannelList(Point2KeyList, FloatXKeyList, FloatYKeyList, FloatZKeyList);
 
-								ofsetCtrl oc;
-								oc.pUC = CreateFloatController(FloatXKeyList);
-								oc.pVC = CreateFloatController(FloatYKeyList);
-								ofsetEmissiveTexList.insert(std::make_pair(pMtl, oc));
-								//SetUVOffsetController(pMtl, pUC, pVC, sampler->interpolation, 0);
-							}
+							ofsetCtrl oc;
+							oc.pUC = CreateFloatController(FloatXKeyList);
+							oc.pVC = CreateFloatController(FloatYKeyList);
+							ofsetEmissiveTexList.insert(std::make_pair(pMtl, oc));
+							//SetUVOffsetController(pMtl, pUC, pVC, sampler->interpolation, 0);
 						}
 					}
 				}
+		}
 
 				else if (retPath[2] == "extensions") {
-
+					if (retPath.size() < 4) continue;
 					if (retPath[3] == "KHR_materials_volume") {
+						if (retPath.size() < 5) continue;
 						if (retPath[4] == "thicknessFactor") {
 							std::map<TimeValue, AnimKeyInfo> FloatKeyList;
 							GetFloatAnimKeyFrameList(sampler, FloatKeyList);
@@ -394,8 +417,11 @@ void glTFImporter_Core::SetAnimationPointer(int animID)
 							SetVolumeColorController(pMtl, pClrC, sampler->interpolation, 0);
 						}
 						else if (retPath[4] == "thicknessTexture") {
+							if (retPath.size() < 6) continue;
 							if (retPath[5] == "extensions") {
+								if (retPath.size() < 7) continue;
 								if (retPath[6] == "KHR_texture_transform") {
+									if (retPath.size() < 8) continue;
 									if (retPath[7] == "offset") {
 										std::map<TimeValue, AnimKeyInfo> Point2KeyList;
 										GetPoint2AnimKeyFrameList(sampler, Point2KeyList);
@@ -437,6 +463,7 @@ void glTFImporter_Core::SetAnimationPointer(int animID)
 					}
 
 					else if (retPath[3] == "KHR_materials_transmission") {
+						if (retPath.size() < 5) continue;
 						if (retPath[4] == "transmissionFactor") {
 							std::map<TimeValue, AnimKeyInfo> FloatKeyList;
 							GetFloatAnimKeyFrameList(sampler, FloatKeyList);
@@ -447,6 +474,7 @@ void glTFImporter_Core::SetAnimationPointer(int animID)
 					}
 
 					else if (retPath[3] == "KHR_materials_emissive_strength") {
+						if (retPath.size() < 5) continue;
 						if (retPath[4] == "emissiveStrength") {
 							std::map<TimeValue, AnimKeyInfo> FloatKeyList;
 							GetFloatAnimKeyFrameList(sampler, FloatKeyList);
@@ -456,6 +484,7 @@ void glTFImporter_Core::SetAnimationPointer(int animID)
 					}
 
 					else if (retPath[3] == "KHR_materials_ior") {
+						if (retPath.size() < 5) continue;
 						if (retPath[4] == "ior") {
 							std::map<TimeValue, AnimKeyInfo> FloatKeyList;
 							GetFloatAnimKeyFrameList(sampler, FloatKeyList);
@@ -466,6 +495,7 @@ void glTFImporter_Core::SetAnimationPointer(int animID)
 					}
 
 					else if (retPath[3] == "KHR_materials_iridescence") {
+						if (retPath.size() < 5) continue;
 						if (retPath[4] == "iridescenceFactor") {
 							std::map<TimeValue, AnimKeyInfo> FloatKeyList;
 							GetFloatAnimKeyFrameList(sampler, FloatKeyList);
@@ -496,6 +526,7 @@ void glTFImporter_Core::SetAnimationPointer(int animID)
 						}
 					}
 					else if (retPath[3] == "KHR_materials_clearcoat") {
+						if (retPath.size() < 5) continue;
 						if (retPath[4] == "clearcoatFactor") {
 							std::map<TimeValue, AnimKeyInfo> FloatKeyList;
 							GetFloatAnimKeyFrameList(sampler, FloatKeyList);
@@ -511,8 +542,11 @@ void glTFImporter_Core::SetAnimationPointer(int animID)
 							SetClearcoatRoughFactorController(pMtl, pFloatC, sampler->interpolation, 0);
 						}
 						else if (retPath[4] == "clearcoatTexture") {
+							if (retPath.size() < 6) continue;
 							if (retPath[5] == "extensions") {
+								if (retPath.size() < 7) continue;
 								if (retPath[6] == "KHR_texture_transform") {
+									if (retPath.size() < 8) continue;
 									if (retPath[7] == "offset") {
 									std::map<TimeValue, AnimKeyInfo> Point2KeyList;
 									GetPoint2AnimKeyFrameList(sampler, Point2KeyList);
@@ -548,6 +582,7 @@ void glTFImporter_Core::SetAnimationPointer(int animID)
 						}
 					}
 					else if (retPath[3] == "KHR_materials_sheen") {
+						if (retPath.size() < 5) continue;
 						if (retPath[4] == "sheenColorFactor") {
 							std::map<TimeValue, AnimKeyInfo> ColorKeyList;
 							GetClr3AnimKeyFrameList(sampler, ColorKeyList);
@@ -564,6 +599,7 @@ void glTFImporter_Core::SetAnimationPointer(int animID)
 						}
 					}
 					else if (retPath[3] == "KHR_materials_specular") {
+						if (retPath.size() < 5) continue;
 						if (retPath[4] == "specularFactor") {
 							std::map<TimeValue, AnimKeyInfo> FloatKeyList;
 							GetFloatAnimKeyFrameList(sampler, FloatKeyList);
@@ -580,6 +616,7 @@ void glTFImporter_Core::SetAnimationPointer(int animID)
 						}
 					}
 					else if (retPath[3] == "KHR_materials_dispersion") {
+						if (retPath.size() < 5) continue;
 						if (retPath[4] == "dispersion") {
 							std::map<TimeValue, AnimKeyInfo> FloatKeyList;
 							GetFloatAnimKeyFrameList(sampler, FloatKeyList);
@@ -589,6 +626,7 @@ void glTFImporter_Core::SetAnimationPointer(int animID)
 						}
 					}
 					else if (retPath[3] == "KHR_materials_anisotropy") {
+						if (retPath.size() < 5) continue;
 						if (retPath[4] == "anisotropyStrength") {
 							std::map<TimeValue, AnimKeyInfo> FloatKeyList;
 							GetFloatAnimKeyFrameList(sampler, FloatKeyList);
@@ -605,6 +643,7 @@ void glTFImporter_Core::SetAnimationPointer(int animID)
 						}
 					}
 					else if (retPath[3] == "KHR_materials_diffuse_transmission") {
+						if (retPath.size() < 5) continue;
 						if (retPath[4] == "diffuseTransmissionFactor") {
 							std::map<TimeValue, AnimKeyInfo> FloatKeyList;
 							GetFloatAnimKeyFrameList(sampler, FloatKeyList);
@@ -621,7 +660,8 @@ void glTFImporter_Core::SetAnimationPointer(int animID)
 						}
 					}
 					else if (retPath[3] == "KHR_materials_pbrSpecularGlossiness") {
-					if (retPath[4] == "diffuseFactor") {
+						if (retPath.size() < 5) continue;
+						if (retPath[4] == "diffuseFactor") {
 						}
 						else if (retPath[4] == "specularFactor") {
 						}
@@ -633,11 +673,16 @@ void glTFImporter_Core::SetAnimationPointer(int animID)
 			}
 
 			else if (retPath[0] == "cameras") {
+				if (retPath.size() < 2) continue;
 				int idx = atoi(retPath[1].c_str());
+				if (idx < 0 || (size_t)idx >= m_glTF_data->cameras_count) continue;
 				cgltf_camera* camera = &m_glTF_data->cameras[idx];
 				GenCamera* pCamera = m_CameraMap[camera];
+				if (!pCamera) continue;
 
+				if (retPath.size() < 3) continue;
 				if (retPath[2] == "perspective") {
+					if (retPath.size() < 4) continue;
 					if (retPath[3] == "znear") {
 						std::map<TimeValue, AnimKeyInfo> FloatKeyList;
 						GetFloatAnimKeyFrameList(sampler, FloatKeyList);
@@ -645,14 +690,14 @@ void glTFImporter_Core::SetAnimationPointer(int animID)
 						Control* pFloatC = CreateFloatController(FloatKeyList, m_scale);
 						SetCamPZnearController(pCamera, pFloatC, sampler->interpolation, 0);
 					}
-					if (retPath[3] == "zfar") {
+					else if (retPath[3] == "zfar") {
 						std::map<TimeValue, AnimKeyInfo> FloatKeyList;
 						GetFloatAnimKeyFrameList(sampler, FloatKeyList);
 
 						Control* pFloatC = CreateFloatController(FloatKeyList, m_scale);
 						SetCamPZfarController(pCamera, pFloatC, sampler->interpolation, 0);
 					}
-					if (retPath[3] == "yfov") {
+					else if (retPath[3] == "yfov") {
 						std::map<TimeValue, AnimKeyInfo> FloatKeyList;
 						GetFloatAnimKeyFrameList(sampler, FloatKeyList);
 
@@ -660,7 +705,8 @@ void glTFImporter_Core::SetAnimationPointer(int animID)
 						SetCamPYfovController(pCamera, pFloatC, sampler->interpolation, 0);
 					}
 				}
-				if (retPath[2] == "orthographic") {
+				else if (retPath[2] == "orthographic") {
+					if (retPath.size() < 4) continue;
 					if (retPath[3] == "ymag") {
 						std::map<TimeValue, AnimKeyInfo> FloatKeyList;
 						GetFloatAnimKeyFrameList(sampler, FloatKeyList);
@@ -668,21 +714,21 @@ void glTFImporter_Core::SetAnimationPointer(int animID)
 						Control* pFloatC = CreateFloatController(FloatKeyList);
 						SetCamOYmagController(pCamera, pFloatC, sampler->interpolation, 0);
 					}
-					if (retPath[3] == "xmag") {
+					else if (retPath[3] == "xmag") {
 						std::map<TimeValue, AnimKeyInfo> FloatKeyList;
 						GetFloatAnimKeyFrameList(sampler, FloatKeyList);
 
 						Control* pFloatC = CreateFloatController(FloatKeyList);
 						SetCamOXmagController(pCamera, pFloatC, sampler->interpolation, 0);
 					}
-					if (retPath[3] == "znear") {
+					else if (retPath[3] == "znear") {
 						std::map<TimeValue, AnimKeyInfo> FloatKeyList;
 						GetFloatAnimKeyFrameList(sampler, FloatKeyList);
 
 						Control* pFloatC = CreateFloatController(FloatKeyList, m_scale);
 						SetCamOZnearController(pCamera, pFloatC, sampler->interpolation, 0);
 					}
-					if (retPath[3] == "zfar") {
+					else if (retPath[3] == "zfar") {
 						std::map<TimeValue, AnimKeyInfo> FloatKeyList;
 						GetFloatAnimKeyFrameList(sampler, FloatKeyList);
 
@@ -693,11 +739,16 @@ void glTFImporter_Core::SetAnimationPointer(int animID)
 			}
 
 			else if (retPath[0] == "extensions") {
+				if (retPath.size() < 2) continue;
 				if (retPath[1] == "KHR_lights_punctual") {
+					if (retPath.size() < 3) continue;
 					if (retPath[2] == "lights") {
+						if (retPath.size() < 5) continue;
 						int idx = atoi(retPath[3].c_str());
+						if (idx < 0 || (size_t)idx >= m_glTF_data->lights_count) continue;
 						cgltf_light* light = &m_glTF_data->lights[idx];
 						GenLight* pLight = m_LightMap[light];
+						if (!pLight) continue;
 						int lightType = pLight->Type();
 
 						if (retPath[4] == "intensity") {
@@ -708,14 +759,14 @@ void glTFImporter_Core::SetAnimationPointer(int animID)
 							Control* pFloatC = CreateFloatController(FloatKeyList, iscale);
 							SetLightIntensController(pLight, pFloatC, sampler->interpolation, 0);
 						}
-						if (retPath[4] == "range") {
+						else if (retPath[4] == "range") {
 							std::map<TimeValue, AnimKeyInfo> FloatKeyList;
 							GetFloatAnimKeyFrameList(sampler, FloatKeyList);
 
 							Control* pFloatC = CreateFloatController(FloatKeyList, m_scale);
 							SetLightRangeController(pLight, pFloatC, sampler->interpolation, 0);
 						}
-						if (retPath[4] == "color") {
+						else if (retPath[4] == "color") {
 							std::map<TimeValue, AnimKeyInfo> ColorKeyList;
 							if (type == cgltf_type_vec3) {
 								GetClr3AnimKeyFrameList(sampler, ColorKeyList);
@@ -727,7 +778,8 @@ void glTFImporter_Core::SetAnimationPointer(int animID)
 							Control* pClrC = CreateColorController(ColorKeyList, type);
 							SetLightColorController(pLight, pClrC, sampler->interpolation, 0);
 						}
-						if (retPath[4] == "spot") {
+						else if (retPath[4] == "spot") {
+							if (retPath.size() < 6) continue;
 							if (retPath[5] == "outerConeAngle") {
 								std::map<TimeValue, AnimKeyInfo> FloatKeyList;
 								GetFloatAnimKeyFrameList(sampler, FloatKeyList);
@@ -735,7 +787,7 @@ void glTFImporter_Core::SetAnimationPointer(int animID)
 								Control* pFloatC = CreateFloatController(FloatKeyList, 180.0f / PI);
 								SetLightOutAngleController(pLight, pFloatC, sampler->interpolation, 0);
 							}
-							if (retPath[5] == "innerConeAngle") {
+							else if (retPath[5] == "innerConeAngle") {
 								std::map<TimeValue, AnimKeyInfo> FloatKeyList;
 								GetFloatAnimKeyFrameList(sampler, FloatKeyList);
 
@@ -747,7 +799,7 @@ void glTFImporter_Core::SetAnimationPointer(int animID)
 				}
 			}
 
-			int xxx = 1;
+			//int xxx = 1;
 			/*
 						if (type == "nodes") {
 							cgltf_node* node = &m_glTF_data->nodes[target];
@@ -787,7 +839,9 @@ void glTFImporter_Core::SetUVAnimation(Mtl *pMtl, cgltf_animation_sampler* sampl
 	Control* pVC = CreateFloatController(FloatYKeyList);
 	SetUVScaleController(pMtl, pUC, pVC, sampler->interpolation, 0, target);
 }
-
+#if 0
+//===============================================================
+//===============================================================
 Control* CheckIfAlreadyExist(Mtl* pMtl)
 {
 	if (!pMtl) return NULL;
@@ -817,3 +871,4 @@ Control* CheckIfAlreadyExist(Mtl* pMtl)
 
 	return NULL;
 }
+#endif

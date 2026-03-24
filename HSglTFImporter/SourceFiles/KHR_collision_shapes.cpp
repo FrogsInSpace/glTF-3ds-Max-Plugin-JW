@@ -337,9 +337,9 @@ void glTFImporter_Core::SetRigidModefiers(void)
     for (int cnt = 0; cnt < m_glTF_data->data_extensions_count; cnt++, ext++) {
         char* name = ext->name;
         char* data = ext->data;
-        if (!stricmp(name, "KHR_implicit_shapes"))
+        if (!_stricmp(name, "KHR_implicit_shapes"))
             CreateCollisionShapeTable(data);
-        if (!stricmp(name, "KHR_physics_rigid_bodies"))
+        if (!_stricmp(name, "KHR_physics_rigid_bodies"))
             CreatePhysicdMtlTableTable(data);
     }
 

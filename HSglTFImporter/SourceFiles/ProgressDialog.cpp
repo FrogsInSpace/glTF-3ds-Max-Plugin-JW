@@ -84,10 +84,10 @@ TCHAR *GetProgressStr(void)
 
 	if (ProgressCount < 0)
 	{
-		_stprintf(ProgressBuf, _T(" Finish."));
+		_stprintf_s(ProgressBuf, sizeof(ProgressBuf), _T(" Finish."));
 	}
 	else {
-		_stprintf(ProgressBuf, _T(" %s"), progSTr[ProgressCount++ % num].data());
+		_stprintf_s(ProgressBuf, sizeof(ProgressBuf), _T(" %s"), progSTr[ProgressCount++ % num].data());
 	}
 
 	return ProgressBuf;

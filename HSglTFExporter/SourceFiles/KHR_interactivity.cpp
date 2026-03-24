@@ -86,8 +86,8 @@ bool isNumber(const tstring& s)
 
 	try {
 		size_t pos;
-		std::stod(s, &pos);  // float でも int でも OK
-		return pos == s.size();  // すべて消費できたら数値
+		std::stod(s, &pos);		// float  int  OK
+		return pos == s.size(); // Numeric
 	}
 	catch (...) {
 		return false;

@@ -104,8 +104,10 @@ INode* glTFImporter_Core::CreateLight(cgltf_node *node)
 	pLightObj->SetRGBColor(m_time, Point3(light->color));
 	pLightObj->SetIntensity(m_time, intensity);
 
-	pLightObj->SetHotspot(m_time, light->spot_inner_cone_angle * (180.0f / PI));
-	pLightObj->SetFallsize(m_time, light->spot_outer_cone_angle * (180.0f / PI));
+	if (light->type == cgltf_light_type_spot) {
+		pLightObj->SetHotspot(m_time, light->spot_inner_cone_angle * (180.0f / PI));
+		pLightObj->SetFallsize(m_time, light->spot_outer_cone_angle * (180.0f / PI));
+	}
 
 	pLightObj->Enable(1);
 

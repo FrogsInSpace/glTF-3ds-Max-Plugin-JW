@@ -207,8 +207,8 @@ void glTFExporter_Core::SetSceneExtras(tinygltf::Scene &Scene)
 			FILETIME ftime = pPropVar->filetime;
 			SYSTEMTIME stime;
 			FileTimeToSystemTime(&ftime, &stime);
-			char retStr[100];
-			sprintf(retStr, "%04d/%02d/%02d", stime.wYear, stime.wMonth, stime.wDay);
+			char retStr[MAX_PATH];
+			sprintf_s(retStr, MAX_PATH, "%04d/%02d/%02d", stime.wYear, stime.wMonth, stime.wDay);
 			params.insert(std::make_pair(str, std::string(retStr)));
 			}
 			break;
