@@ -559,7 +559,7 @@ int CALLBACK CompareFunc(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSort) {
 //=============================================================================
 static LRESULT CALLBACK NodeIndexDlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-	int typeIdx;
+	//int typeIdx;
 	tstring valStr;
 
 	switch (msg) {

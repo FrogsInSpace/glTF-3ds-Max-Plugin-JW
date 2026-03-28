@@ -43,13 +43,20 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
     <_ProjectFileVersion>10.0.40219.1</_ProjectFileVersion>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Hybrid|x64'">.\Hybrid2022\</OutDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='Hybrid|x64'">.\Hybrid2022\</IntDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Hybrid|x64'">$(ADSK_3DSMAX_x64_2020)\plugins\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Hybrid|x64'">.\Hybrid2020\</IntDir>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Hybrid|x64'">true</LinkIncremental>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(Platform)\$(Configuration)\</OutDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(Platform)\$(Configuration)\</IntDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ADSK_3DSMAX_x64_2020)\plugins\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\Release2020\</IntDir>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkIncremental>
-    <TargetExt Condition="'$(Configuration)|$(Platform)'=='Hybrid|x64'">.dlu</TargetExt>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='Hybrid|x64'">.dle</TargetExt>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Hybrid|x64'">
+    <TargetName>HSglTFExporter</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <TargetName>HSglTFExporter</TargetName>
+    <TargetExt>.dle</TargetExt>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Hybrid|x64'">
     <Midl>
@@ -62,7 +69,7 @@
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>.\;.\include;.\Resource;$(ADSK_3DSMAX_SDK_2020)\include;$(ADSK_3DSMAX_SDK_2020)\samples\modifiers\bonesdef;$(ADSK_3DSMAX_SDK_2020)\samples\modifiers\morpher;..\3rd_Party_Products;..\3rd_Party_Products\KTX2;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_WINDOWS;_DEBUG;ENABLE_BUILD_WITH_DRACO;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderOutputFile>.\Hybrid2020/HSglTFExporter.pch</PrecompiledHeaderOutputFile>
@@ -117,7 +124,7 @@
       <AdditionalOptions>/LD  %(AdditionalOptions)</AdditionalOptions>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
       <AdditionalIncludeDirectories>.\;.\include;.\Resource;$(ADSK_3DSMAX_SDK_2020)\include;$(ADSK_3DSMAX_SDK_2020)\samples\modifiers\bonesdef;$(ADSK_3DSMAX_SDK_2020)\samples\modifiers\morpher;..\3rd_Party_Products;..\3rd_Party_Products\KTX2;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>NDEBUG;_WINDOWS;_USRDLL;ENABLE_BUILD_WITH_DRACO;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>

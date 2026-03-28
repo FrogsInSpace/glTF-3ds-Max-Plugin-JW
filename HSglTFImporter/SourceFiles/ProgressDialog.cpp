@@ -22,13 +22,13 @@
 
 static HWND hProgressWnd;
 
-static int Total_Node = 0;
-static int Total_Mtl = 0;
-static int Total_Texture = 0;
-static int Total_Animation = 0;
-static int Total_Skin = 0;
-static int Total_Morph = 0;
-static int Physic_Morph = 0;
+static size_t Total_Node = 0;
+static size_t Total_Mtl = 0;
+static size_t Total_Texture = 0;
+static size_t Total_Animation = 0;
+static size_t Total_Skin = 0;
+static size_t Total_Morph = 0;
+static size_t Physic_Morph = 0;
 
 //======================================================================
 //======================================================================

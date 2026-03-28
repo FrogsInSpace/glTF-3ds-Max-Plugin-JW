@@ -86,7 +86,8 @@ bool isNumber(const tstring& s)
 
 	try {
 		size_t pos;
-		std::stod(s, &pos);		// float  int  OK
+		[[maybe_unused]] double val = std::stod(s, &pos);		// float  int  OK
+		//(void)val;
 		return pos == s.size(); // Numeric
 	}
 	catch (...) {
@@ -154,7 +155,7 @@ int SetTypeTable(socketDataType type)
 	}
 	typeTable.push_back(type);
 
-	return typeTable.size()-1;
+	return (int)(typeTable.size()-1);
 }
 
 //======================================================================
@@ -198,7 +199,7 @@ int SetDeclarationTable(const std::string &op)
 
 	// 存在しない場合、新しく追加し、そのインデックスを返す
 	declarationTable.push_back(op);
-	return declarationTable.size() - 1;
+	return (int)(declarationTable.size() - 1);
 }
 
 //======================================================================
@@ -396,7 +397,7 @@ void glTFExporter_Core::CreateDeclarationExtensionInfo(INode *pNode, const std::
 //======================================================================
 void glTFExporter_Core::SetNodeTable(INode *pNode, tinygltf::Value::Array& nodes)
 {
-	int s = m_NodeMap.size();
+	size_t s = m_NodeMap.size();
 
 
 	BOOL PointerSegmentIDFound = FALSE;

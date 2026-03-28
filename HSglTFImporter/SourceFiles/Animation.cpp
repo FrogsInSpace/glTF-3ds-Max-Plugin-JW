@@ -86,7 +86,7 @@ void glTFImporter_Core::GetPosAnimKeyFrameList(cgltf_animation_sampler *sampler,
 	AnimKeyInfo keyInfo;
 	PosKeyList.clear();
 	if (sampler->interpolation == cgltf_interpolation_type_cubic_spline) {
-		// CubicSpline is not yet implemented
+		// TODO: CubicSpline InTan/OutTan not yet implemented(Position part)
 		std::vector<float>::iterator p = AnimationList.begin();
 		for (auto key : KeyFrames) {
 			float ix = *(p + 0);
@@ -132,7 +132,7 @@ void glTFImporter_Core::GetRotAnimKeyFrameList(cgltf_animation_sampler *sampler,
 	AnimKeyInfo keyInfo;
 	RotKeyList.clear();
 	if (sampler->interpolation == cgltf_interpolation_type_cubic_spline) {
-		// CubicSplineは未実装
+		// TODO: CubicSpline InTan/OutTan not yet implemented(Rotate part)
 		std::vector<float>::iterator p = AnimationList.begin();
 		for (auto key : KeyFrames) {
 			float ix = *(p + 0);
@@ -181,7 +181,7 @@ void glTFImporter_Core::GetClr3AnimKeyFrameList(cgltf_animation_sampler* sampler
 	AnimKeyInfo keyInfo;
 	PosKeyList.clear();
 	if (sampler->interpolation == cgltf_interpolation_type_cubic_spline) {
-		// CubicSpline[InTan/OutTan]は未実装
+		// TODO: CubicSpline InTan/OutTan not yet implemented(Scale part)
 		std::vector<float>::iterator p = AnimationList.begin();
 		for (auto key : KeyFrames) {
 			float ix = *(p + 0);
@@ -1960,7 +1960,7 @@ void glTFImporter_Core::SetAnimationRec(INode *pNode, int animIdx)
 				ScaleInterpType = sampler->interpolation;
 				GetSclAnimKeyFrameList(sampler, SclKeyList);
 			} else if (ch->target_path == cgltf_animation_path_type_weights) {
-				GetWeightAnimKeyFrameList(sampler, WeightKeyList, node->mesh->weights_count);
+				GetWeightAnimKeyFrameList(sampler, WeightKeyList, (int)node->mesh->weights_count);
 			}
 
 			SetAnimImportStatus(1);
@@ -2059,7 +2059,7 @@ void glTFImporter_Core::GetAnimatedNodeTable(void)
 
 	INode *pRootNode = GetCOREInterface()->GetRootNode();
 
-	int cnt = m_glTF_data->animations_count;
+	size_t cnt = m_glTF_data->animations_count;
 	for (int animID = 0; animID < cnt; animID++) {
 		for (int i = 0; i < pRootNode->NumChildren(); i++) {
 			GetAnimatedNodeTableRec(pRootNode->GetChildNode(i), animID);

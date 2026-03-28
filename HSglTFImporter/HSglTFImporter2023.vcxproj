@@ -43,13 +43,20 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
     <_ProjectFileVersion>10.0.40219.1</_ProjectFileVersion>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Hybrid|x64'">.\Hybrid2023</OutDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='Hybrid|x64'">.\Hybrid2023</IntDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Hybrid|x64'">$(ADSK_3DSMAX_x64_2023)\Plugins\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Hybrid|x64'">.\Hybrid2023\</IntDir>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Hybrid|x64'">true</LinkIncremental>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(Platform)\$(Configuration)\</OutDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(Platform)\$(Configuration)\</IntDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ADSK_3DSMAX_x64_2023)\Plugins\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\Release2023\</IntDir>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkIncremental>
-    <TargetExt Condition="'$(Configuration)|$(Platform)'=='Hybrid|x64'">.dlu</TargetExt>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='Hybrid|x64'">.dli</TargetExt>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Hybrid|x64'">
+    <TargetName>HSglTFImporter</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <TargetName>HSglTFImporter</TargetName>
+    <TargetExt>.dli</TargetExt>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Hybrid|x64'">
     <Midl>
@@ -89,7 +96,7 @@
     </ResourceCompile>
     <Link>
       <AdditionalDependencies>odbc32.lib;odbccp32.lib;comctl32.lib;shlwapi.lib;bmm.lib;core.lib;geom.lib;gfx.lib;mesh.lib;maxutil.lib;maxscrpt.lib;gup.lib;paramblk2.lib;MNMath.lib;bonesDef.lib;assetmanagement.lib;Morpher.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>C:\Program Files\Autodesk\3ds Max 2023\Plugins\HSglTFImporter.dli</OutputFile>
+      <OutputFile>$(ADSK_3DSMAX_x64_2023)\Plugins\HSglTFImporter.dli</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <AdditionalLibraryDirectories>$(ADSK_3DSMAX_SDK_2023)\lib\x64\Release;$(ADSK_3DSMAX_SDK_2023)\samples\modifiers\morpher\Lib\x64\Release;..\3rd_Party_Products</AdditionalLibraryDirectories>
       <ModuleDefinitionFile>.\SourceFiles\HSglTFImporter.def</ModuleDefinitionFile>
@@ -119,7 +126,7 @@
       <AdditionalOptions>/LD  %(AdditionalOptions)</AdditionalOptions>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
       <AdditionalIncludeDirectories>.\;.\include;.\Resource;$(ADSK_3DSMAX_SDK_2023)\include;$(ADSK_3DSMAX_SDK_2023)\samples\modifiers\bonesdef;$(ADSK_3DSMAX_SDK_2023)\samples\modifiers\morpher;$(ADSK_3DSMAX_SDK_2023)\howto\utilities\customattribute;..\3rd_Party_Products;..\3rd_Party_Products\KTX2</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>NDEBUG;_WINDOWS;_USRDLL;NOMINMAX;MAX_SILENCE_DEPRECATED_MATRIX_BOOL_CTOR;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;MAX_SILENCE_DEPRECATED_MATRIX_BOOL_CTOR;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
@@ -142,7 +149,7 @@
     </ResourceCompile>
     <Link>
       <AdditionalDependencies>odbc32.lib;odbccp32.lib;comctl32.lib;shlwapi.lib;bmm.lib;core.lib;geom.lib;gfx.lib;mesh.lib;maxutil.lib;maxscrpt.lib;gup.lib;paramblk2.lib;MNMath.lib;bonesDef.lib;assetmanagement.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>C:\Program Files\Autodesk\3ds Max 2023\Plugins\HSglTFImporter.dli</OutputFile>
+      <OutputFile>$(ADSK_3DSMAX_x64_2023)\Plugins\HSglTFImporter.dli</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <AdditionalLibraryDirectories>$(ADSK_3DSMAX_SDK_2023)\lib\x64\Release;$(ADSK_3DSMAX_SDK_2023)\samples\modifiers\morpher\Lib\x64\Release;..\3rd_Party_Products</AdditionalLibraryDirectories>
       <ModuleDefinitionFile>.\SourceFiles\HSglTFImporter.def</ModuleDefinitionFile>

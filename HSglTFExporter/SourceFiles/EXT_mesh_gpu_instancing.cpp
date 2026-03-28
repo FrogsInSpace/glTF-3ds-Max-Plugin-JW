@@ -31,7 +31,7 @@ BOOL glTFExporter_Core::IsInstanced(INode* pNode)
 
 void glTFExporter_Core::ExportGPUInstanceSection(tinygltf::Scene& scene)
 {
-	UINT cnt = m_GPUInstanceNodeList.size();
+	size_t cnt = m_GPUInstanceNodeList.size();
 
 	auto map_p = m_GPUInstanceMap.begin();
 	auto node_p = m_GPUInstanceNodeList.begin();
@@ -72,7 +72,7 @@ void glTFExporter_Core::ExportGPUInstanceSection(tinygltf::Scene& scene)
 		node.extensions.insert(std::make_pair("EXT_mesh_gpu_instancing", extension));
 
 		m_model.nodes.push_back(node);
-		scene.nodes.push_back(m_model.nodes.size() - 1);
+		scene.nodes.push_back((int)(m_model.nodes.size() - 1));
 
 		map_p++;
 		node_p++;
@@ -91,9 +91,9 @@ int glTFExporter_Core::CreateInstanceTranslationSection(std::vector<Point3> &pos
 	tinygltf::BufferView bfViewOut;
 	bfViewOut.buffer = 0;
 	bfViewOut.byteOffset = m_BufferByteOffset;
-	bfViewOut.byteLength = accOut.count * sizeof(float) * 3;
+	bfViewOut.byteLength = (int)(accOut.count * sizeof(float) * 3);
 
-	void* ptr = SecureMemory(bfViewOut.byteLength);
+	void* ptr = SecureMemory((int)(bfViewOut.byteLength));
 	float* pData = (float*)((char*)ptr + bfViewOut.byteOffset);
 	//Control *pPosC = pC->GetPositionController();
 	for (auto p : pos) {
@@ -103,10 +103,10 @@ int glTFExporter_Core::CreateInstanceTranslationSection(std::vector<Point3> &pos
 	}
 
 	m_model.bufferViews.push_back(bfViewOut);
-	accOut.bufferView = m_model.bufferViews.size() - 1;
+	accOut.bufferView = (int)(m_model.bufferViews.size() - 1);
 	m_model.accessors.push_back(accOut);
 
-	return m_model.accessors.size() - 1;
+	return (int)(m_model.accessors.size() - 1);
 }
 
 int glTFExporter_Core::CreateInstanceRotationSection(std::vector<Quat>& rot)
@@ -121,7 +121,7 @@ int glTFExporter_Core::CreateInstanceRotationSection(std::vector<Quat>& rot)
 	bfViewOut.byteOffset = m_BufferByteOffset;
 	bfViewOut.byteLength = accOut.count * sizeof(float) * 4;
 
-	void* ptr = SecureMemory(bfViewOut.byteLength);
+	void* ptr = SecureMemory((int)(bfViewOut.byteLength));
 	float* pData = (float*)((char*)ptr + bfViewOut.byteOffset);
 	for (auto r : rot) {
 		*pData++ = r.x;
@@ -131,10 +131,10 @@ int glTFExporter_Core::CreateInstanceRotationSection(std::vector<Quat>& rot)
 	}
 
 	m_model.bufferViews.push_back(bfViewOut);
-	accOut.bufferView = m_model.bufferViews.size() - 1;
+	accOut.bufferView = (int)(m_model.bufferViews.size() - 1);
 	m_model.accessors.push_back(accOut);
 
-	return m_model.accessors.size() - 1;
+	return (int)(m_model.accessors.size() - 1);
 }
 
 int glTFExporter_Core::CreateInstanceScaleSection(std::vector<Point3>& scl)
@@ -149,7 +149,7 @@ int glTFExporter_Core::CreateInstanceScaleSection(std::vector<Point3>& scl)
 	bfViewOut.byteOffset = m_BufferByteOffset;
 	bfViewOut.byteLength = accOut.count * sizeof(float) * 3;
 
-	void* ptr = SecureMemory(bfViewOut.byteLength);
+	void* ptr = SecureMemory((int)(bfViewOut.byteLength));
 	float* pData = (float*)((char*)ptr + bfViewOut.byteOffset);
 	for (auto s : scl) {
 		*pData++ = s.x;
@@ -157,9 +157,9 @@ int glTFExporter_Core::CreateInstanceScaleSection(std::vector<Point3>& scl)
 		*pData++ = s.z;
 	}
 	m_model.bufferViews.push_back(bfViewOut);
-	accOut.bufferView = m_model.bufferViews.size() - 1;
+	accOut.bufferView = (int)(m_model.bufferViews.size() - 1);
 	m_model.accessors.push_back(accOut);
 
-	return m_model.accessors.size() - 1;
+	return (int)(m_model.accessors.size() - 1);
 }
 

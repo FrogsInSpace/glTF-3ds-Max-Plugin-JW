@@ -1132,7 +1132,7 @@ BOOL glTFImporter_Core::ImportScene(void)
 		}
 		pLayerMan->SetCurrentLayer(defaultSceneName.c_str());
 	} else{
-		if (m_SceneChannel >= m_glTF_data->scenes_count)m_SceneChannel = m_glTF_data->scenes_count - 1;
+		if (m_SceneChannel >= m_glTF_data->scenes_count) m_SceneChannel = static_cast<int>(m_glTF_data->scenes_count - 1);
 		cgltf_scene* pScene = m_SceneMode==0 ? m_glTF_data->scene : &m_glTF_data->scenes[m_SceneChannel];
 		if (!pScene) pScene = m_glTF_data->scenes;
 		if (!pScene) return FALSE;
@@ -1277,7 +1277,7 @@ BOOL glTFImporter_Core::ImportScene(void)
 		AnimateOn();
 
 		if (m_AnimChannel == 0) {
-			int cnt = m_glTF_data->animations_count;
+			size_t cnt = m_glTF_data->animations_count;
 			for (int anim = 0; anim < cnt; anim++) {
 				INode *pRootNode = GetCOREInterface()->GetRootNode();
 				for (int i = 0; i < pRootNode->NumChildren(); i++) {
@@ -1444,7 +1444,7 @@ BOOL glTFImporter_Core::GetDataList(std::vector<float>& retVal, cgltf_accessor* 
 	cgltf_type type = acc->type;
 	cgltf_component_type componentType = acc->component_type;
 
-	UINT IdxCount = sparse->count;
+	size_t IdxCount = sparse->count;
 	cgltf_component_type IdxComponentType = sparse->indices_component_type;
 	cgltf_buffer_view *IdxBufferView = sparse->indices_buffer_view;
 	cgltf_buffer *IdxBuffer = IdxBufferView->buffer;
@@ -1743,20 +1743,20 @@ std::string WStringToString(std::wstring oWString, int code)
 //======================================================================
 std::string UTF8toSjis(std::string srcUTF8)
 {
-	//Unicodeへ変換後の文字列長を得る
-	int lenghtUnicode = MultiByteToWideChar(CP_UTF8, 0, srcUTF8.c_str(), srcUTF8.size() + 1, NULL, 0);
+	// get string for Unicode conversion length
+	size_t lenghtUnicode = MultiByteToWideChar(CP_UTF8, 0, srcUTF8.c_str(), (int)(srcUTF8.size() + 1), NULL, 0);
 
-	//必要な分だけUnicode文字列のバッファを確保
+	// Keep buffer for Unicode string
 	wchar_t* bufUnicode = new wchar_t[lenghtUnicode];
 
-	//UTF8からUnicodeへ変換
-	MultiByteToWideChar(CP_UTF8, 0, srcUTF8.c_str(), srcUTF8.size() + 1, bufUnicode, lenghtUnicode);
+	//UTF8 -> Unicode
+	MultiByteToWideChar(CP_UTF8, 0, srcUTF8.c_str(), (int)(srcUTF8.size() + 1), bufUnicode, (int)lenghtUnicode);
 
 	int lengthSJis = WideCharToMultiByte(CP_ACP, 0, bufUnicode, -1, NULL, 0, NULL, NULL);
 
 	char* bufShiftJis = new char[lengthSJis];
 
-	WideCharToMultiByte(CP_ACP, 0, bufUnicode, lenghtUnicode + 1, bufShiftJis, lengthSJis, NULL, NULL);
+	WideCharToMultiByte(CP_ACP, 0, bufUnicode, (int)(lenghtUnicode + 1), bufShiftJis, lengthSJis, NULL, NULL);
 
 	std::string strSJis(bufShiftJis);
 

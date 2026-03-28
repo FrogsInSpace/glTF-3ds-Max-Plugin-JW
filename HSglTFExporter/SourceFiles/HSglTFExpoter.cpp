@@ -137,7 +137,7 @@ void LogOutput(const std::wstring& str, int pcs)
 
 //======================================================================
 //======================================================================
-tstring TextureTableCountStr(void)
+inline tstring TextureTableCountStr(void)
 {
 #ifdef UNICODE
 	return std::to_wstring(theExporterCore.TextureTableCount());
@@ -147,20 +147,14 @@ tstring TextureTableCountStr(void)
 }
 //======================================================================
 //======================================================================
-const tstring ExportFolder(void)
-{
-	return theExporterCore.ExportFolder();
-}
+inline const tstring ExportFolder(void){return theExporterCore.ExportFolder();}
 
 //======================================================================
 //======================================================================
-IPoint2 GetBitmapSize(void)
-{
-	return theExporterCore.m_CreateBitmapSize;
-}
+inline IPoint2 GetBitmapSize(void){	return theExporterCore.m_CreateBitmapSize;}
 
 //======================================================================
-// Exportee class declaration
+// Exportee class definition
 //======================================================================
 class HSglTFExporter : public SceneExport
 {
@@ -406,11 +400,6 @@ INT_PTR CALLBACK HSglTFExporterOptionsDlgProc(HWND hWnd, UINT message, WPARAM wP
 	case WM_INITDIALOG:
 		exp = (HSglTFExporter*)lParam;
 
-
-#ifndef ENABLE_BUILD_WITH_DRACO
-		ShowWindow(GetDlgItem(hWnd, IDC_DRACO_CHECK), FALSE);
-		HH_DracoCompress = FALSE;
-#endif
 		ShowWindow(GetDlgItem(hWnd, IDC_ANIMPTR_CHK), HH_ViewAnimPointer);
 		if (!HH_ViewAnimPointer) HH_AnimPointer = FALSE;
 
@@ -650,11 +639,6 @@ INT_PTR CALLBACK HSglTFExporterMainDlgProc(HWND hWnd, UINT message, WPARAM wPara
 		SetWindowText(hWnd, s_TitleString.c_str());
 
 		exp = (HSglTFExporter*)lParam;
-
-#ifndef ENABLE_BUILD_WITH_DRACO
-		ShowWindow(GetDlgItem(hWnd, IDC_DRACO_CHECK), FALSE);
-		HH_DracoCompress = FALSE;
-#endif
 
 		ShowWindow(GetDlgItem(hWnd, IDC_LICENSE_BTN), FALSE);
 

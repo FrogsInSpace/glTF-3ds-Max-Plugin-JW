@@ -48,7 +48,7 @@
 //===================================================================
 BOOL glTFImporter_Core::WebpDecode(const tstring &fname, tstring &retname)
 {
-    size_t data_size;
+    //size_t data_size;
     int width;
     int height;
 

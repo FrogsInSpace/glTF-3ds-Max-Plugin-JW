@@ -73,7 +73,7 @@ void SetNormal(Mesh *pMesh, const std::vector<Point3> &VertNormalTable)
 	MeshNormalSpec *pNrmSpec = pMesh->GetSpecifiedNormals();
 	//pNrmSpec->SetParent(pMesh);
 	pNrmSpec->SetNumFaces(pMesh->numFaces);
-	pNrmSpec->SetNumNormals(VertNormalTable.size());
+	pNrmSpec->SetNumNormals((int)VertNormalTable.size());
 
 	Face *pFace = pMesh->faces;
 	for (int i = 0; i < pMesh->numFaces; i++, pFace++) {
@@ -280,15 +280,14 @@ INode* glTFImporter_Core::CreateMaxNode(cgltf_node* node, INode* pParent)
 			std::vector<Mtl*>::iterator itr = std::find(mtlIdTable.begin(), mtlIdTable.end(), pMtl);
 			if (itr == mtlIdTable.end()) {
 				mtlIdTable.push_back(pMtl);
-				mId = mtlIdTable.size();
+				mId = static_cast<int>(mtlIdTable.size());
 			}
 			else {
 				mId = static_cast<int>(std::distance(mtlIdTable.begin(), itr) + 1);
 			}
 		}
 
-		// 頂点の設定
-		int attr_index;
+		// Set vertex
 		std::vector<float> VertIdList;
 		if (mc) {
 			DracoDecodeProc(mc->buffer_view, VertIdList, DracoDecodeType::POSITION);
@@ -296,12 +295,12 @@ INode* glTFImporter_Core::CreateMaxNode(cgltf_node* node, INode* pParent)
 		else {
 			GetDataList(VertIdList, findAttrAccesor(pr, "POSITION"));
 		}
-		UINT VertNum = 0;
+		size_t VertNum = 0;
 		if ((pr->type == cgltf_primitive_type_triangles) ||
 			(pr->type == cgltf_primitive_type_triangle_strip) ||
 			(pr->type == cgltf_primitive_type_triangle_fan)){
 			VertNum = VertIdList.size() / 3;
-			NewMesh.setNumVerts(VertNum + VertOffset, TRUE);
+			NewMesh.setNumVerts((int)(VertNum + VertOffset), TRUE);
 			UINT vIdx = VertOffset;
 			for (std::vector<float>::iterator v = VertIdList.begin(); v != VertIdList.end(); v += 3, vIdx++) {
 				Point3 p(*v, *(v + 1), *(v + 2));
@@ -323,7 +322,7 @@ INode* glTFImporter_Core::CreateMaxNode(cgltf_node* node, INode* pParent)
 		}
 
 		// 面の設定
-		UINT FaceNum = 0;
+		size_t FaceNum = 0;
 		if ((pr->type == cgltf_primitive_type_triangles) ||
 			(pr->type == cgltf_primitive_type_triangle_strip) ||
 			(pr->type == cgltf_primitive_type_triangle_fan)) {
@@ -350,7 +349,7 @@ INode* glTFImporter_Core::CreateMaxNode(cgltf_node* node, INode* pParent)
 
 			if (pr->type == cgltf_primitive_type_triangles) {
 				FaceNum = FaceIdList.size() / 3;
-				NewMesh.setNumFaces(FaceNum + FaceOffset, TRUE);
+				NewMesh.setNumFaces((int)(FaceNum + FaceOffset), TRUE);
 				UINT fIdx = FaceOffset;
 				for (std::vector<float>::iterator f = FaceIdList.begin(); f != FaceIdList.end(); f += 3, fIdx++) {
 					NewMesh.faces[fIdx].v[0] = static_cast<int>(*(f + 0)) + VertOffset;
@@ -363,7 +362,7 @@ INode* glTFImporter_Core::CreateMaxNode(cgltf_node* node, INode* pParent)
 			}
 			else if (pr->type == cgltf_primitive_type_triangle_strip) {
 				FaceNum = FaceIdList.size() - 2;
-				NewMesh.setNumFaces(FaceNum + FaceOffset, TRUE);
+				NewMesh.setNumFaces((int)(FaceNum + FaceOffset), TRUE);
 				UINT fIdx = FaceOffset;
 				auto f = FaceIdList.begin();
 				UINT vIdx1 = (UINT) * (f++) + VertOffset;
@@ -390,7 +389,7 @@ INode* glTFImporter_Core::CreateMaxNode(cgltf_node* node, INode* pParent)
 			}
 			else if (pr->type == cgltf_primitive_type_triangle_fan) {
 				FaceNum = FaceIdList.size() - 1;
-				NewMesh.setNumFaces(FaceNum + FaceOffset, TRUE);
+				NewMesh.setNumFaces((int)(FaceNum + FaceOffset), TRUE);
 				UINT fIdx = FaceOffset;
 				auto f = FaceIdList.begin();
 				UINT vIdx1 = (UINT) * (f++) + VertOffset;
@@ -484,7 +483,7 @@ INode* glTFImporter_Core::CreateMaxNode(cgltf_node* node, INode* pParent)
 		else {
 			GetDataList(NormalList, findAttrAccesor(pr, "NORMAL"));
 		}
-		UINT normalNum = NormalList.size() / 3;
+		size_t normalNum = NormalList.size() / 3;
 		if (normalNum > 0) {
 			int vIdx = NormalOffset;
 			for (std::vector<float>::iterator v = NormalList.begin(); v != NormalList.end(); v += 3, vIdx++) {
@@ -497,7 +496,7 @@ INode* glTFImporter_Core::CreateMaxNode(cgltf_node* node, INode* pParent)
 			//if (normalNum != VertNormalTable.size())VertNormalTable.clear();
 		}
 
-		// 頂点カラーの設定
+		// Set Vertex Ccolor
 		std::vector<float> vClrList;
 		cgltf_type val_type= cgltf_type_vec4;
 		float vcScale = 255.0f;
@@ -517,12 +516,12 @@ INode* glTFImporter_Core::CreateMaxNode(cgltf_node* node, INode* pParent)
 				val_type = acc->type;
 			}
 		}
-		UINT data_size = (val_type == cgltf_type_vec3)? 3:4;
-		UINT vClrNum = vClrList.size() / data_size;
+		size_t data_size = (val_type == cgltf_type_vec3)? 3:4;
+		size_t vClrNum = vClrList.size() / data_size;
 		if (vClrNum > 0) {
 			NewMesh.setMapSupport(0, TRUE);
-			NewMesh.setNumMapVerts(0, VertNum + VertOffset, TRUE);
-			NewMesh.setNumMapFaces(0, FaceNum + FaceOffset, TRUE);
+			NewMesh.setNumMapVerts(0, (int)(VertNum + VertOffset), TRUE);
+			NewMesh.setNumMapFaces(0, (int)(FaceNum + FaceOffset), TRUE);
 
 			if (NewMesh.mapFaces(0)) {
 				MeshMap *pMap = &NewMesh.Map(0);
@@ -549,7 +548,7 @@ INode* glTFImporter_Core::CreateMaxNode(cgltf_node* node, INode* pParent)
 			}
 		}
 
-		// 頂点UV1の設定
+		//Set UV1
 		std::vector<float> texCoord1List;
 		if (mc) {
 			DracoDecodeProc(mc->buffer_view, texCoord1List, DracoDecodeType::TEX_COORD);
@@ -560,7 +559,7 @@ INode* glTFImporter_Core::CreateMaxNode(cgltf_node* node, INode* pParent)
 			GetDataList(texCoord1List, acc);
 		}
 
-		UINT tex1Num = texCoord1List.size() / 2;
+		size_t tex1Num = texCoord1List.size() / 2;
 		if (NewMesh.mapSupport(1)&& tex1Num==0) {
 			//tex1Num=VertNum;
 			/*
@@ -587,8 +586,8 @@ INode* glTFImporter_Core::CreateMaxNode(cgltf_node* node, INode* pParent)
 		}
 		else if (tex1Num > 0) {
 			//NewMesh.setMapSupport(1, TRUE);
-			NewMesh.setNumMapVerts(1, VertNum + VertOffset, TRUE);
-			NewMesh.setNumMapFaces(1, FaceNum + FaceOffset, TRUE);
+			NewMesh.setNumMapVerts(1, (int)(VertNum + VertOffset), TRUE);
+			NewMesh.setNumMapFaces(1, (int)(FaceNum + FaceOffset), TRUE);
 			TVFace *pTVFace = &NewMesh.mapFaces(1)[FaceOffset];
 			Face *pFace = &NewMesh.faces[FaceOffset];
 			for (UINT f = FaceOffset; f < FaceOffset + FaceNum; f++) {
@@ -627,11 +626,11 @@ INode* glTFImporter_Core::CreateMaxNode(cgltf_node* node, INode* pParent)
 			//if (CheckBufferSize(acc))
 			GetDataList(texCoord2List, acc);
 		}
-		UINT tex2Num = texCoord2List.size() / 2;
+		size_t tex2Num = texCoord2List.size() / 2;
 		if (tex2Num > 0) {
 			//NewMesh.setMapSupport(2, TRUE);
-			NewMesh.setNumMapVerts(2, VertNum + VertOffset, TRUE);
-			NewMesh.setNumMapFaces(2, FaceNum + FaceOffset, TRUE);
+			NewMesh.setNumMapVerts(2, (int)(VertNum + VertOffset), TRUE);
+			NewMesh.setNumMapFaces(2, (int)(FaceNum + FaceOffset), TRUE);
 			MeshMap *pMap = &NewMesh.Map(2);
 			TVFace *pTVFace = &NewMesh.mapFaces(2)[FaceOffset];
 			Face *pFace = &NewMesh.faces[FaceOffset];
@@ -651,12 +650,12 @@ INode* glTFImporter_Core::CreateMaxNode(cgltf_node* node, INode* pParent)
 			}
 		}
 
-		VertOffset += VertNum;
-		FaceOffset += FaceNum;
-		NormalOffset += normalNum;
-		vClrOffset += vClrNum;
-		Tex1Offset += tex1Num;
-		Tex2Offset += tex2Num;
+		VertOffset += (int)VertNum;
+		FaceOffset += (int)FaceNum;
+		NormalOffset += (int)normalNum;
+		vClrOffset += (int)vClrNum;
+		Tex1Offset += (int)tex1Num;
+		Tex2Offset += (int)tex2Num;
 	}
 	//primId++;
 	//smGroupBit = smGroupBit << 1;
@@ -696,12 +695,12 @@ INode* glTFImporter_Core::CreateMaxNode(cgltf_node* node, INode* pParent)
 		if (pCompositeMtl) {
 			//IMaterialViewportShading *p = (IMaterialViewportShading*)pCompositeMtl->GetInterface(IID_MATERIAL_VIEWPORT_SHADING);
 			if (pCompositeMtl->ClassID()== MaterialSwitcherClassID) {
-				int num = mesh->primitives[0].mappings_count;
+				size_t num = mesh->primitives[0].mappings_count;
 				IParamBlock2* pBlock = pCompositeMtl->GetParamBlock(0);
-				pBlock->SetCount(0, num);
-				pBlock->SetCount(1, num);
+				pBlock->SetCount(0, static_cast<int>(num));
+				pBlock->SetCount(1, static_cast<int>(num));
 				pBlock->SetValue(2, m_time, 1);
-				pBlock->SetValue(3, m_time, num);
+				pBlock->SetValue(3, m_time, static_cast<int>(num));
 			}
 
 			cgltf_material_mapping *mappings = mesh->primitives[0].mappings;
