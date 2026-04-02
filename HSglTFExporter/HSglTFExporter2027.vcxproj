@@ -11,7 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectName>HSglTFExporter2026</ProjectName>
+    <ProjectName>HSglTFExporter2027</ProjectName>
     <ProjectGuid>{97D49973-99A4-41B9-B601-8E129D18F026}</ProjectGuid>
     <RootNamespace>Test</RootNamespace>
     <WindowsTargetPlatformVersion>10.0.19041.0</WindowsTargetPlatformVersion>
@@ -43,11 +43,11 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
     <_ProjectFileVersion>10.0.40219.1</_ProjectFileVersion>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Hybrid|x64'">$(ADSK_3DSMAX_x64_2026)\Plugins\</OutDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='Hybrid|x64'">.\Hybrid2026\</IntDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Hybrid|x64'">$(ADSK_3DSMAX_x64_2027)\Plugins\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Hybrid|x64'">.\Hybrid2027\</IntDir>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Hybrid|x64'">true</LinkIncremental>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ADSK_3DSMAX_x64_2026)\Plugins\</OutDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\Release2026\</IntDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ADSK_3DSMAX_x64_2027)\Plugins\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\Release2027\</IntDir>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkIncremental>
     <TargetExt Condition="'$(Configuration)|$(Platform)'=='Hybrid|x64'">.dle</TargetExt>
   </PropertyGroup>
@@ -68,7 +68,7 @@
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>.\;.\include;.\Resource;$(ADSK_3DSMAX_SDK_2026)\include;$(ADSK_3DSMAX_SDK_2026)\modifiers\bonesdef;$(ADSK_3DSMAX_SDK_2026)\include\geom;$(ADSK_3DSMAX_SDK_2026)\samples\modifiers\morpher;..\3rd_Party_Products;..\3rd_Party_Products\KTX2;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\;.\include;.\Resource;$(ADSK_3DSMAX_SDK_2027)\include;$(ADSK_3DSMAX_SDK_2027)\modifiers\bonesdef;$(ADSK_3DSMAX_SDK_2027)\include\geom;$(ADSK_3DSMAX_SDK_2027)\samples\modifiers\morpher;..\3rd_Party_Products;..\3rd_Party_Products\KTX2;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
@@ -97,7 +97,7 @@
       <AdditionalDependencies>odbc32.lib;odbccp32.lib;comctl32.lib;bmm.lib;core.lib;geom.lib;gfx.lib;mesh.lib;maxutil.lib;maxscrpt.lib;gup.lib;paramblk2.lib;MNMath.lib;bonesDef.lib;Shlwapi.lib;assetmanagement.lib;iGame.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>$(ADSK_3DSMAX_SDK_2026)\lib\x64\Release;$(ADSK_3DSMAX_SDK_2026)\samples\modifiers\morpher\Lib\x64\Release;..\3rd_Party_Products;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ADSK_3DSMAX_SDK_2027)\lib\x64\Release;$(ADSK_3DSMAX_SDK_2027)\samples\modifiers\morpher\Lib\x64\Release;..\3rd_Party_Products;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ModuleDefinitionFile>.\SourceFiles\HSglTFExporter.def</ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>$(IntDir)HSglTFExporter.pdb</ProgramDatabaseFile>
@@ -124,7 +124,7 @@
     <ClCompile>
       <AdditionalOptions>/LD  %(AdditionalOptions)</AdditionalOptions>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
-      <AdditionalIncludeDirectories>.\;.\include;.\Resource;$(ADSK_3DSMAX_SDK_2026)\include;$(ADSK_3DSMAX_SDK_2026)\modifiers\bonesdef;$(ADSK_3DSMAX_SDK_2026)\include\geom;$(ADSK_3DSMAX_SDK_2026)\samples\modifiers\morpher;..\3rd_Party_Products;..\3rd_Party_Products\KTX2;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\;.\include;.\Resource;$(ADSK_3DSMAX_SDK_2027)\include;$(ADSK_3DSMAX_SDK_2027)\modifiers\bonesdef;$(ADSK_3DSMAX_SDK_2027)\include\geom;$(ADSK_3DSMAX_SDK_2027)\samples\modifiers\morpher;..\3rd_Party_Products;..\3rd_Party_Products\KTX2;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
@@ -150,7 +150,7 @@
       <AdditionalDependencies>odbc32.lib;odbccp32.lib;comctl32.lib;bmm.lib;core.lib;geom.lib;gfx.lib;mesh.lib;maxutil.lib;maxscrpt.lib;gup.lib;paramblk2.lib;MNMath.lib;bonesDef.lib;Shlwapi.lib;assetmanagement.lib;iGame.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>$(ADSK_3DSMAX_SDK_2026)\lib\x64\Release;$(ADSK_3DSMAX_SDK_2026)\samples\modifiers\morpher\Lib\x64\Release;..\3rd_Party_Products;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ADSK_3DSMAX_SDK_2027)\lib\x64\Release;$(ADSK_3DSMAX_SDK_2027)\samples\modifiers\morpher\Lib\x64\Release;..\3rd_Party_Products;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ModuleDefinitionFile>.\SourceFiles\HSglTFExporter.def</ModuleDefinitionFile>
       <ProgramDatabaseFile>$(IntDir)HSglTFExporter.pdb</ProgramDatabaseFile>
       <SubSystem>Windows</SubSystem>

@@ -11,10 +11,10 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectName>HSglTFExporter2026</ProjectName>
-    <ProjectGuid>{97D49973-99A4-41B9-B601-8E129D18F026}</ProjectGuid>
+    <ProjectName>HSglTFImporter2027</ProjectName>
+    <ProjectGuid>{4DCC8EB2-9C05-48F9-B619-34A40F7D84C1}</ProjectGuid>
     <RootNamespace>Test</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.19041.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
@@ -43,20 +43,20 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
     <_ProjectFileVersion>10.0.40219.1</_ProjectFileVersion>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Hybrid|x64'">$(ADSK_3DSMAX_x64_2026)\Plugins\</OutDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='Hybrid|x64'">.\Hybrid2026\</IntDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Hybrid|x64'">$(ADSK_3DSMAX_x64_2027)\Plugins\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Hybrid|x64'">.\Hybrid2027\</IntDir>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Hybrid|x64'">true</LinkIncremental>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ADSK_3DSMAX_x64_2026)\Plugins\</OutDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\Release2026\</IntDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ADSK_3DSMAX_x64_2027)\Plugins\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\Release2027\</IntDir>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkIncremental>
-    <TargetExt Condition="'$(Configuration)|$(Platform)'=='Hybrid|x64'">.dle</TargetExt>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <TargetExt>.dle</TargetExt>
-    <TargetName>HSglTFExporter</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='Hybrid|x64'">.dli</TargetExt>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Hybrid|x64'">
-    <TargetName>HSglTFExporter</TargetName>
+    <TargetName>HSglTFImporter</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <TargetExt>.dli</TargetExt>
+    <TargetName>HSglTFImporter</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Hybrid|x64'">
     <Midl>
@@ -68,11 +68,11 @@
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>.\;.\include;.\Resource;$(ADSK_3DSMAX_SDK_2026)\include;$(ADSK_3DSMAX_SDK_2026)\modifiers\bonesdef;$(ADSK_3DSMAX_SDK_2026)\include\geom;$(ADSK_3DSMAX_SDK_2026)\samples\modifiers\morpher;..\3rd_Party_Products;..\3rd_Party_Products\KTX2;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>.\;.\include;.\Resource;$(ADSK_3DSMAX_SDK_2027)\include;$(ADSK_3DSMAX_SDK_2027)\include\Geom;$(ADSK_3DSMAX_SDK_2027)\samples\modifiers\bonesdef;$(ADSK_3DSMAX_SDK_2027)\samples\modifiers\morpher;$(ADSK_3DSMAX_SDK_2027)\howto\utilities\customattribute;..\3rd_Party_Products;..\3rd_Party_Products\KTX2</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_DEBUG;NOMINMAX;MAX_SILENCE_DEPRECATED_MATRIX_BOOL_CTOR;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <PrecompiledHeaderOutputFile>$(IntDir)HSglTFExporter.pch</PrecompiledHeaderOutputFile>
+      <PrecompiledHeaderOutputFile>$(IntDir)HSglTFImporter.pch</PrecompiledHeaderOutputFile>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <ObjectFileName>$(IntDir)</ObjectFileName>
       <ProgramDataBaseFileName>$(IntDir)</ProgramDataBaseFileName>
@@ -94,18 +94,18 @@
       <Culture>0x0411</Culture>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>odbc32.lib;odbccp32.lib;comctl32.lib;bmm.lib;core.lib;geom.lib;gfx.lib;mesh.lib;maxutil.lib;maxscrpt.lib;gup.lib;paramblk2.lib;MNMath.lib;bonesDef.lib;Shlwapi.lib;assetmanagement.lib;iGame.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>odbc32.lib;odbccp32.lib;comctl32.lib;shlwapi.lib;bmm.lib;core.lib;geom.lib;gfx.lib;mesh.lib;maxutil.lib;maxscrpt.lib;gup.lib;paramblk2.lib;MNMath.lib;bonesDef.lib;assetmanagement.lib;Morpher.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>$(ADSK_3DSMAX_SDK_2026)\lib\x64\Release;$(ADSK_3DSMAX_SDK_2026)\samples\modifiers\morpher\Lib\x64\Release;..\3rd_Party_Products;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <ModuleDefinitionFile>.\SourceFiles\HSglTFExporter.def</ModuleDefinitionFile>
+      <AdditionalLibraryDirectories>$(ADSK_3DSMAX_SDK_2027)\lib\x64\Release;$(ADSK_3DSMAX_SDK_2027)\samples\modifiers\morpher\Lib\x64\Release;..\3rd_Party_Products</AdditionalLibraryDirectories>
+      <ModuleDefinitionFile>.\SourceFiles\HSglTFImporter.def</ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <ProgramDatabaseFile>$(IntDir)HSglTFExporter.pdb</ProgramDatabaseFile>
+      <ProgramDatabaseFile>$(IntDir)HSglTFImporter.pdb</ProgramDatabaseFile>
       <SubSystem>Windows</SubSystem>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <DataExecutionPrevention>
       </DataExecutionPrevention>
-      <ImportLibrary>$(IntDir)HSglTFExporter.lib</ImportLibrary>
+      <ImportLibrary>$(IntDir)HSglTFImporter.lib</ImportLibrary>
       <TargetMachine>MachineX64</TargetMachine>
     </Link>
     <PostBuildEvent>
@@ -124,14 +124,14 @@
     <ClCompile>
       <AdditionalOptions>/LD  %(AdditionalOptions)</AdditionalOptions>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
-      <AdditionalIncludeDirectories>.\;.\include;.\Resource;$(ADSK_3DSMAX_SDK_2026)\include;$(ADSK_3DSMAX_SDK_2026)\modifiers\bonesdef;$(ADSK_3DSMAX_SDK_2026)\include\geom;$(ADSK_3DSMAX_SDK_2026)\samples\modifiers\morpher;..\3rd_Party_Products;..\3rd_Party_Products\KTX2;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>.\;.\include;.\Resource;$(ADSK_3DSMAX_SDK_2027)\include;$(ADSK_3DSMAX_SDK_2027)\include\Geom;$(ADSK_3DSMAX_SDK_2027)\samples\modifiers\bonesdef;$(ADSK_3DSMAX_SDK_2027)\samples\modifiers\morpher;$(ADSK_3DSMAX_SDK_2027)\howto\utilities\customattribute;..\3rd_Party_Products;..\3rd_Party_Products\KTX2</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>NDEBUG;NOMINMAX;MAX_SILENCE_DEPRECATED_MATRIX_BOOL_CTOR;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <PrecompiledHeader>
       </PrecompiledHeader>
-      <PrecompiledHeaderOutputFile>$(IntDir)HSglTFExporter.pch</PrecompiledHeaderOutputFile>
+      <PrecompiledHeaderOutputFile>$(IntDir)HSglTFImporter.pch</PrecompiledHeaderOutputFile>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <ObjectFileName>$(IntDir)</ObjectFileName>
       <ProgramDataBaseFileName>$(IntDir)</ProgramDataBaseFileName>
@@ -139,7 +139,6 @@
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <CompileAs>Default</CompileAs>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <Optimization>MaxSpeed</Optimization>
       <ExceptionHandling>Async</ExceptionHandling>
     </ClCompile>
     <ResourceCompile>
@@ -147,18 +146,18 @@
       <Culture>0x0411</Culture>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>odbc32.lib;odbccp32.lib;comctl32.lib;bmm.lib;core.lib;geom.lib;gfx.lib;mesh.lib;maxutil.lib;maxscrpt.lib;gup.lib;paramblk2.lib;MNMath.lib;bonesDef.lib;Shlwapi.lib;assetmanagement.lib;iGame.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>odbc32.lib;odbccp32.lib;comctl32.lib;shlwapi.lib;bmm.lib;core.lib;geom.lib;gfx.lib;mesh.lib;maxutil.lib;maxscrpt.lib;gup.lib;paramblk2.lib;MNMath.lib;bonesDef.lib;assetmanagement.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>$(ADSK_3DSMAX_SDK_2026)\lib\x64\Release;$(ADSK_3DSMAX_SDK_2026)\samples\modifiers\morpher\Lib\x64\Release;..\3rd_Party_Products;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <ModuleDefinitionFile>.\SourceFiles\HSglTFExporter.def</ModuleDefinitionFile>
-      <ProgramDatabaseFile>$(IntDir)HSglTFExporter.pdb</ProgramDatabaseFile>
+      <AdditionalLibraryDirectories>$(ADSK_3DSMAX_SDK_2027)\lib\x64\Release;$(ADSK_3DSMAX_SDK_2027)\samples\modifiers\morpher\Lib\x64\Release;..\3rd_Party_Products</AdditionalLibraryDirectories>
+      <ModuleDefinitionFile>.\SourceFiles\HSglTFImporter.def</ModuleDefinitionFile>
+      <ProgramDatabaseFile>$(IntDir)HSglTFImporter.pdb</ProgramDatabaseFile>
       <SubSystem>Windows</SubSystem>
       <SetChecksum>true</SetChecksum>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <DataExecutionPrevention>
       </DataExecutionPrevention>
-      <ImportLibrary>$(IntDir)HSglTFExporter.lib</ImportLibrary>
+      <ImportLibrary>$(IntDir)HSglTFImporter.lib</ImportLibrary>
       <TargetMachine>MachineX64</TargetMachine>
     </Link>
     <PostBuildEvent>
@@ -169,50 +168,45 @@
   <ItemGroup>
     <ClCompile Include="SourceFiles\Animation.cpp" />
     <ClCompile Include="SourceFiles\ArnoldMaterial.cpp" />
-    <ClCompile Include="SourceFiles\Camera_Light.cpp" />
+    <ClCompile Include="SourceFiles\Camera.cpp" />
     <ClCompile Include="SourceFiles\CoronaMaterial.cpp" />
     <ClCompile Include="SourceFiles\CustomAttribute.cpp" />
     <ClCompile Include="SourceFiles\DllEntry.cpp" />
-    <ClCompile Include="SourceFiles\DracoEncode.cpp" />
-    <ClCompile Include="SourceFiles\EXT_mesh_gpu_instancing.cpp" />
+    <ClCompile Include="SourceFiles\DracoDecode.cpp" />
     <ClCompile Include="SourceFiles\glTFMaterial.cpp" />
     <ClCompile Include="SourceFiles\gltfx_reference.cpp" />
-    <ClCompile Include="SourceFiles\HSglTFExpoter.cpp" />
-    <ClCompile Include="SourceFiles\ImageBuffer.cpp" />
+    <ClCompile Include="SourceFiles\HSglTFImporter.cpp" />
+    <ClCompile Include="SourceFiles\HSglTFTool.cpp" />
     <ClCompile Include="SourceFiles\KHR_animation_pointer.cpp" />
     <ClCompile Include="SourceFiles\KHR_collision_shapes.cpp" />
-    <ClCompile Include="SourceFiles\KHR_interactivity.cpp" />
-    <ClCompile Include="SourceFiles\KTX2_Encoder.cpp" />
+    <ClCompile Include="SourceFiles\KTX2Reader.cpp" />
     <ClCompile Include="SourceFiles\Materials.cpp" />
-    <ClCompile Include="SourceFiles\MergeBitmap.cpp" />
     <ClCompile Include="SourceFiles\MimeTypes.cpp" />
     <ClCompile Include="SourceFiles\Morph.cpp" />
     <ClCompile Include="SourceFiles\Node.cpp" />
-    <ClCompile Include="SourceFiles\Node2.cpp" />
     <ClCompile Include="SourceFiles\OpenPBRMaterial.cpp" />
-    <ClCompile Include="SourceFiles\PBRMaterial.cpp" />
+    <ClCompile Include="SourceFiles\OSLmanager.cpp" />
+    <ClCompile Include="SourceFiles\PBRMetalMaterial.cpp" />
     <ClCompile Include="SourceFiles\PBRSpecGlossMaterial.cpp" />
     <ClCompile Include="SourceFiles\PhysicalMaterial.cpp" />
-    <ClCompile Include="SourceFiles\PostProcess.cpp" />
+    <ClCompile Include="SourceFiles\ProgressDialog.cpp" />
     <ClCompile Include="SourceFiles\ScanlineMaterial.cpp" />
-    <ClCompile Include="SourceFiles\SceneExtension.cpp" />
-    <ClCompile Include="SourceFiles\Shape.cpp" />
+    <ClCompile Include="SourceFiles\SceneProperty.cpp" />
     <ClCompile Include="SourceFiles\Skin.cpp" />
     <ClCompile Include="SourceFiles\USDMaterial.cpp" />
     <ClCompile Include="SourceFiles\VRayMaterial.cpp" />
-    <ClCompile Include="SourceFiles\WebpEncoder.cpp" />
+    <ClCompile Include="SourceFiles\WebpDecoder.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Include\define.h" />
-    <ClInclude Include="Include\HSglTFExporter.h" />
+    <ClInclude Include="Include\HSglTFImporter.h" />
     <ClInclude Include="resource.h" />
-    <ClInclude Include="Resource\resource.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="HSglTFExporter.def" />
+    <None Include="HSglTFImporter.def" />
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="Resource\HSglTFExporter.rc" />
+    <ResourceCompile Include="Resource\HSglTFImporter.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

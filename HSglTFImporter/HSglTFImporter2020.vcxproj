@@ -72,10 +72,10 @@
       <PreprocessorDefinitions>_DEBUG;NOMINMAX;MAX_SILENCE_DEPRECATED_MATRIX_BOOL_CTOR;_CRT_SECURE_NO_WARNINGS;_0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <PrecompiledHeaderOutputFile>.\Hybrid2020/HSglTFImporter.pch</PrecompiledHeaderOutputFile>
-      <AssemblerListingLocation>.\Hybrid2020/</AssemblerListingLocation>
-      <ObjectFileName>.\Hybrid2020/</ObjectFileName>
-      <ProgramDataBaseFileName>.\Hybrid2020/</ProgramDataBaseFileName>
+      <PrecompiledHeaderOutputFile>$(IntDir)HSglTFImporter.pch</PrecompiledHeaderOutputFile>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <ProgramDataBaseFileName>$(IntDir)</ProgramDataBaseFileName>
       <WarningLevel>Level3</WarningLevel>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -96,17 +96,17 @@
     </ResourceCompile>
     <Link>
       <AdditionalDependencies>odbc32.lib;odbccp32.lib;comctl32.lib;bmm.lib;core.lib;geom.lib;gfx.lib;mesh.lib;maxutil.lib;maxscrpt.lib;gup.lib;paramblk2.lib;MNMath.lib;bonesDef.lib;Morpher.lib;Shlwapi.lib;assetmanagement.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>$(ADSK_3DSMAX_x64_2020)\Plugins\HSglTFImporter.dli</OutputFile>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <AdditionalLibraryDirectories>$(ADSK_3DSMAX_SDK_2020)\lib\x64\Release;$(ADSK_3DSMAX_SDK_2020)\samples\modifiers\morpher\Lib\x64\Release;..\3rd_Party_Products</AdditionalLibraryDirectories>
       <ModuleDefinitionFile>.\SourceFiles\HSglTFImporter.def</ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <ProgramDatabaseFile>.\Hybrid2020/HSglTFImporter.pdb</ProgramDatabaseFile>
+      <ProgramDatabaseFile>$(IntDir)HSglTFImporter.pdb</ProgramDatabaseFile>
       <SubSystem>Windows</SubSystem>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <DataExecutionPrevention>
       </DataExecutionPrevention>
-      <ImportLibrary>.\Hybrid2020/HSglTFImporter.lib</ImportLibrary>
+      <ImportLibrary>$(IntDir)HSglTFImporter.lib</ImportLibrary>
       <TargetMachine>MachineX64</TargetMachine>
     </Link>
     <PostBuildEvent>
@@ -132,10 +132,10 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <PrecompiledHeader>
       </PrecompiledHeader>
-      <PrecompiledHeaderOutputFile>.\Release2020/HSglTFImporter.pch</PrecompiledHeaderOutputFile>
-      <AssemblerListingLocation>.\Release2020/</AssemblerListingLocation>
-      <ObjectFileName>.\Release2020/</ObjectFileName>
-      <ProgramDataBaseFileName>.\Release2020/</ProgramDataBaseFileName>
+      <PrecompiledHeaderOutputFile>$(IntDir)HSglTFImporter.pch</PrecompiledHeaderOutputFile>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <ProgramDataBaseFileName>$(IntDir)</ProgramDataBaseFileName>
       <WarningLevel>Level3</WarningLevel>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <CompileAs>Default</CompileAs>
@@ -149,17 +149,17 @@
     </ResourceCompile>
     <Link>
       <AdditionalDependencies>odbc32.lib;odbccp32.lib;comctl32.lib;bmm.lib;core.lib;geom.lib;gfx.lib;mesh.lib;maxutil.lib;maxscrpt.lib;gup.lib;paramblk2.lib;MNMath.lib;bonesDef.lib;Morpher.lib;Shlwapi.lib;assetmanagement.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>$(ADSK_3DSMAX_x64_2020)\Plugins\HSglTFImporter.dli</OutputFile>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <AdditionalLibraryDirectories>$(ADSK_3DSMAX_SDK_2020)\lib\x64\Release;$(ADSK_3DSMAX_SDK_2020)\samples\modifiers\morpher\Lib\x64\Release;..\3rd_Party_Products</AdditionalLibraryDirectories>
       <ModuleDefinitionFile>.\SourceFiles\HSglTFImporter.def</ModuleDefinitionFile>
-      <ProgramDatabaseFile>.\Release2020/HSglTFImporter.pdb</ProgramDatabaseFile>
+      <ProgramDatabaseFile>$(IntDir)HSglTFImporter.pdb</ProgramDatabaseFile>
       <SubSystem>Windows</SubSystem>
       <SetChecksum>true</SetChecksum>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <DataExecutionPrevention>
       </DataExecutionPrevention>
-      <ImportLibrary>.\Release2020/HSglTFImporter.lib</ImportLibrary>
+      <ImportLibrary>$(IntDir)HSglTFImporter.lib</ImportLibrary>
       <TargetMachine>MachineX64</TargetMachine>
     </Link>
     <PostBuildEvent>
