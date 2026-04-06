@@ -71,7 +71,7 @@ Use the variable name corresponding to your specific 3ds Max version:
   2023 -------------- ADSK_3DSMAX_SDK_2023  
   2024 -------------- ADSK_3DSMAX_SDK_2024  
   2025 -------------- ADSK_3DSMAX_SDK_2025  
-  2026 -------------- ADSK_3DSMAX_SDK_2026
+  2026 -------------- ADSK_3DSMAX_SDK_2026  
   2027 -------------- ADSK_3DSMAX_SDK_2027
   
 ### 3rd Party Libraries
