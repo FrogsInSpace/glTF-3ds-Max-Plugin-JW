@@ -1,0 +1,15 @@
+.vs/
+**/Hybrid*/
+**/Debug*/
+**/Release*/
+**/Releases*/
+**/obj/
+**/ipch/
+**/x64/
+**/src/Generated/
+*.suo
+*.log
+*.aps
+*.sdf
+*.user
+RCa12100
