@@ -44,18 +44,6 @@
       <Configuration>Release-Max2020</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
-    <ProjectConfiguration Include="Release-Max2019|x64">
-      <Configuration>Release-Max2019</Configuration>
-      <Platform>x64</Platform>
-    </ProjectConfiguration>
-    <ProjectConfiguration Include="Release-Max2018|x64">
-      <Configuration>Release-Max2018</Configuration>
-      <Platform>x64</Platform>
-    </ProjectConfiguration>
-    <ProjectConfiguration Include="Release-Max2017|x64">
-      <Configuration>Release-Max2017</Configuration>
-      <Platform>x64</Platform>
-    </ProjectConfiguration>
   </ItemGroup>
   <ImportGroup Label="PropertySheets">
     <Import Project="$(ProjectDir)propertysheets\MaxSDKSetup.props" />
