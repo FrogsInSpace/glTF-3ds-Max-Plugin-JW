@@ -79,6 +79,7 @@
       <TypeLibraryName>.\Hybrid/Test.tlb</TypeLibraryName>
     </Midl>
     <ClCompile>
+      <ConformanceMode>Default</ConformanceMode>
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>.\;.\include;.\Resource;$(MaxSDKPath)\include;$(MaxSDKPath)\include\Geom;$(MaxSDKPath)\samples\modifiers\bonesdef;$(MaxSDKPath)\samples\modifiers\morpher;$(MaxSDKPath)\howto\utilities\customattribute;..\3rd_Party_Products;..\3rd_Party_Products\KTX2</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_DEBUG;NOMINMAX;MAX_SILENCE_DEPRECATED_MATRIX_BOOL_CTOR;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -133,6 +134,7 @@
       <TypeLibraryName>.\Release/Test.tlb</TypeLibraryName>
     </Midl>
     <ClCompile>
+      <ConformanceMode>Default</ConformanceMode>
       <AdditionalOptions>/LD  %(AdditionalOptions)</AdditionalOptions>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
       <AdditionalIncludeDirectories>.\;.\include;.\Resource;$(MaxSDKPath)\include;$(MaxSDKPath)\include\Geom;$(MaxSDKPath)\samples\modifiers\bonesdef;$(MaxSDKPath)\samples\modifiers\morpher;$(MaxSDKPath)\howto\utilities\customattribute;..\3rd_Party_Products;..\3rd_Party_Products\KTX2</AdditionalIncludeDirectories>

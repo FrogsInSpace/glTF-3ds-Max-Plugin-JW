@@ -55,10 +55,10 @@
       <Configuration>Release-Max2017</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
-  </ItemGroup>	
+  </ItemGroup>
   <ImportGroup Label="PropertySheets">
     <Import Project="$(ProjectDir)propertysheets\MaxSDKSetup.props" />
-  </ImportGroup>	
+  </ImportGroup>
   <ImportGroup Label="PropertySheets">
     <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
     <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
@@ -67,7 +67,7 @@
   <PropertyGroup>
     <TargetName>$(ProjectName)_$(MaxSDKRelease)</TargetName>
     <TargetExt>.dle</TargetExt>
-  </PropertyGroup>	
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="$(Configuration.Contains('Hybrid')) OR $(Configuration.Contains('Debug'))">
     <Midl>
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -77,6 +77,7 @@
       <TypeLibraryName>.\Hybrid/Test.tlb</TypeLibraryName>
     </Midl>
     <ClCompile>
+      <ConformanceMode>Default</ConformanceMode>
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>.\;.\include;.\Resource;$(MaxSDKPath)\include;$(MaxSDKPath)\modifiers\bonesdef;$(MaxSDKPath)\include\geom;$(MaxSDKPath)\samples\modifiers\morpher;..\3rd_Party_Products;..\3rd_Party_Products\KTX2;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -131,6 +132,7 @@
       <TypeLibraryName>.\Release/Test.tlb</TypeLibraryName>
     </Midl>
     <ClCompile>
+      <ConformanceMode>Default</ConformanceMode>
       <AdditionalOptions>/LD  %(AdditionalOptions)</AdditionalOptions>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
       <AdditionalIncludeDirectories>.\;.\include;.\Resource;$(MaxSDKPath)\include;$(MaxSDKPath)\modifiers\bonesdef;$(MaxSDKPath)\include\geom;$(MaxSDKPath)\samples\modifiers\morpher;..\3rd_Party_Products;..\3rd_Party_Products\KTX2;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
