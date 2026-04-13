@@ -98,7 +98,7 @@ int GetImportedNodeTab(INodeTab& tab)
 	return tab.Count();
 }
 
-static TCHAR *pLicenseStr = _T(
+static const TCHAR *pLicenseStr = _T(
 	"glTF/glb Importer for 3dsmax Designed By Satoshi Hayashi\r\n\r\n \
 jkuhlmann/cgltf is licensed under the MIT License.\r\n \
 Draco is licensed under the Apache 2.0.\r\n \

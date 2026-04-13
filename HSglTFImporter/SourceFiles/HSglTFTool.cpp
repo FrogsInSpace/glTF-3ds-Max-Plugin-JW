@@ -686,23 +686,23 @@ void NodeIndexDlgInit(HWND hWnd)
 	LV_COLUMN lColumn;
 	lColumn.mask = LVCF_FMT | LVCF_SUBITEM | LVCF_WIDTH | LVCF_TEXT; //| LVCF_DEFAULTWIDTH;
 	lColumn.fmt = LVCFMT_RIGHT;
-	lColumn.pszText = _T("Name");
+	lColumn.pszText = const_cast<TCHAR*>(_T("Name"));
 	lColumn.cx = 90;
 	lColumn.iSubItem = 0;
 	ListView_InsertColumn(hListView, 0, &lColumn);
-	lColumn.pszText = _T("nodeIndex");
+	lColumn.pszText = const_cast<TCHAR*>(_T("nodeIndex"));
 	lColumn.cx = 80;
 	lColumn.iSubItem = 1;
 	ListView_InsertColumn(hListView, 1, &lColumn);
-	lColumn.pszText = _T("Sel");
+	lColumn.pszText = const_cast<TCHAR*>(_T("Sel"));
 	lColumn.cx = 35;
 	lColumn.iSubItem = 2;
 	ListView_InsertColumn(hListView, 2, &lColumn);
-	lColumn.pszText = _T("Hov");
+	lColumn.pszText = const_cast<TCHAR*>(_T("Hov"));
 	lColumn.cx = 35;
 	lColumn.iSubItem = 3;
 	ListView_InsertColumn(hListView, 3, &lColumn);
-	lColumn.pszText = _T("Vis");
+	lColumn.pszText = const_cast<TCHAR*>(_T("Vis"));
 	lColumn.cx = 35;
 	lColumn.iSubItem = 4;
 	ListView_InsertColumn(hListView, 4, &lColumn);
@@ -869,7 +869,7 @@ BOOL DeleteNodeIndex(HWND hWnd)
 
 		item.mask = LVIF_TEXT;
 		item.iSubItem = 1;
-		ListView_SetItemText(hListView, i, 1, _T(""));
+		ListView_SetItemText(hListView, i, 1, const_cast<TCHAR*>(_T("")));
 	}
 
 	return TRUE;
