@@ -1,11 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup Label="Globals">
-    <ProjectName>HSglTFImporter</ProjectName>
     <ProjectGuid>{4DCC8EB2-9C05-48F9-B619-34A40F7D84C1}</ProjectGuid>
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <ProjectName>HSglTFImporter</ProjectName>
     <RootNamespace>HSglTFImporter</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.19041.0</WindowsTargetPlatformVersion>
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
   </PropertyGroup>
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Hybrid-Max2025|x64">
@@ -67,7 +66,7 @@
       <TypeLibraryName>.\Hybrid/Test.tlb</TypeLibraryName>
     </Midl>
     <ClCompile>
-      <ConformanceMode>Default</ConformanceMode>
+      <ConformanceMode>false</ConformanceMode>
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>.\;.\include;.\Resource;$(MaxSDKPath)\include;$(MaxSDKPath)\include\Geom;$(MaxSDKPath)\samples\modifiers\bonesdef;$(MaxSDKPath)\samples\modifiers\morpher;$(MaxSDKPath)\howto\utilities\customattribute;..\3rd_Party_Products;..\3rd_Party_Products\KTX2</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_DEBUG;NOMINMAX;MAX_SILENCE_DEPRECATED_MATRIX_BOOL_CTOR;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -122,7 +121,7 @@
       <TypeLibraryName>.\Release/Test.tlb</TypeLibraryName>
     </Midl>
     <ClCompile>
-      <ConformanceMode>Default</ConformanceMode>
+      <ConformanceMode>false</ConformanceMode>
       <AdditionalOptions>/LD  %(AdditionalOptions)</AdditionalOptions>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
       <AdditionalIncludeDirectories>.\;.\include;.\Resource;$(MaxSDKPath)\include;$(MaxSDKPath)\include\Geom;$(MaxSDKPath)\samples\modifiers\bonesdef;$(MaxSDKPath)\samples\modifiers\morpher;$(MaxSDKPath)\howto\utilities\customattribute;..\3rd_Party_Products;..\3rd_Party_Products\KTX2</AdditionalIncludeDirectories>
@@ -201,7 +200,7 @@
   <ItemGroup>
     <ClInclude Include="Include\define.h" />
     <ClInclude Include="Include\HSglTFImporter.h" />
-    <ClInclude Include="resource.h" />
+    <ClInclude Include="Resource\resource.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="HSglTFImporter.def" />

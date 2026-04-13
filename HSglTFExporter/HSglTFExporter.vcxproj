@@ -65,7 +65,7 @@
       <TypeLibraryName>.\Hybrid/Test.tlb</TypeLibraryName>
     </Midl>
     <ClCompile>
-      <ConformanceMode>Default</ConformanceMode>
+      <ConformanceMode>false</ConformanceMode>
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>.\;.\include;.\Resource;$(MaxSDKPath)\include;$(MaxSDKPath)\modifiers\bonesdef;$(MaxSDKPath)\include\geom;$(MaxSDKPath)\samples\modifiers\morpher;..\3rd_Party_Products;..\3rd_Party_Products\KTX2;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -120,7 +120,7 @@
       <TypeLibraryName>.\Release/Test.tlb</TypeLibraryName>
     </Midl>
     <ClCompile>
-      <ConformanceMode>Default</ConformanceMode>
+      <ConformanceMode>false</ConformanceMode>
       <AdditionalOptions>/LD  %(AdditionalOptions)</AdditionalOptions>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
       <AdditionalIncludeDirectories>.\;.\include;.\Resource;$(MaxSDKPath)\include;$(MaxSDKPath)\modifiers\bonesdef;$(MaxSDKPath)\include\geom;$(MaxSDKPath)\samples\modifiers\morpher;..\3rd_Party_Products;..\3rd_Party_Products\KTX2;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -203,7 +203,6 @@
   <ItemGroup>
     <ClInclude Include="Include\define.h" />
     <ClInclude Include="Include\HSglTFExporter.h" />
-    <ClInclude Include="resource.h" />
     <ClInclude Include="Resource\resource.h" />
   </ItemGroup>
   <ItemGroup>
