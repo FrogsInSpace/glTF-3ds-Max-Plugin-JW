@@ -1372,7 +1372,7 @@ float GetW(const Point3 &normal, const Point3 &tangent, const Point3 &bitangent)
 }
 
 //=============================================================================
-// Geommetryオブジェクトか
+// Geommetry object?
 //=============================================================================
 BOOL IsGeometryObject(INode* pNode, TimeValue t)
 {

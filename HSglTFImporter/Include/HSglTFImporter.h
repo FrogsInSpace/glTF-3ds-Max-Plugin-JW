@@ -57,8 +57,10 @@
 
 #ifdef UNICODE
 #define tstring std::wstring
+#define to_tstring(a) std::to_wstring(a)
 #else
 #define tstring std::string
+#define to_tstring(a) std::to_string(a)
 #endif
 
 extern std::string UTF8toSjis(std::string srcUTF8);
@@ -70,7 +72,7 @@ extern BOOL IsLogOut(void);
 
 
 #define HS_APP_CODE 200
-#define HS_GLTF_IMPORTER_VER (_T("1.67a"))
+#define HS_GLTF_IMPORTER_VER (_T("2.00"))
 
 #define HS_UV_MODE 1
 

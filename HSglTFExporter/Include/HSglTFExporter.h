@@ -73,7 +73,7 @@
 //using namespace tinygltf;
 
 
-#define HS_GLTF_EXPORTER_VER (_T("1.57a"))
+#define HS_GLTF_EXPORTER_VER (_T("2.00"))
 
 #define HSglTFExporter_CLASS_ID		Class_ID(0x38586030, 0x1b315b3e)
 #define HSglTF2Exporter_CLASS_ID	Class_ID(0x56337879, 0x5a732c12)
@@ -129,8 +129,10 @@
 
 #ifdef UNICODE
 #define tstring std::wstring
+#define to_tstring(a) std::to_wstring(a)
 #else
 #define tstring std::string
+#define to_tstring(a) std::to_string(a)
 #endif
 
 inline const MCHAR* GetCustomAttrName(CustAttrib* p)

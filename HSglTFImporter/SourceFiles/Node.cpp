@@ -888,29 +888,29 @@ void glTFImporter_Core::CreateNodeInfosRec(cgltf_node *node, INode *targetParent
 		float xyz[3];
 
 		decomp_affine(tm, &parts);
-		tstring posStr1 = _T("T:[") + std::to_wstring(parts.t.x) + _T(",");
-		posStr1 += std::to_wstring(parts.t.y) + _T(",");
-		posStr1 += std::to_wstring(parts.t.z) + _T("]");
+		tstring posStr1 = _T("T:[") + to_tstring(parts.t.x) + _T(",");
+		posStr1 += to_tstring(parts.t.y) + _T(",");
+		posStr1 += to_tstring(parts.t.z) + _T("]");
 		QuatToEuler(parts.q, xyz);
-		tstring rotStr1 = _T("R:[") + std::to_wstring(RadToDeg(xyz[0])) + _T(",");
-		rotStr1 += std::to_wstring(RadToDeg(xyz[1])) + _T(",");
-		rotStr1 += std::to_wstring(RadToDeg(xyz[2])) + _T("]");
-		tstring sclStr1 = _T("S:[") + std::to_wstring(parts.k.x) + _T(",");
-		sclStr1 += std::to_wstring(parts.k.y) + _T(",");
-		sclStr1 += std::to_wstring(parts.k.z) + _T("]");
+		tstring rotStr1 = _T("R:[") + to_tstring(RadToDeg(xyz[0])) + _T(",");
+		rotStr1 += to_tstring(RadToDeg(xyz[1])) + _T(",");
+		rotStr1 += to_tstring(RadToDeg(xyz[2])) + _T("]");
+		tstring sclStr1 = _T("S:[") + to_tstring(parts.k.x) + _T(",");
+		sclStr1 += to_tstring(parts.k.y) + _T(",");
+		sclStr1 += to_tstring(parts.k.z) + _T("]");
 
 		Matrix3 postTM = pNewObject->GetNodeTM(0);
 		decomp_affine(postTM, &parts);
-		tstring posStr2 = _T("[") + std::to_wstring(parts.t.x) + _T(",");
-		posStr2 += std::to_wstring(parts.t.y) + _T(",");
-		posStr2 += std::to_wstring(parts.t.z) + _T("]");
+		tstring posStr2 = _T("[") + to_tstring(parts.t.x) + _T(",");
+		posStr2 += to_tstring(parts.t.y) + _T(",");
+		posStr2 += to_tstring(parts.t.z) + _T("]");
 		QuatToEuler(parts.q, xyz);
-		tstring rotStr2 = _T("[") + std::to_wstring(RadToDeg(xyz[0])) + _T(",");
-		rotStr2 += std::to_wstring(RadToDeg(xyz[1])) + _T(",");
-		rotStr2 += std::to_wstring(RadToDeg(xyz[2])) + _T("]");
-		tstring sclStr2 = _T("[") + std::to_wstring(parts.k.x) + _T(",");
-		sclStr2 += std::to_wstring(parts.k.y) + _T(",");
-		sclStr2 += std::to_wstring(parts.k.z) + _T("]");
+		tstring rotStr2 = _T("[") + to_tstring(RadToDeg(xyz[0])) + _T(",");
+		rotStr2 += to_tstring(RadToDeg(xyz[1])) + _T(",");
+		rotStr2 += to_tstring(RadToDeg(xyz[2])) + _T("]");
+		tstring sclStr2 = _T("[") + to_tstring(parts.k.x) + _T(",");
+		sclStr2 += to_tstring(parts.k.y) + _T(",");
+		sclStr2 += to_tstring(parts.k.z) + _T("]");
 
 		LogOutput(_T("--------------"));
 		LogOutput(StringToWString(node->name));
