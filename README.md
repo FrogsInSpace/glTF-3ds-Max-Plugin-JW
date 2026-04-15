@@ -56,7 +56,7 @@ To build or use this project, the following environment is required:
 ### Build Environment (Compiler)
 * **Microsoft Visual Studio 2017**: For 3ds Max 2020, 2021, and 2022
 * **Microsoft Visual Studio 2019**: For 3ds Max 2023, 2024, and 2025
-* **Microsoft Visual Studio 2022**: For 3ds Max 2026
+* **Microsoft Visual Studio 2022**: For 3ds Max 2026, and 2027
 
 ### Required SDK
 * **Autodesk 3ds Max SDK**: Provided by Autodesk.
@@ -72,7 +72,8 @@ Use the variable name corresponding to your specific 3ds Max version:
   2024 -------------- ADSK_3DSMAX_SDK_2024  
   2025 -------------- ADSK_3DSMAX_SDK_2025  
   2026 -------------- ADSK_3DSMAX_SDK_2026  
-
+  2027 -------------- ADSK_3DSMAX_SDK_2027
+  
 ### 3rd Party Libraries
 This project incorporates the following open-source libraries:
 * [KTX-Software](https://github.com/KhronosGroup/KTX-Software) (Apache 2.0)
