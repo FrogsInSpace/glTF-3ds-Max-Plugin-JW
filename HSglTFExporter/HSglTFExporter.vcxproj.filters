@@ -130,11 +130,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <None Include="HSglTFExporter.def">
-      <Filter>Header</Filter>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
     <ResourceCompile Include="Resource\HSglTFExporter.rc">
       <Filter>Resource</Filter>
     </ResourceCompile>

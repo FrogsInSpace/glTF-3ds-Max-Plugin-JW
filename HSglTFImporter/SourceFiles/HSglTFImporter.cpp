@@ -20,7 +20,7 @@
 
 
 //#include "maxscript/maxscript.h"
-#include "simpobj.h"	// GenSphere に必要
+#include "simpobj.h"	// Required for GenSphere
 
 #define CGLTF_IMPLEMENTATION
 
@@ -1065,7 +1065,7 @@ BOOL glTFImporter_Core::ImportScene(void)
 	}
 #endif
 
-	// ビューレンダラがMetallnesに対応できるようにダミーで1つPBRマテリアルを作る
+	// Create a dummy PBR material so the viewport renderer can support metalness
 	Mtl* pDummyMtl = (Mtl*)GetCOREInterface()->CreateInstance(MATERIAL_CLASS_ID, PBRMetalMtlID);
 
 	SetMtlImportStatus(0);
@@ -1111,7 +1111,7 @@ BOOL glTFImporter_Core::ImportScene(void)
 			cgltf_scene* pScene = &m_glTF_data->scenes[i];
 			tstring sceneName;
 			if (!pScene->name)
-				sceneName = _T("scene") + std::to_wstring(i);
+				sceneName = _T("scene") + to_tstring(i);
 			else
 				sceneName = StringToWString(pScene->name);
 
@@ -1727,10 +1727,10 @@ std::string WStringToString(std::wstring oWString, int code)
 	int iBufferSize = WideCharToMultiByte(code, 0, oWString.c_str(), -1, (char *)NULL, 0, NULL, NULL);
 	CHAR* cpMultiByte = new CHAR[iBufferSize];
 
-	// wstring → UTF8
+	// wstring -> UTF8
 	WideCharToMultiByte(code, 0, oWString.c_str(), -1, cpMultiByte, iBufferSize, NULL, NULL);
 
-	// stringの生成
+	// Construct the string
 	std::string oRet(cpMultiByte, cpMultiByte + iBufferSize - 1);
 
 	delete[] cpMultiByte;
@@ -1907,7 +1907,7 @@ BOOL GetFileName(HWND hWnd, tstring &ret, FileType type)
 	OpenInfo.lpfnHook = NULL;
 	OpenInfo.lpTemplateName = NULL;
 
-	/* キャンセルされた場合は何もしないで抜ける */
+	//  If cancelled, do nothing and exit
 	if (GetOpenFileName(&OpenInfo) == 0) return FALSE;
 
 	ret = FileFullPath;
@@ -1922,7 +1922,7 @@ TCHAR HexToChar(TCHAR first, TCHAR second)
 {
 	TCHAR ret;
 
-	//16進数文字を16進数数字に変換
+	// Convert hex character to numeric value
 	if (first >= 'A') {
 		ret = first - 'A' + 10;
 	}
@@ -1930,10 +1930,10 @@ TCHAR HexToChar(TCHAR first, TCHAR second)
 		ret = first - '0';
 	}
 
-	//先の文字を上位ビットにシフト
+	// Shift the earlier character into the high bits
 	ret = ret << 4;
 
-	//後の文字を変換して追加
+	// Convert the later character and add it
 	if (second >= 'A') {
 		ret += second - 'A' + 10;
 	}
@@ -1953,9 +1953,9 @@ tstring urlDecode(tstring str)
 	tstring::size_type length = str.size();
 	TCHAR tmpChar[2];
 
-	//文字数分繰り返す
+	// Repeat for each character
 	for (tstring::size_type i = 0; i < length; i++) {
-		//+をスペースに変換
+		// Convert '+' to space
 		if (str[i] == '+') {
 			retStr += ' ';
 			//%付き文字の場合変換
@@ -1963,19 +1963,19 @@ tstring urlDecode(tstring str)
 		else if (str[i] == '%' && (i + 2) < length) {
 			tmpChar[0] = str[i + 1];
 			tmpChar[1] = str[i + 2];
-			//16進数文字かチェック
+			// Check if characters are hexadecimal
 			if (isxdigit(tmpChar[0]) && isxdigit(tmpChar[1])) {
 				i += 2;
 
-				//変換関数を呼び出して、結果を繋げる
+				// Call conversion function and append the result
 				retStr += HexToChar(tmpChar[0], tmpChar[1]);
 
-				//16進数文字ではない場合、%を繋げる
+				// If not hex digits, append '%'
 			}
 			else {
 				retStr += '%';
 			}
-			//当てはまらない時は、そのままの文字を繋げる
+			// Otherwise append the character as-is
 		}
 		else {
 			retStr += str[i];

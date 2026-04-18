@@ -54,10 +54,12 @@ void GetDracoMeshIndexList(cgltf_buffer_view* bufferView, std::vector<float> &tb
 	cgltf_buffer *data = bufferView->buffer;
 	if (!data || !data->data) return;
 	if (bufferView->offset >= data->size) return;
+	// Ensure buffer view fits inside the buffer
+	if (bufferView->offset + bufferView->size > data->size) return;
 
 	draco::Decoder decoder;
 	draco::DecoderBuffer buffer;
-	buffer.Init((char*)data->data+ bufferView->offset, data->size);
+	buffer.Init(reinterpret_cast<const char*>(data->data) + bufferView->offset, bufferView->size);
 	const draco::StatusOr<draco::EncodedGeometryType> geom_type = decoder.GetEncodedGeometryType(&buffer);
 	if (geom_type.value() == draco::TRIANGULAR_MESH) {
 		auto statusor = decoder.DecodeMeshFromBuffer(&buffer);
@@ -84,10 +86,12 @@ void DracoDecodeProc(cgltf_buffer_view *bufferView, std::vector<float> &tbl, Dra
 	tbl.clear();
 
 	cgltf_buffer *data = bufferView->buffer;
+	if (!data || !data->data) return;
+	if (bufferView->offset >= data->size) return;
 
 	draco::Decoder decoder;
 	draco::DecoderBuffer buffer;
-	buffer.Init((char*)data->data+ bufferView->offset, data->size);
+	buffer.Init(reinterpret_cast<const char*>(data->data) + bufferView->offset, bufferView->size);
 	const draco::StatusOr<draco::EncodedGeometryType> geom_type = decoder.GetEncodedGeometryType(&buffer);
 	if (!geom_type.ok()) { tbl.clear(); return; }
 
@@ -250,5 +254,3 @@ void DracoDecodeProc(cgltf_buffer_view *bufferView, std::vector<float> &tbl, Dra
 		//std::unique_ptr< std::unique_ptr<draco::PointCloud> > pc = draco::Decoder::DecodePointCloudFromBuffer(&buffer);
 	}
 }
-
-

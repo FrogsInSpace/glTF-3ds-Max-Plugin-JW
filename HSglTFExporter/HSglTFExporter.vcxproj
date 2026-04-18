@@ -206,9 +206,6 @@
     <ClInclude Include="Resource\resource.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="HSglTFExporter.def" />
-  </ItemGroup>
-  <ItemGroup>
     <ResourceCompile Include="Resource\HSglTFExporter.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

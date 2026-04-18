@@ -182,7 +182,7 @@ BOOL CreateReferenceBase(const TCHAR* filename, float scale)
 		cgltf_scene* pScene = &glTF_data->scenes[i];
 		tstring sceneName;
 		if (!pScene->name)
-			sceneName = _T("scene") + std::to_wstring(i);
+			sceneName = _T("scene") + to_tstring(i);
 		else
 			sceneName = StringToWString(pScene->name);
 
