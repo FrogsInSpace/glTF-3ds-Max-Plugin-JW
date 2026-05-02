@@ -22,8 +22,6 @@
 #include "HSglTFExporter.h"
 #include <include\MorpherApi.h>
 
-#ifdef ENABLE_BUILD_WITH_DRACO
-
 #undef max
 #undef min
 
@@ -58,7 +56,7 @@ static draco::EncoderBuffer s_buffer;
 
 
 //======================================================================
-// Draco圧縮バッファの圧縮前後頂点座標テーブル及びインデックス変換マップを作る
+// Build vertex position tables(before / after Draco compression) and index conversion map from encoded buffer
 //======================================================================
 void GetDracoMeshIndexList(draco::EncoderBuffer &EncoBuffer, std::vector<int>& tbl, std::vector<Point3> &mappedPos, std::vector<Point3>& dracoPos)
 {
@@ -84,7 +82,7 @@ void GetDracoMeshIndexList(draco::EncoderBuffer &EncoBuffer, std::vector<int>& t
 }
 
 //======================================================================
-// 元メッシュ座標とDraco圧縮バッファの圧縮前頂点インデックス変換マップを作る
+// Build index conversion map between original mesh positions and pre-compression Draco vertex positions
 //======================================================================
 void GetDracoMeshIndexList2(std::vector<int>& tbl, std::vector<Point3>& dracoPos, std::vector<Point3>& orgPos)
 {
@@ -104,7 +102,7 @@ void GetDracoMeshIndexList2(std::vector<int>& tbl, std::vector<Point3>& dracoPos
 }
 
 //======================================================================
-//　Morphターゲットウエイトテーブルを作る
+// Build morph target weight table
 //======================================================================
 void SetDracoMorphTargetPositionTable(Modifier* pMod, int chID, const std::vector<VertexProp>& VertPropTable, std::vector<Point3>& targetPtTbl)
 {
@@ -147,7 +145,7 @@ void SetDracoMorphTargetPositionTable(Modifier* pMod, int chID, const std::vecto
 }
 
 //========================================================================
-// 　PrimitiveのMorph部分の生成
+// Generate morph target section of the primitive
 //========================================================================
 void glTFExporter_Core::CreateDracoMorphPrimiteve(tinygltf::Primitive& primitive, Modifier* pMorphMod, std::vector<VertexProp>& VertPropTable)
 {
@@ -207,7 +205,7 @@ void glTFExporter_Core::CreateDracoMorphPrimiteve(tinygltf::Primitive& primitive
 
 
 //========================================================================
-// 座標 アトリビュートバッファの登録
+// Register position attribute buffer
 //========================================================================
 int CreatePosDracoBuffer(draco::Mesh &dracoMesh, Mesh *pMesh, std::vector<int> &faceIDTable, std::vector<VertexProp>& VertPropTable, std::map<int, int>& vertPropMap, const Matrix3 &OffsetTM, float scale)
 {
@@ -281,7 +279,7 @@ int CreatePosDracoBuffer(draco::Mesh &dracoMesh, Mesh *pMesh, std::vector<int> &
 }
 
 //========================================================================
-// 法線 アトリビュートバッファの登録
+// Register normal attribute buffer
 //========================================================================
 int CreateNrmDracoBuffer(draco::Mesh &dracoMesh, Mesh *pMesh, MeshNormalSpec *pNrmSpec, std::vector<int> &faceIDTable, std::vector<VertexProp>& VertPropTable, std::map<int, int>& vertPropMap)
 {
@@ -353,8 +351,7 @@ int CreateNrmDracoBuffer(draco::Mesh &dracoMesh, Mesh *pMesh, MeshNormalSpec *pN
 }
 
 //========================================================================
-// UV座標 アトリビュートバッファの登録
-// ※ mapCh=1のみ対応
+// Register UV coordinate attribute buffer
 //========================================================================
 int CreateUVDracoBuffer(draco::Mesh &dracoMesh, Mesh *pMesh, std::vector<int> &faceIDTable, std::vector<VertexProp>& VertPropTable, std::map<int, int>& vertPropMap, int mapCh)
 {
@@ -364,12 +361,12 @@ int CreateUVDracoBuffer(draco::Mesh &dracoMesh, Mesh *pMesh, std::vector<int> &f
 	draco::GeometryAttribute dracoUVAttr;
 	dracoUVAttr.Init(
 		draco::GeometryAttribute::TEX_COORD, // attribute type (like POSITION or NORMAL)
-		nullptr, // buffer
-		2, // number of component
-		draco::DT_FLOAT32, // data type
-		false, // normalized
-		sizeof(float) * 2, // byte stride
-		0); // byte offset
+		nullptr,			// buffer
+		2,					// number of component
+		draco::DT_FLOAT32,	// data type
+		false,				// normalized
+		sizeof(float) * 2,	// byte stride
+		0);					// byte offset
 
 	const int uvAttrId = dracoMesh.AddAttribute(dracoUVAttr, false, numv);
 	dracoMesh.attribute(uvAttrId)->SetExplicitMapping(numv);
@@ -428,7 +425,7 @@ int CreateUVDracoBuffer(draco::Mesh &dracoMesh, Mesh *pMesh, std::vector<int> &f
 }
 
 //========================================================================
-// Tangent アトリビュートバッファの登録
+// Register tangent attribute buffer
 //========================================================================
 int CreateTangentDracoBuffer(draco::Mesh& dracoMesh, IGameMesh* pGameMesh, Mtl *pMtl, std::vector<int>& faceIDTable, std::vector<VertexProp>& VertPropTable, std::map<int, int>& vertPropMap, int mapCh)
 {
@@ -441,12 +438,12 @@ int CreateTangentDracoBuffer(draco::Mesh& dracoMesh, IGameMesh* pGameMesh, Mtl *
 	draco::GeometryAttribute dracoTanAttr;
 	dracoTanAttr.Init(
 		draco::GeometryAttribute::GENERIC, // attribute type (like POSITION or NORMAL)
-		nullptr, // buffer
-		4, // number of component
-		draco::DT_FLOAT32, // data type
-		true, // normalized
-		sizeof(float) * 4, // byte stride
-		0); // byte offset
+		nullptr,			// buffer
+		4,					// number of component
+		draco::DT_FLOAT32,	// data type
+		true,				// normalized
+		sizeof(float) * 4,	// byte stride
+		0);					// byte offset
 
 	const int tanAttrId = dracoMesh.AddAttribute(dracoTanAttr, false, numv);
 	dracoMesh.attribute(tanAttrId)->SetExplicitMapping(numv);
@@ -515,7 +512,7 @@ int CreateTangentDracoBuffer(draco::Mesh& dracoMesh, IGameMesh* pGameMesh, Mtl *
 }
 
 //========================================================================
-// 頂点カラー アトリビュートバッファの登録
+// Register vertex color attribute buffer
 //========================================================================
 int CreateColDracoBuffer(draco::Mesh &dracoMesh, Mesh *pMesh, std::vector<int> &faceIDTable, std::vector<VertexProp>& VertPropTable, std::map<int, int>& vertPropMap)
 {
@@ -525,12 +522,12 @@ int CreateColDracoBuffer(draco::Mesh &dracoMesh, Mesh *pMesh, std::vector<int> &
 	draco::GeometryAttribute dracoColAttr;
 	dracoColAttr.Init(
 		draco::GeometryAttribute::COLOR, // attribute type (like POSITION or NORMAL)
-		nullptr, // buffer
-		3, // number of component
-		draco::DT_FLOAT32, // data type
-		false, // normalized
-		sizeof(float) * 3, // byte stride
-		0); // byte offset
+		nullptr,			// buffer
+		3,					// number of component
+		draco::DT_FLOAT32,	// data type
+		false,				// normalized
+		sizeof(float) * 3,	// byte stride
+		0);					// byte offset
 
 	const int colAttrId = dracoMesh.AddAttribute(dracoColAttr, false, numv);
 	dracoMesh.attribute(colAttrId)->SetExplicitMapping(numv);
@@ -590,7 +587,7 @@ int CreateColDracoBuffer(draco::Mesh &dracoMesh, Mesh *pMesh, std::vector<int> &
 }
 
 //========================================================================
-// Skin Joint アトリビュートバッファの登録
+// Register skin joint attribute buffer
 //========================================================================
 int CreateJointDracoBuffer(draco::Mesh &dracoMesh, Mesh *pMesh, std::map<int, std::array<USHORT, 4> > &bTable, std::vector<int> &faceIDTable, ISkinContextData *pSkinMC, std::vector<VertexProp>& VertPropTable, std::map<int, int>& vertPropMap)
 {
@@ -600,12 +597,12 @@ int CreateJointDracoBuffer(draco::Mesh &dracoMesh, Mesh *pMesh, std::map<int, st
 	draco::GeometryAttribute dracoJointAtr;
 	dracoJointAtr.Init(
 		draco::GeometryAttribute::GENERIC, // attribute type (like POSITION or NORMAL)
-		nullptr, // buffer
-		4, // number of component
-		draco::DT_UINT16, // data type
-		false, // normalized
+		nullptr,			// buffer
+		4,					// number of component
+		draco::DT_UINT16,	// data type
+		false,				// normalized
 		sizeof(USHORT) * 4, // byte stride
-		0); // byte offset
+		0);					// byte offset
 
 	const int jointAttrId = dracoMesh.AddAttribute(dracoJointAtr, false, numv);
 	dracoMesh.attribute(jointAttrId)->SetExplicitMapping(numv);
@@ -662,7 +659,7 @@ int CreateJointDracoBuffer(draco::Mesh &dracoMesh, Mesh *pMesh, std::map<int, st
 }
 
 //========================================================================
-// Skin Weightアトリビュートバッファの登録
+// Register skin weight attribute buffer
 //========================================================================
 int CreateWeightDracoBuffer(draco::Mesh &dracoMesh, Mesh *pMesh, std::map<int, std::array<float, 4> > &wTable, std::vector<int> &faceIDTable, std::vector<VertexProp>& VertPropTable, std::map<int, int>& vertPropMap)
 {
@@ -672,12 +669,12 @@ int CreateWeightDracoBuffer(draco::Mesh &dracoMesh, Mesh *pMesh, std::map<int, s
 	draco::GeometryAttribute dracoWeightAtr;
 	dracoWeightAtr.Init(
 		draco::GeometryAttribute::GENERIC, // attribute type (like POSITION or NORMAL)
-		nullptr, // buffer
-		4, // number of component
-		draco::DT_FLOAT32, // data type
-		false, // normalized
-		sizeof(float) * 4, // byte stride
-		0); // byte offset
+		nullptr,			// buffer
+		4,					// number of component
+		draco::DT_FLOAT32,	// data type
+		false,				// normalized
+		sizeof(float) * 4,	// byte stride
+		0);					// byte offset
 	const int weighttAttrId = dracoMesh.AddAttribute(dracoWeightAtr, false, numv);
 
 	for (uint32_t vIndex = 0; vIndex < numv; vIndex++) {
@@ -992,7 +989,7 @@ void glTFExporter_Core::CreateDracoMeshProp(tinygltf::Primitive &primitive, Mesh
 
 	}
 
-	// バッファをエンコードする
+	// Encode the buffer
 	draco::Encoder encoder;
 	encoder.SetSpeedOptions(m_EncodeSpeed, 0);
 	//draco::EncoderBuffer buffer;
@@ -1002,11 +999,11 @@ void glTFExporter_Core::CreateDracoMeshProp(tinygltf::Primitive &primitive, Mesh
 	buff.clear();
 	for (auto d : *s_buffer.buffer()) buff.push_back(d);
 
-	//エンコードバッファサイズを４の倍数にする
+	// Pad encoded buffer size to a multiple of 4
 	int padding = 4-(buff.size() % 4);
 	for(int i=0; i< padding; i++) buff.push_back('0');
 
-	// glTF bufferにコピー
+	// Copy to glTF buffer
 	int offset = m_BufferByteOffset;
 	char* ptr = (char*)SecureMemory(buff.size());
 	ptr += offset;
@@ -1279,7 +1276,7 @@ void glTFExporter_Core::ExCreateDracoMeshProp(tinygltf::Primitive& primitive, Me
 
 	}
 
-	// バッファをエンコードする
+	// Encode the buffer
 	draco::Encoder encoder;
 	encoder.SetSpeedOptions(m_EncodeSpeed, 0);
 	//draco::EncoderBuffer buffer;
@@ -1289,11 +1286,11 @@ void glTFExporter_Core::ExCreateDracoMeshProp(tinygltf::Primitive& primitive, Me
 	buff.clear();
 	for (auto d : *s_buffer.buffer()) buff.push_back(d);
 
-	//エンコードバッファサイズを４の倍数にする
+	// Pad encoded buffer size to a multiple of 4
 	int padding = 4 - (buff.size() % 4);
 	for (int i = 0; i < padding; i++) buff.push_back('0');
 
-	// glTF bufferにコピー
+	// Copy to glTF buffer
 	int offset = m_BufferByteOffset;
 	char* ptr = (char*)SecureMemory(buff.size());
 	ptr += offset;
@@ -1321,11 +1318,7 @@ void glTFExporter_Core::ExCreateDracoMeshProp(tinygltf::Primitive& primitive, Me
 }
 #endif
 
-#else
-void glTFExporter_Core::CreateDracoMeshProp(tinygltf::Primitive &primitive, Mesh *pMesh, MeshNormalSpec *pNrmSpec, std::vector<Point3> &vertTable, std::vector<int> &faceIDTable, BOOL CVertMode, Mtl *pMtl, ISkinContextData *pSkinMC)
-{
-}
-#endif
+
 
 
 

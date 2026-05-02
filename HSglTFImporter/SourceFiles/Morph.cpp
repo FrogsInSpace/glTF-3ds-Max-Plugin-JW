@@ -26,6 +26,8 @@
 #include <ilayer.h>
 #include <include\MorpherApi.h>
 #include <maxscript\maxscript.h>
+#include "wM3.h"
+
 
 #define MR3_CLASS_ID		Class_ID(0x17bb6854, 0xa5cba2a3)
 
@@ -127,7 +129,7 @@ void glTFImporter_Core::SetMorph(void)
 		SetMorphChannelNameTable(node->mesh, morphTargetTbl);
 
 		std::vector<std::vector<Point3> > morphNormalMapList;
-		int targetNum = node->mesh->primitives[0].targets_count;
+		size_t targetNum = node->mesh->primitives[0].targets_count;
 		for (int i = 0; i < targetNum; i++) {
 			Mesh targetMesh(*pOrgMesh);
 
@@ -150,7 +152,7 @@ void glTFImporter_Core::SetMorph(void)
 					//mc = &pr->draco_mesh_compression;
 				}
 
-				cgltf_attribute_type att_type;
+				//cgltf_attribute_type att_type;
 				std::vector<float> VertIdList;
 				if (mc) {
 					DracoDecodeProc(mc->buffer_view, VertIdList, DracoDecodeType::POSITION);
@@ -159,14 +161,14 @@ void glTFImporter_Core::SetMorph(void)
 					GetDataList(VertIdList, findTargetAttrAccesor(target, "POSITION"));
 				}
 
-				UINT VertNum = VertIdList.size() / 3;
+				size_t VertNum = VertIdList.size() / 3;
 				UINT vIdx = VertOffset;
 				for (std::vector<float>::iterator v = VertIdList.begin(); v != VertIdList.end(); v += 3, vIdx++) {
 					Point3 op = pOrgPt[vIdx];// *Inverse(pNode->GetNodeTM(m_time));
 					Point3 p(*v, *(v + 1), *(v + 2));
 					targetMesh.setVert(vIdx, (op + p* m_scale));
 				}
-				VertOffset += VertNum;
+				VertOffset += static_cast<int>(VertNum);
 
 				// 頂点法線の設定
 				std::vector<float> NormalList;
@@ -176,14 +178,14 @@ void glTFImporter_Core::SetMorph(void)
 				else {
 					GetDataList(NormalList, findTargetAttrAccesor(target, "NORMAL"));
 				}
-				UINT normalNum = NormalList.size() / 3;
+				size_t normalNum = NormalList.size() / 3;
 				if (normalNum > 0) {
 					for (std::vector<float>::iterator v = NormalList.begin(); v != NormalList.end(); v += 3) {
 						Point3 n(*v, *(v + 1), *(v + 2));
 						VertNormalTable.push_back(n);
 					}
 				}
-				NormalOffset += normalNum;
+				NormalOffset += static_cast<int>(normalNum);
 			}
 
 			morphNormalMapList.push_back(VertNormalTable);
@@ -215,7 +217,7 @@ void glTFImporter_Core::SetMorph(void)
 #endif;
 		}
 
-		int wc = node->mesh->weights_count;
+		size_t wc = node->mesh->weights_count;
 		for (int i = 0; i < wc; i++) {
 			float w = node->mesh->weights[i];
 			TSTR ComStr;
@@ -251,7 +253,7 @@ void CreateMorphVertMapTable(Modifier* pMorphMod, Mesh* pBaseMesh, MeshNormalSpe
 {
 	if (!pMorphMod) return;
 
-	int morphCnt = morphNormalMapList.size();
+	size_t morphCnt = morphNormalMapList.size();
 	auto VertNormalTable = morphNormalMapList.begin();
 
 	MaxMorphModifier maxMorphModifier(pMorphMod);
@@ -312,7 +314,7 @@ void CreateMorphVertMapTable(Modifier* pMorphMod, Mesh* pBaseMesh, MeshNormalSpe
 		pTargetMesh->SpecifyNormals();
 		MeshNormalSpec* pTargetNrmSpec = pTargetMesh->GetSpecifiedNormals();
 		pTargetNrmSpec->SetNumFaces(pTargetMesh->numFaces);
-		pTargetNrmSpec->SetNumNormals(VertNormalTable->size());
+		pTargetNrmSpec->SetNumNormals((int)VertNormalTable->size());
 
 		for (auto item : normalMap) {
 			int faceID = (int)(item.first / 10);

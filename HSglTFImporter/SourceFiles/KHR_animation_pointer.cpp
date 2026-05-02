@@ -195,7 +195,7 @@ void glTFImporter_Core::SetAnimationPointer(int animID)
 				else if (retPath[2] == "weights") {
 					std::map<TimeValue, std::vector<float> > WeightKeyList;
 					if (node->mesh)
-						GetWeightAnimKeyFrameList(sampler, WeightKeyList, node->mesh->weights_count);
+						GetWeightAnimKeyFrameList(sampler, WeightKeyList, (int)node->mesh->weights_count);
 					SetMorphWeightAnimation(pNode, WeightKeyList);
 				}
 			}

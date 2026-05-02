@@ -75,7 +75,7 @@ void glTFImporter_Core::CreateParamTableFromExtras(cgltf_extras &extras, cgltf_s
 	//jsmntok_t tokens[10] = { (jsmntype_t)0 };
 	jsmntok_t* tokens = new jsmntok_t[tokenNum];// { (jsmntype_t)0 };
 	jsmn_init(&p);
-	jsmn_parse(&p, extras_buffer, size, tokens, tokenNum);
+	jsmn_parse(&p, extras_buffer, size, tokens, static_cast<unsigned int>(tokenNum));
 
 	BOOL TitleFlag = TRUE;
 	BOOL ParamFlag = FALSE;
@@ -182,7 +182,7 @@ void glTFImporter_Core::CreateTargetListFromExtras(cgltf_extras& extras, cgltf_s
 
 	jsmntok_t* tokens = new jsmntok_t[tokenNum];// { (jsmntype_t)0 };
 	jsmn_init(&p);
-	jsmn_parse(&p, extras_buffer, size, tokens, tokenNum);
+	jsmn_parse(&p, extras_buffer, size, tokens, static_cast<unsigned int>(tokenNum));
 
 	int index = -1;
 	for (int i = 0; i < tokenNum; i++) {

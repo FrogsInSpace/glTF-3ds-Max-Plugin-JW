@@ -33,7 +33,7 @@ void glTFExporter_Core::CreateAnimation(void)
 //======================================================================
 void glTFExporter_Core::GetFulFrameAnimation(INode* pNode, Tab<TimeValue> &PosFrameList,Tab<TimeValue> &RotFrameList,Tab<TimeValue> &SclFrameList)
 {
-	Interval ii = GetCOREInterface()->GetAnimRange();
+	//Interval ii = GetCOREInterface()->GetAnimRange();
 	TimeValue start = GetCOREInterface()->GetAnimRange().Start();
 	TimeValue end = GetCOREInterface()->GetAnimRange().End();
 	TimeValue step = GetTicksPerFrame();
@@ -80,7 +80,7 @@ void glTFExporter_Core::GetFulFrameAnimation(INode* pNode, Tab<TimeValue> &PosFr
 //======================================================================
 void glTFExporter_Core::GetFullFrameAnimationColor(Control *pC, std::list<TimeValue>& FrameList)
 {
-	Interval ii = GetCOREInterface()->GetAnimRange();
+	//Interval ii = GetCOREInterface()->GetAnimRange();
 	TimeValue start = GetCOREInterface()->GetAnimRange().Start();
 	TimeValue end = GetCOREInterface()->GetAnimRange().End();
 	TimeValue step = GetTicksPerFrame();
@@ -108,7 +108,7 @@ void glTFExporter_Core::GetFullFrameAnimationColor(Control *pC, std::list<TimeVa
 //======================================================================
 void glTFExporter_Core::GetFullFrameAnimationInt(Control* pC, std::list<TimeValue>& FrameList)
 {
-	Interval ii = GetCOREInterface()->GetAnimRange();
+	//Interval ii = GetCOREInterface()->GetAnimRange();
 	TimeValue start = GetCOREInterface()->GetAnimRange().Start();
 	TimeValue end = GetCOREInterface()->GetAnimRange().End();
 	TimeValue step = GetTicksPerFrame();
@@ -136,7 +136,7 @@ void glTFExporter_Core::GetFullFrameAnimationInt(Control* pC, std::list<TimeValu
 //======================================================================
 void glTFExporter_Core::GetFullFrameAnimationFloat(Control* pC, std::list<TimeValue>& FrameList)
 {
-	Interval ii = GetCOREInterface()->GetAnimRange();
+	//Interval ii = GetCOREInterface()->GetAnimRange();
 	TimeValue start = GetCOREInterface()->GetAnimRange().Start();
 	TimeValue end = GetCOREInterface()->GetAnimRange().End();
 	TimeValue step = GetTicksPerFrame();
@@ -511,8 +511,8 @@ void glTFExporter_Core::CreateAnimationRec(INode *pNode)
 
 			void* ptr = SecureMemory(bfViewIn.byteLength);
 			float* pFrame = (float*)((char*)ptr + bfViewIn.byteOffset);
-			float time_min = (float)wFrameList[0] / m_TimeScale;;
-			float time_max = (float)wFrameList[0] / m_TimeScale;;
+			float time_min = (float)wFrameList[0] / m_TimeScale;
+			float time_max = (float)wFrameList[0] / m_TimeScale;
 			for (int i = 0; i < wFrameList.size(); i++) {
 				float fr = (float)wFrameList[i] / m_TimeScale;
 				if (time_min > fr) time_min = fr;

@@ -19,8 +19,7 @@
 
 #pragma once
 
-#pragma warning( disable : 4101 )
-#pragma warning( disable : 4267 )
+//#pragma warning( disable : 4267 )
 #pragma warning( disable : 4828 )
 
 
@@ -49,7 +48,6 @@
 #include <simpobj.h>
 #include <dummy.h>
 #include "decomp.h"
-#include "wM3.h"
 #include "maxscript/maxscript.h"
 #include <ILayerControl.h>
 #include <templt.h>
@@ -59,8 +57,10 @@
 
 #ifdef UNICODE
 #define tstring std::wstring
+#define to_tstring(a) std::to_wstring(a)
 #else
 #define tstring std::string
+#define to_tstring(a) std::to_string(a)
 #endif
 
 extern std::string UTF8toSjis(std::string srcUTF8);
@@ -72,11 +72,9 @@ extern BOOL IsLogOut(void);
 
 
 #define HS_APP_CODE 200
-
-#define HS_GLTF_IMPORTER_VER (_T("1.67a"))
+#define HS_GLTF_IMPORTER_VER (_T("2.00"))
 
 #define HS_UV_MODE 1
-
 
 #define HSglTFImporter_CLASS_ID		Class_ID(0x87a91a65, 0xa2560866)
 #define HSglTF2Importer_CLASS_ID	Class_ID(0x24081954, 0x30fd74c7)
@@ -194,9 +192,9 @@ enum class FileType {
 };
 
 struct AnimKeyInfo {
-#define LINEAR		0
-#define CUBICSPLINE 1
-#define STEP		2
+	static constexpr int  LINEAR = 0;
+	static constexpr int  CUBICSPLINE = 1;
+	static constexpr int  STEP = 2;
 
 	Point3 pos;
 	Quat rot;
@@ -209,42 +207,42 @@ struct AnimKeyInfo {
 	Point4 inTan4;
 	Point4 outTan4;
 
-	int i;
-	float f;
-	int interpolation;
+	int i = 0;
+	float f = 0.0f;
+	int interpolation = 0;
 };
 
 struct custAttrParam {
-	int type;
+	int type = 0;
 	std::string name;
-	float fParam;
-	float fminParam;
-	float fmaxParam;
-	int iParam;
-	int iminParam;
-	int imaxParam;
+	float fParam = 0.0f;
+	float fminParam = 0.0f;
+	float fmaxParam = 0.0f;
+	int iParam = 0;
+	int iminParam = 0;
+	int imaxParam = 0;
 	std::string sParam;
-	Color cParam;
-	Animatable* pParam;
-	BOOL inVisible;
+	Color cParam = Color(0.0f, 0.0f, 0.0f);
+	Animatable* pParam = nullptr;
+	BOOL inVisible = FALSE;
 };
 
 struct CollisionInfo {
-	int rigidType;
-	float mass;
-	Point3 inertiaDiagonal;
+	int rigidType = 0;
+	float mass = 0;
+	Point3 inertiaDiagonal = Point3(0.0,0.0,0.0);
 	Quat inertiaOrientation;
-	Point3 linearVelocity;
-	Point3 angularVelocity;
-	int shape;
-	int physicsMaterial;
-	int collisionFilter;
-	INode* gravityNode;
-	int COM;
+	Point3 linearVelocity = Point3(0.0, 0.0, 0.0);
+	Point3 angularVelocity = Point3(0.0, 0.0, 0.0);
+	int shape = 0;
+	int physicsMaterial = 0;
+	int collisionFilter = 0;
+	INode* gravityNode = nullptr;
+	int COM = 0;
 	Point3 COM_pt;
-	int joint;
-	INode* connectedNode;
-	BOOL enableCollision;
+	int joint = 0;
+	INode* connectedNode = nullptr;
+	BOOL enableCollision = FALSE;
 };
 
 struct vrayExtStruct {
@@ -267,9 +265,10 @@ struct InteractivityStruct {
 	DWORD id;//GetTickCount
 };
 
-extern HINSTANCE hInstance;
-static Matrix3 YupTM(Point3(1, 0, 0), Point3(0, 0, 1), Point3(0, -1, 0), Point3(0, 0, 0));
+inline const Matrix3 YupTM(Point3(1, 0, 0), Point3(0, 0, 1), Point3(0, -1, 0), Point3(0, 0, 0));
 //static Matrix3 YupTM(Point3(-1, 0, 0), Point3(0, 0, 1), Point3(0, 1, 0), Point3(0, 0, 0));
+
+extern HINSTANCE hInstance;
 extern std::wstring StringToWString(const char *oString, int code = CP_UTF8);
 extern std::string WStringToString(std::wstring oWString, int code = CP_UTF8);
 
@@ -577,6 +576,7 @@ public:
 		static INodeTab tab;
 		tab.ZeroCount();
 		for (auto n : m_NodeMap) {
+			if (!n.second) continue;
 			if (n.second->GetObjectRef()->SuperClassID() == GEOMOBJECT_CLASS_ID) {
 				tab.AppendNode(n.second);
 			}

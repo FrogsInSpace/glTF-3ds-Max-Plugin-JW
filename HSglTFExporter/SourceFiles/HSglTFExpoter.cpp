@@ -137,30 +137,27 @@ void LogOutput(const std::wstring& str, int pcs)
 
 //======================================================================
 //======================================================================
-tstring TextureTableCountStr(void)
+inline tstring TextureTableCountStr(void)
 {
+	return to_tstring(theExporterCore.TextureTableCount());
+/*
 #ifdef UNICODE
 	return std::to_wstring(theExporterCore.TextureTableCount());
 #else
 	return std::to_string(theExporterCore.TextureTableCount());
 #endif
+*/
 }
 //======================================================================
 //======================================================================
-const tstring ExportFolder(void)
-{
-	return theExporterCore.ExportFolder();
-}
+inline const tstring ExportFolder(void){return theExporterCore.ExportFolder();}
 
 //======================================================================
 //======================================================================
-IPoint2 GetBitmapSize(void)
-{
-	return theExporterCore.m_CreateBitmapSize;
-}
+inline IPoint2 GetBitmapSize(void){	return theExporterCore.m_CreateBitmapSize;}
 
 //======================================================================
-// Exportee class declaration
+// Exportee class definition
 //======================================================================
 class HSglTFExporter : public SceneExport
 {
@@ -338,7 +335,7 @@ INT_PTR CALLBACK HSglTFRapidCompOptionsDlgProc(HWND hWnd, UINT message, WPARAM w
 	{
 		CheckDlgButton(hWnd, IDC_CHECK1, HH_PostProcess);
 
-		// ハイパーリンクの色を青に設定
+		// Set hyperlink color to blue
 		HWND hLink = GetDlgItem(hWnd, IDC_HYPERLINK_STATIC);
 		//SetWindowText(hLink, L"Click here to visit Google");
 
@@ -406,11 +403,6 @@ INT_PTR CALLBACK HSglTFExporterOptionsDlgProc(HWND hWnd, UINT message, WPARAM wP
 	case WM_INITDIALOG:
 		exp = (HSglTFExporter*)lParam;
 
-
-#ifndef ENABLE_BUILD_WITH_DRACO
-		ShowWindow(GetDlgItem(hWnd, IDC_DRACO_CHECK), FALSE);
-		HH_DracoCompress = FALSE;
-#endif
 		ShowWindow(GetDlgItem(hWnd, IDC_ANIMPTR_CHK), HH_ViewAnimPointer);
 		if (!HH_ViewAnimPointer) HH_AnimPointer = FALSE;
 
@@ -651,11 +643,6 @@ INT_PTR CALLBACK HSglTFExporterMainDlgProc(HWND hWnd, UINT message, WPARAM wPara
 
 		exp = (HSglTFExporter*)lParam;
 
-#ifndef ENABLE_BUILD_WITH_DRACO
-		ShowWindow(GetDlgItem(hWnd, IDC_DRACO_CHECK), FALSE);
-		HH_DracoCompress = FALSE;
-#endif
-
 		ShowWindow(GetDlgItem(hWnd, IDC_LICENSE_BTN), FALSE);
 
 		ShowWindow(GetDlgItem(hWnd, IDC_WM_CHK), Open_InstanceWithMtl);
@@ -784,6 +771,7 @@ int HSglTFExporter::DoExport(const TCHAR* filename, ExpInterface* exporterInt, I
 // -----------------------------------------------------------
 void *glTFExporter_Core::SecureMemory(int size)
 {
+#if 1
 	m_BufferByteOffset += size;
 	void *ptr = realloc(m_glTf_Buffer, m_BufferByteOffset);
 
@@ -791,6 +779,26 @@ void *glTFExporter_Core::SecureMemory(int size)
 	//m_glTf_Buffer = m_BufferByteOffset;
 
 	return ptr;
+#else
+	if (size <= 0) return nullptr;
+
+	// Prevent overflow
+	size_t oldOffset = m_BufferByteOffset;
+	size_t newOffset = oldOffset + static_cast<size_t>(size);
+	if (newOffset < oldOffset) return nullptr; // overflow
+
+	void* newBuf = realloc(m_glTf_Buffer, newOffset);
+	if (!newBuf) {
+		// allocation failed, keep existing buffer intact
+		return nullptr;
+	}
+
+	m_glTf_Buffer = newBuf;
+	m_BufferByteOffset = newOffset;
+
+	// Return pointer to the start of newly allocated chunk
+	return static_cast<unsigned char*>(m_glTf_Buffer) + oldOffset;
+#endif
 }
 
 // -----------------------------------------------------------
@@ -815,7 +823,46 @@ void glTFExporter_Core::FreeSceneData(void)
 		for(auto p : anim.samplers) delete &p;
 	}
 */
-	if (m_glTf_Buffer) free(m_glTf_Buffer);
+	if (m_glTf_Buffer) {
+		free(m_glTf_Buffer);
+		m_glTf_Buffer = nullptr;
+	}
+	m_BufferByteOffset = 0;
+
+
+	// Clear containers to release owned resources and avoid dangling refs
+	m_model.accessors.clear();
+	m_model.animations.clear();
+	m_model.buffers.clear();
+	m_model.bufferViews.clear();
+	m_model.materials.clear();
+	m_model.meshes.clear();
+	m_model.nodes.clear();
+	m_model.textures.clear();
+	m_model.images.clear();
+	m_model.skins.clear();
+	m_model.samplers.clear();
+	m_model.cameras.clear();
+	m_model.scenes.clear();
+	m_model.lights.clear();
+	m_model.extensions.clear();
+
+	m_imagePathTable.clear();
+	m_NodeMap.clear();
+	m_MeshMap.clear();
+	m_LightMap.clear();
+	m_LightIESMap.clear();
+	m_mimeTable.clear();
+	m_nameTable.clear();
+	m_skinNodeTable.clear();
+	m_morphNodeTable.clear();
+	m_animation.channels.clear();
+	m_animation.samplers.clear();
+	m_WireColorMtlMap.clear();
+	m_GPUInstanceMap.clear();
+	m_GPUInstanceNodeList.clear();
+	m_PhysicMtlTable.clear();
+	m_CollisionShapeTable.clear();
 }
 
 //======================================================================
@@ -1291,7 +1338,7 @@ void glTFExporter_Core::ExportScene(int ver)
 	}
 
 	{
-		s_TitleString += _T(" (custom3dsmax@gmail.com)");
+		s_TitleString += _T(" (C)Khronos Group Inc.");
 		m_model.asset.generator = WStringToString(s_TitleString);
 		m_model.asset.copyright = WStringToString(GetCompanyString());
 		m_model.asset.version = "2.0";
@@ -1390,17 +1437,19 @@ void glTFExporter_Core::CreateInteractiveLayerTable(void)
 // //----------------------------------------------------------
 int FindModifier(INode* pNode, const Class_ID &CID, Modifier **pMod)
 {
+	if (!pNode) return -1;
+
 	*pMod = NULL;
 	Object* pObj = pNode->GetObjectRef();
-	if (!pObj) return NULL;
+	if (!pObj) return -1;
 
 	const TCHAR *ptr = pNode->GetName();
 	SClass_ID ss = pObj->SuperClassID();
 
-	// 参照先が派生オブジェクトならばモデファイアあり
+	// If the referenced object is a derived object, it has modifiers
 	if (pObj->SuperClassID() == GEN_DERIVOB_CLASS_ID) {
 		IDerivedObject *pDerivedObject = static_cast<IDerivedObject*>(pObj);
-		// モデファイアスタック分ループ
+		// Loop through the modifier stack
 		for (int i = 0; i < pDerivedObject->NumModifiers(); i++) {
 			*pMod = pDerivedObject->GetModifier(i);
 			if ((*pMod)->ClassID() == CID) return i;
@@ -1439,20 +1488,17 @@ BOOL UVGenAnimated(StdUVGen* pUVGen)
 	if (!pUVGen) return FALSE;
 
 	IParamBlock* pBlock = GetParamBlock(pUVGen, 0);
+	if (!pBlock) return FALSE;
 
 	Control* pOffsetUC = pBlock->GetController(0);
 	Control* pOffsetVC = pBlock->GetController(1);
 	Control* pScaleUC = pBlock->GetController(2);
 	Control* pScaleVC = pBlock->GetController(3);
 
-	if (pOffsetUC)
-		if (pOffsetUC->IsAnimated()) return TRUE;
-	if (pOffsetVC)
-		if (pOffsetVC->IsAnimated()) return TRUE;
-	if (pScaleUC)
-		if (pScaleUC->IsAnimated()) return TRUE;
-	if (pScaleVC)
-		if (pScaleVC->IsAnimated()) return TRUE;
+	if (pOffsetUC && pOffsetUC->IsAnimated()) return TRUE;
+	if (pOffsetVC && pOffsetVC->IsAnimated()) return TRUE;
+	if (pScaleUC && pScaleUC->IsAnimated()) return TRUE;
+	if (pScaleVC && pScaleVC->IsAnimated()) return TRUE;
 
 	return FALSE;
 }
@@ -1468,7 +1514,7 @@ std::string WStringToString(std::wstring oWString)
 	// wstring → UTF
 	WideCharToMultiByte(CP_UTF8, 0, oWString.c_str(), -1, cpMultiByte, iBufferSize, NULL, NULL);
 
-	// stringの生成
+	// create the string
 	std::string oRet(cpMultiByte, cpMultiByte + iBufferSize - 1);
 
 	delete[] cpMultiByte;
@@ -1485,10 +1531,10 @@ std::wstring StringToWString(const char *oString)
 
 	wchar_t* cpUCS2 = new wchar_t[iBufferSize];
 
-	// SJIS → wstring
+	// SJIS ->wstring
 	MultiByteToWideChar(CP_ACP, 0, oString, -1, cpUCS2, iBufferSize);
 
-	// stringの生成
+	// creqate a string
 	std::wstring oRet(cpUCS2, cpUCS2 + iBufferSize - 1);
 
 	delete[] cpUCS2;

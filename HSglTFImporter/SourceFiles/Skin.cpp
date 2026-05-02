@@ -33,7 +33,7 @@ void glTFImporter_Core::SetSkin(cgltf_node *node)
 	if (!pSkinImp) return;
 
 	cgltf_skin *skin = node->skin;
-	int numBone = skin->joints_count;
+	size_t numBone = skin->joints_count;
 	for (int i = 0; i < numBone; i++) {
 		INode *pBone = m_NodeMap[skin->joints[i]];
 		if(pBone) pSkinImp->AddBoneEx(pBone, (i == (numBone-1)));
@@ -107,7 +107,7 @@ void glTFImporter_Core::SetSkin(cgltf_node *node)
 	// Weight
 	std::vector<Point4>::iterator pb = boneIDList.begin();
 	std::vector<Point4>::iterator pw = weightList.begin();
-	int numVert = weightList.size() < boneIDList.size() ? weightList.size() : boneIDList.size();
+	size_t numVert = weightList.size() < boneIDList.size() ? weightList.size() : boneIDList.size();
 	for (int idx = 0; idx < numVert; idx++) {
 		Tab<INode*> b;
 		Tab<float> w;

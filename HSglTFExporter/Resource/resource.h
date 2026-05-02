@@ -1,6 +1,6 @@
 //{{NO_DEPENDENCIES}}
-// Microsoft Visual C++ で生成されたインクルード ファイル。
-// HSglTFExporter.rc で使用
+// Microsoft Visual C++
+// HSglTFExporter.rc
 //
 #define IDS_LIBDESCRIPTION              1
 #define IDS_CATEGORY                    2

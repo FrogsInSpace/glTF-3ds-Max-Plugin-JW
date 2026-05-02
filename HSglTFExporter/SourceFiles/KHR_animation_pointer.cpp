@@ -21,7 +21,7 @@
 #include "HSglTFExporter.h"
 #include <Shaders.h>
 
-Control* ConvertColorToFloatController(Control* pSrcC, UINT ch);
+//Control* ConvertColorToFloatController(Control* pSrcC, UINT ch);
 
 //======================================================================
 //======================================================================
@@ -47,9 +47,9 @@ void glTFExporter_Core::CreateAnimationPointer(void)
 		TSTR name = pMtl->GetName();
 		if (pMtl->ClassID() == ScanLineMtlID) {
 			Texmap *pTex = pMtl->GetSubTexmap(ID_DI);
-			CreateUVAnimation(pTex, m.second, BaseColorMap);
+			CreateUVAnimation(pTex, m.second, TargetTex::BaseColorMap);
 			pTex = pMtl->GetSubTexmap(ID_BU);
-			CreateUVAnimation(pTex, m.second, NormalMap);
+			CreateUVAnimation(pTex, m.second, TargetTex::NormalMap);
 
 			BaseShader* pShader = GetShader(pMtl);
 			IParamBlock2* pBlock = pShader->GetParamBlockByID(0);
@@ -66,17 +66,17 @@ void glTFExporter_Core::CreateAnimationPointer(void)
 		else if (pMtl->ClassID() == PBRMetalMtlID) {
 			IParamBlock2* pBlock = pMtl->GetParamBlockByID(1);
 			Texmap* pTex = pBlock->GetTexmap(pbr_base_color_map);
-			CreateUVAnimation(pTex, m.second, BaseColorMap);
+			CreateUVAnimation(pTex, m.second, TargetTex::BaseColorMap);
 			pTex = pBlock->GetTexmap(pbr_metalness_map);
-			CreateUVAnimation(pTex, m.second, MetalnessMap);
+			CreateUVAnimation(pTex, m.second, TargetTex::MetalnessMap);
 			pTex = pBlock->GetTexmap(pbr_roughness_map);
-			CreateUVAnimation(pTex, m.second, RoughnessMap);
+			CreateUVAnimation(pTex, m.second, TargetTex::RoughnessMap);
 			pTex = pBlock->GetTexmap(pbr_norm_map);
-			CreateUVAnimation(pTex, m.second, NormalMap);
+			CreateUVAnimation(pTex, m.second, TargetTex::NormalMap);
 			pTex = pBlock->GetTexmap(pbr_emit_color_map);
-			CreateUVAnimation(pTex, m.second, EmissiveMap);
+			CreateUVAnimation(pTex, m.second, TargetTex::EmissiveMap);
 			pTex = pBlock->GetTexmap(pbr_ao_map);
-			CreateUVAnimation(pTex, m.second, OcclusionMap);
+			CreateUVAnimation(pTex, m.second, TargetTex::OcclusionMap);
 
 			Control* pC = pBlock->GetControllerByID(pbr_base_color);
 			CreateBaseColorAnimation(pC, m.second, TRUE);
@@ -105,32 +105,32 @@ void glTFExporter_Core::CreateAnimationPointer(void)
 		else if (pMtl->ClassID() == PHYSICALMATERIAL_CLASS_ID) {
 			IParamBlock2* pBlock = pMtl->GetParamBlockByID(0);
 			Texmap* pTex = pBlock->GetTexmap(fm_base_color_map);
-			CreateUVAnimation(pTex, m.second, BaseColorMap);
+			CreateUVAnimation(pTex, m.second, TargetTex::BaseColorMap);
 			pTex = pBlock->GetTexmap(fm_metalness_map);
-			CreateUVAnimation(pTex, m.second, MetalnessMap);
+			CreateUVAnimation(pTex, m.second, TargetTex::MetalnessMap);
 			pTex = pBlock->GetTexmap(fm_roughness_map);
-			CreateUVAnimation(pTex, m.second, RoughnessMap);
+			CreateUVAnimation(pTex, m.second, TargetTex::RoughnessMap);
 			pTex = pBlock->GetTexmap(fm_emission_map);
-			CreateUVAnimation(pTex, m.second, EmissiveMap);
+			CreateUVAnimation(pTex, m.second, TargetTex::EmissiveMap);
 			pTex = pBlock->GetTexmap(fm_transparency_map);
-			CreateUVAnimation(pTex, m.second, TransmissionMap);
+			CreateUVAnimation(pTex, m.second, TargetTex::TransmissionMap);
 			pTex = pBlock->GetTexmap(fm_bump_map);
-			CreateUVAnimation(pTex, m.second, NormalMap);
+			CreateUVAnimation(pTex, m.second, TargetTex::NormalMap);
 			//pTex = pBlock->GetTexmap(pbr_ao_map);
 			//CreateUVAnimation(pTex, m.second, OcclusionMap);
 			pTex = pBlock->GetTexmap(fm_coat_map);
-			CreateUVAnimation(pTex, m.second, ClearcoatMap);
+			CreateUVAnimation(pTex, m.second, TargetTex::ClearcoatMap);
 			pTex = pBlock->GetTexmap(fm_coat_rough_map);
-			CreateUVAnimation(pTex, m.second, ClearcoatRoughnessMap);
+			CreateUVAnimation(pTex, m.second, TargetTex::ClearcoatRoughnessMap);
 			pTex = pBlock->GetTexmap(fm_coat_bump_map);
-			CreateUVAnimation(pTex, m.second, ClearcoatNormalMap);
+			CreateUVAnimation(pTex, m.second, TargetTex::ClearcoatNormalMap);
 #if MAX_RELEASE >= 25000
 			pTex = pBlock->GetTexmap(fm_sheen_color_map);
-			CreateUVAnimation(pTex, m.second, SheenColorMap);
+			CreateUVAnimation(pTex, m.second, TargetTex::SheenColorMap);
 			pTex = pBlock->GetTexmap(fm_sheen_rough_map);
-			CreateUVAnimation(pTex, m.second, SheenRoughnessMap);
+			CreateUVAnimation(pTex, m.second, TargetTex::SheenRoughnessMap);
 			pTex = pBlock->GetTexmap(fm_thin_film_map);
-			CreateUVAnimation(pTex, m.second, IridescenceMap);
+			CreateUVAnimation(pTex, m.second, TargetTex::IridescenceMap);
 #endif
 
 			Control* pC = pBlock->GetControllerByID(fm_base_color);
@@ -173,39 +173,39 @@ void glTFExporter_Core::CreateAnimationPointer(void)
 			IParamBlock2* pBlock1 = pMtl->GetParamBlockByID(1);
 
 			Texmap* pTex = pBlock0->GetTexmap(glTF_baseColorMap);
-			CreateUVAnimation(pTex, m.second, BaseColorMap);
+			CreateUVAnimation(pTex, m.second, TargetTex::BaseColorMap);
 			//pTex = pBlock0->GetTexmap(glTF_alphaMap);
 			//CreateUVAnimation(pTex, m.second, TransmissionMap);
 			pTex = pBlock0->GetTexmap(glTF_metalnessMap);
-			if (!CreateUVAnimation(pTex, m.second, MetalnessMap)) {
+			if (!CreateUVAnimation(pTex, m.second, TargetTex::MetalnessMap)) {
 				pTex = pBlock0->GetTexmap(glTF_roughnessMap);
-				CreateUVAnimation(pTex, m.second, RoughnessMap);
+				CreateUVAnimation(pTex, m.second, TargetTex::RoughnessMap);
 			}
 			pTex = pBlock0->GetTexmap(glTF_normalMap);
-			CreateUVAnimation(pTex, m.second, NormalMap);
+			CreateUVAnimation(pTex, m.second, TargetTex::NormalMap);
 			pTex = pBlock0->GetTexmap(glTF_ambientOcclusionMap);
-			CreateUVAnimation(pTex, m.second, OcclusionMap);
+			CreateUVAnimation(pTex, m.second, TargetTex::OcclusionMap);
 			pTex = pBlock0->GetTexmap(glTF_emissionMap);
-			CreateUVAnimation(pTex, m.second, EmissiveMap);
+			CreateUVAnimation(pTex, m.second, TargetTex::EmissiveMap);
 
 			pTex = pBlock1->GetTexmap(glTF_clearcoatMap);
-			CreateUVAnimation(pTex, m.second, ClearcoatMap);
+			CreateUVAnimation(pTex, m.second, TargetTex::ClearcoatMap);
 			pTex = pBlock1->GetTexmap(glTF_clearcoatRoughnessMap);
-			CreateUVAnimation(pTex, m.second, ClearcoatRoughnessMap);
+			CreateUVAnimation(pTex, m.second, TargetTex::ClearcoatRoughnessMap);
 			pTex = pBlock1->GetTexmap(glTF_clearcoatNormalMap);
-			CreateUVAnimation(pTex, m.second, ClearcoatNormalMap);
+			CreateUVAnimation(pTex, m.second, TargetTex::ClearcoatNormalMap);
 			pTex = pBlock1->GetTexmap(glTF_sheenColorMap);
-			CreateUVAnimation(pTex, m.second, SheenColorMap);
+			CreateUVAnimation(pTex, m.second, TargetTex::SheenColorMap);
 			pTex = pBlock1->GetTexmap(glTF_sheenRoughnessMap);
-			CreateUVAnimation(pTex, m.second, SheenRoughnessMap);
+			CreateUVAnimation(pTex, m.second, TargetTex::SheenRoughnessMap);
 			pTex = pBlock1->GetTexmap(glTF_specularMap);
-			CreateUVAnimation(pTex, m.second, SpecularMap);
+			CreateUVAnimation(pTex, m.second, TargetTex::SpecularMap);
 			pTex = pBlock1->GetTexmap(glTF_specularColorMap);
-			CreateUVAnimation(pTex, m.second, SpecularColorMap);
+			CreateUVAnimation(pTex, m.second, TargetTex::SpecularColorMap);
 			pTex = pBlock1->GetTexmap(glTF_transmissionMap);
-			CreateUVAnimation(pTex, m.second, TransmissionMap);
+			CreateUVAnimation(pTex, m.second, TargetTex::TransmissionMap);
 			pTex = pBlock1->GetTexmap(glTF_volumeThicknessMap);
-			CreateUVAnimation(pTex, m.second, VolumeThicknessMap);
+			CreateUVAnimation(pTex, m.second, TargetTex::VolumeThicknessMap);
 
 			Control* pC = pBlock0->GetControllerByID(glTF_baseColor);
 			CreateBaseColorAnimation(pC, m.second, TRUE);
@@ -269,7 +269,7 @@ void glTFExporter_Core::CreateAnimationPointer(void)
 		else  if (pMtl->ClassID() == USDMaterialID) {
 			IParamBlock2* pBlock = pMtl->GetParamBlockByID(1);
 			Texmap* pTex = pBlock->GetTexmap(usd_diffuseColor_map);
-			CreateUVAnimation(pTex, m.second, BaseColorMap);
+			CreateUVAnimation(pTex, m.second, TargetTex::BaseColorMap);
 
 			Control* pC = pBlock->GetControllerByID(usd_diffuseColor);
 			CreateBaseColorAnimation(pC, m.second, TRUE);
@@ -303,15 +303,15 @@ void glTFExporter_Core::CreateAnimationPointer(void)
 		else  if (pMtl->ClassID() == Arnold_StandardSufaceID) {
 			IParamBlock2* pBlock = pMtl->GetParamBlockByID(1);
 			Texmap* pTex = pBlock->GetTexmap(an_sf_base_color_shader);
-			CreateUVAnimation(pTex, m.second, BaseColorMap);
+			CreateUVAnimation(pTex, m.second, TargetTex::BaseColorMap);
 			pTex = pBlock->GetTexmap(an_sf_metalness_shader);
-			CreateUVAnimation(pTex, m.second, MetalnessMap);
+			CreateUVAnimation(pTex, m.second, TargetTex::MetalnessMap);
 			pTex = pBlock->GetTexmap(an_sf_diffuse_roughness_shader);
-			CreateUVAnimation(pTex, m.second, RoughnessMap);
+			CreateUVAnimation(pTex, m.second, TargetTex::RoughnessMap);
 			pTex = pBlock->GetTexmap(an_sf_emission_shader);
-			CreateUVAnimation(pTex, m.second, EmissiveMap);
+			CreateUVAnimation(pTex, m.second, TargetTex::EmissiveMap);
 			pTex = pBlock->GetTexmap(an_sf_normal_shader);
-			CreateUVAnimation(pTex, m.second, NormalMap);
+			CreateUVAnimation(pTex, m.second, TargetTex::NormalMap);
 
 			Control* pC = pBlock->GetControllerByID(an_sf_base_color);
 			CreateBaseColorAnimation(pC, m.second, TRUE);
@@ -362,7 +362,7 @@ void glTFExporter_Core::CreateAnimationPointer(void)
 				if (pTex->ClassID() == VRayCompTexID) {
 					pTex->GetParamBlock(0)->GetValue(1, m_time, pTex, FOREVER, 0);
 				}
-				CreateUVAnimation(pTex, m.second, BaseColorMap);
+				CreateUVAnimation(pTex, m.second, TargetTex::BaseColorMap);
 			}
 			pBlock = pMtl->GetParamBlock(0);
 			Control* pC = pBlock->GetControllerByID(vr_diffuse);
@@ -413,7 +413,7 @@ void glTFExporter_Core::CreateAnimationPointer(void)
 					m_AnimationPointer_Used = TRUE;
 
 				Texmap* pTex = pBlock->GetTexmap(3);
-				CreateUVAnimation(pTex, m.second, TransmissionMap);
+				CreateUVAnimation(pTex, m.second, TargetTex::TransmissionMap);
 			}
 		}
 		pBlock = GetCustAttrPBlock(pMtl, tstring(_T("IOR")));
@@ -448,7 +448,7 @@ void glTFExporter_Core::CreateAnimationPointer(void)
 					m_AnimationPointer_Used = TRUE;
 
 				Texmap* pTex = pBlock->GetTexmap(5);
-				CreateUVAnimation(pTex, m.second, VolumeThicknessMap);
+				CreateUVAnimation(pTex, m.second, TargetTex::VolumeThicknessMap);
 			}
 		}
 		pBlock = GetCustAttrPBlock(pMtl, tstring(_T("Iridescence")));
@@ -469,9 +469,9 @@ void glTFExporter_Core::CreateAnimationPointer(void)
 				if (CreateIridescenceThicknessMaxAnimation(pC, m.second)) m_AnimationPointer_Used = TRUE;
 
 				Texmap* pTex = pBlock->GetTexmap(6);
-				CreateUVAnimation(pTex, m.second, IridescenceMap);
+				CreateUVAnimation(pTex, m.second, TargetTex::IridescenceMap);
 				pTex = pBlock->GetTexmap(7);
-				CreateUVAnimation(pTex, m.second, IridescenceThicknessMap);
+				CreateUVAnimation(pTex, m.second, TargetTex::IridescenceThicknessMap);
 			}
 		}
 		pBlock = GetCustAttrPBlock(pMtl, tstring(_T("Sheen")));
@@ -486,9 +486,9 @@ void glTFExporter_Core::CreateAnimationPointer(void)
 					m_AnimationPointer_Used = TRUE;
 
 				Texmap* pTex = pBlock->GetTexmap(3);
-				CreateUVAnimation(pTex, m.second, SheenColorMap);
+				CreateUVAnimation(pTex, m.second, TargetTex::SheenColorMap);
 				pTex = pBlock->GetTexmap(5);
-				CreateUVAnimation(pTex, m.second, SheenRoughnessMap);
+				CreateUVAnimation(pTex, m.second, TargetTex::SheenRoughnessMap);
 			}
 		}
 		pBlock = GetCustAttrPBlock(pMtl, tstring(_T("Clearcoat")));
@@ -501,11 +501,11 @@ void glTFExporter_Core::CreateAnimationPointer(void)
 				if (CreateClearcoatRoughnessAnimation(pC, m.second)) m_AnimationPointer_Used = TRUE;
 
 				Texmap* pTex = pBlock->GetTexmap(3);
-				CreateUVAnimation(pTex, m.second, ClearcoatMap);
+				CreateUVAnimation(pTex, m.second, TargetTex::ClearcoatMap);
 				pTex = pBlock->GetTexmap(5);
-				CreateUVAnimation(pTex, m.second, ClearcoatRoughnessMap);
+				CreateUVAnimation(pTex, m.second, TargetTex::ClearcoatRoughnessMap);
 				pTex = pBlock->GetTexmap(6);
-				CreateUVAnimation(pTex, m.second, ClearcoatNormalMap);
+				CreateUVAnimation(pTex, m.second, TargetTex::ClearcoatNormalMap);
 			}
 		}
 		pBlock = GetCustAttrPBlock(pMtl, tstring(_T("Specular")));
@@ -521,11 +521,11 @@ void glTFExporter_Core::CreateAnimationPointer(void)
 				if (CreateSpecularColorAnimation(pC, m.second)) m_AnimationPointer_Used = TRUE;
 
 				Texmap* pTex = pBlock->GetTexmap(3);
-				CreateUVAnimation(pTex, m.second, ClearcoatMap);
+				CreateUVAnimation(pTex, m.second, TargetTex::ClearcoatMap);
 				pTex = pBlock->GetTexmap(3);
-				CreateUVAnimation(pTex, m.second, SpecularMap);
+				CreateUVAnimation(pTex, m.second, TargetTex::SpecularMap);
 				pTex = pBlock->GetTexmap(5);
-				CreateUVAnimation(pTex, m.second, SpecularColorMap);
+				CreateUVAnimation(pTex, m.second, TargetTex::SpecularColorMap);
 			}
 		}
 
@@ -539,7 +539,7 @@ void glTFExporter_Core::CreateAnimationPointer(void)
 				if (CreateAnisotropyRotationAnimation(pC, m.second)) m_AnimationPointer_Used = TRUE;
 
 				Texmap* pTex = pBlock->GetTexmap(4);
-				CreateUVAnimation(pTex, m.second, AnisotropyMap);
+				CreateUVAnimation(pTex, m.second, TargetTex::AnisotropyMap);
 			}
 		}
 
@@ -561,9 +561,9 @@ void glTFExporter_Core::CreateAnimationPointer(void)
 				if (CreateDiffTransColorAnimation(pC, m.second)) m_AnimationPointer_Used = TRUE;
 
 				Texmap* pTex = pBlock->GetTexmap(5);
-				CreateUVAnimation(pTex, m.second, DiffuseTransmissionMap);
+				CreateUVAnimation(pTex, m.second, TargetTex::DiffuseTransmissionMap);
 				pTex = pBlock->GetTexmap(4);
-				CreateUVAnimation(pTex, m.second, DiffuseTransmissionColorMap);
+				CreateUVAnimation(pTex, m.second, TargetTex::DiffuseTransmissionColorMap);
 			}
 		}
 
@@ -675,46 +675,46 @@ BOOL glTFExporter_Core::CreateUVAnimation(Texmap *pSrcTex, UINT mtlIdx, TargetTe
 	CreateKeyFrameList(pScaleVC, KeyFrameList1, FALSE);
 	if (KeyFrameList1.size() > 0) {
 		std::string name;
-		if(target== BaseColorMap)
+		if(target== TargetTex::BaseColorMap)
 			name = "/materials/" + std::to_string(mtlIdx) + "/pbrMetallicRoughness/baseColorTexture/extensions/KHR_texture_transform/scale";
-		else if (target == EmissiveMap)
+		else if (target == TargetTex::EmissiveMap)
 			name = "/materials/" + std::to_string(mtlIdx) + "/emissiveTexture/extensions/KHR_texture_transform/scale";
-		else if (target == MetalnessMap)
+		else if (target == TargetTex::MetalnessMap)
 			name = "/materials/" + std::to_string(mtlIdx) + "/pbrMetallicRoughness/metallicRoughnessTexture/extensions/KHR_texture_transform/scale";
-		else if (target == RoughnessMap)
+		else if (target == TargetTex::RoughnessMap)
 			name = "/materials/" + std::to_string(mtlIdx) + "/pbrMetallicRoughness/metallicRoughnessTexture/extensions/KHR_texture_transform/scale";
-		else if (target == NormalMap)
+		else if (target == TargetTex::NormalMap)
 			name = "/materials/" + std::to_string(mtlIdx) + "/normalTexture/extensions/KHR_texture_transform/scale";
-		else if (target == OcclusionMap)
+		else if (target == TargetTex::OcclusionMap)
 			name = "/materials/" + std::to_string(mtlIdx) + "/occlusionTexture/extensions/KHR_texture_transform/scale";
 
-		else if (target == ClearcoatMap)
+		else if (target == TargetTex::ClearcoatMap)
 			name = "/materials/" + std::to_string(mtlIdx) + "/extensions/KHR_materials_clearcoat/clearcoatTexture/extensions/KHR_texture_transform/scale";
-		else if (target == ClearcoatRoughnessMap)
+		else if (target == TargetTex::ClearcoatRoughnessMap)
 			name = "/materials/" + std::to_string(mtlIdx) + "/extensions/KHR_materials_clearcoat/clearcoatRoughnessTexture/extensions/KHR_texture_transform/scale";
-		else if (target == ClearcoatNormalMap)
+		else if (target == TargetTex::ClearcoatNormalMap)
 			name = "/materials/" + std::to_string(mtlIdx) + "/extensions/KHR_materials_clearcoat/clearcoatNormalTexture/extensions/KHR_texture_transform/scale";
-		else if (target == SheenColorMap)
+		else if (target == TargetTex::SheenColorMap)
 			name = "/materials/" + std::to_string(mtlIdx) + "/extensions/KHR_materials_sheen/sheenColorTexture/extensions/KHR_texture_transform/scale";
-		else if (target == SheenRoughnessMap)
+		else if (target == TargetTex::SheenRoughnessMap)
 			name = "/materials/" + std::to_string(mtlIdx) + "/extensions/KHR_materials_sheen/sheenRoughnessTexture/extensions/KHR_texture_transform/scale";
-		else if (target == SpecularMap)
+		else if (target == TargetTex::SpecularMap)
 			name = "/materials/" + std::to_string(mtlIdx) + "/extensions/KHR_materials_specular/specularTexture/extensions/KHR_texture_transform/scale";
-		else if (target == SpecularColorMap)
+		else if (target == TargetTex::SpecularColorMap)
 			name = "/materials/" + std::to_string(mtlIdx) + "/extensions/KHR_materials_specular/specularColorTexture/extensions/KHR_texture_transform/scale";
-		else if (target == TransmissionMap)
+		else if (target == TargetTex::TransmissionMap)
 			name = "/materials/" + std::to_string(mtlIdx) + "/extensions/KHR_materials_transmission/transmissionTexture/extensions/KHR_texture_transform/scale";
-		else if (target == VolumeThicknessMap)
+		else if (target == TargetTex::VolumeThicknessMap)
 			name = "/materials/" + std::to_string(mtlIdx) + "/extensions/KHR_materials_volume/thicknessTexture/extensions/KHR_texture_transform/scale";
-		else if (target == IridescenceMap)
+		else if (target == TargetTex::IridescenceMap)
 			name = "/materials/" + std::to_string(mtlIdx) + "/extensions/KHR_materials_iridescence/iridescenceTexture/extensions/KHR_texture_transform/scale";
-		else if (target == IridescenceThicknessMap)
+		else if (target == TargetTex::IridescenceThicknessMap)
 			name = "/materials/" + std::to_string(mtlIdx) + "/extensions/KHR_materials_iridescence/iridescenceThicknessTexture/extensions/KHR_texture_transform/scale";
-		else if (target == AnisotropyMap)
+		else if (target == TargetTex::AnisotropyMap)
 			name = "/materials/" + std::to_string(mtlIdx) + "/extensions/KHR_materials_anisotropy/anisotropyTexture/extensions/KHR_texture_transform/scale";
-		else if (target == DiffuseTransmissionMap)
+		else if (target == TargetTex::DiffuseTransmissionMap)
 			name = "/materials/" + std::to_string(mtlIdx) + "/extensions/KHR_materials_diffuse_transmission/diffuseTransmissionTexture/extensions/KHR_texture_transform/scale";
-		else if (target == DiffuseTransmissionColorMap)
+		else if (target == TargetTex::DiffuseTransmissionColorMap)
 			name = "/materials/" + std::to_string(mtlIdx) + "/extensions/KHR_materials_diffuse_transmission/diffuseTransmissionColorTexture/extensions/KHR_texture_transform/scale";
 
 		KeyFrameList1.sort();
@@ -725,46 +725,46 @@ BOOL glTFExporter_Core::CreateUVAnimation(Texmap *pSrcTex, UINT mtlIdx, TargetTe
 	CreateKeyFrameList(pRotateW, KeyFrameList1);
 	if (KeyFrameList1.size() > 0) {
 		std::string name;
-		if (target == BaseColorMap)
+		if (target == TargetTex::BaseColorMap)
 			name = "/materials/" + std::to_string(mtlIdx) + "/pbrMetallicRoughness/baseColorTexture/extensions/KHR_texture_transform/rotation";
-		else if (target == EmissiveMap)
+		else if (target == TargetTex::EmissiveMap)
 			name = "/materials/" + std::to_string(mtlIdx) + "/emissiveTexture/extensions/KHR_texture_transform/rotation";
-		else if (target == MetalnessMap)
+		else if (target == TargetTex::MetalnessMap)
 			name = "/materials/" + std::to_string(mtlIdx) + "/pbrMetallicRoughness/metallicRoughnessTexture/extensions/KHR_texture_transform/rotation";
-		else if (target == RoughnessMap)
+		else if (target == TargetTex::RoughnessMap)
 			name = "/materials/" + std::to_string(mtlIdx) + "/pbrMetallicRoughness/metallicRoughnessTexture/extensions/KHR_texture_transform/rotation";
-		else if (target == NormalMap)
+		else if (target == TargetTex::NormalMap)
 			name = "/materials/" + std::to_string(mtlIdx) + "/normalTexture/extensions/KHR_texture_transform/rotation";
-		else if (target == OcclusionMap)
+		else if (target == TargetTex::OcclusionMap)
 			name = "/materials/" + std::to_string(mtlIdx) + "/occlusionTexture/extensions/KHR_texture_transform/rotation";
 
-		else if (target == ClearcoatMap)
+		else if (target == TargetTex::ClearcoatMap)
 			name = "/materials/" + std::to_string(mtlIdx) + "/extensions/KHR_materials_clearcoat/clearcoatTexture/extensions/KHR_texture_transform/rotation";
-		else if (target == ClearcoatRoughnessMap)
+		else if (target == TargetTex::ClearcoatRoughnessMap)
 			name = "/materials/" + std::to_string(mtlIdx) + "/extensions/KHR_materials_clearcoat/clearcoatRoughnessTexture/extensions/KHR_texture_transform/rotation";
-		else if (target == ClearcoatNormalMap)
+		else if (target == TargetTex::ClearcoatNormalMap)
 			name = "/materials/" + std::to_string(mtlIdx) + "/extensions/KHR_materials_clearcoat/clearcoatNormalTexture/extensions/KHR_texture_transform/rotation";
-		else if (target == SheenColorMap)
+		else if (target == TargetTex::SheenColorMap)
 			name = "/materials/" + std::to_string(mtlIdx) + "/extensions/KHR_materials_sheen/sheenColorTexture/extensions/KHR_texture_transform/rotation";
-		else if (target == SheenRoughnessMap)
+		else if (target == TargetTex::SheenRoughnessMap)
 			name = "/materials/" + std::to_string(mtlIdx) + "/extensions/KHR_materials_sheen/sheenRoughnessTexture/extensions/KHR_texture_transform/rotation";
-		else if (target == SpecularMap)
+		else if (target == TargetTex::SpecularMap)
 			name = "/materials/" + std::to_string(mtlIdx) + "/extensions/KHR_materials_specular/specularTexture/extensions/KHR_texture_transform/rotation";
-		else if (target == SpecularColorMap)
+		else if (target == TargetTex::SpecularColorMap)
 			name = "/materials/" + std::to_string(mtlIdx) + "/extensions/KHR_materials_specular/specularColorTexture/extensions/KHR_texture_transform/rotation";
-		else if (target == TransmissionMap)
+		else if (target == TargetTex::TransmissionMap)
 			name = "/materials/" + std::to_string(mtlIdx) + "/extensions/KHR_materials_transmission/transmissionTexture/extensions/KHR_texture_transform/rotation";
-		else if (target == VolumeThicknessMap)
+		else if (target == TargetTex::VolumeThicknessMap)
 			name = "/materials/" + std::to_string(mtlIdx) + "/extensions/KHR_materials_volume/thicknessTexture/extensions/KHR_texture_transform/rotation";
-		else if (target == IridescenceMap)
+		else if (target == TargetTex::IridescenceMap)
 			name = "/materials/" + std::to_string(mtlIdx) + "/extensions/KHR_materials_iridescence/iridescenceTexture/extensions/KHR_texture_transform/rotation";
-		else if (target == IridescenceThicknessMap)
+		else if (target == TargetTex::IridescenceThicknessMap)
 			name = "/materials/" + std::to_string(mtlIdx) + "/extensions/KHR_materials_iridescence/iridescenceThicknessTexture/extensions/KHR_texture_transform/rotation";
-		else if (target == AnisotropyMap)
+		else if (target == TargetTex::AnisotropyMap)
 			name = "/materials/" + std::to_string(mtlIdx) + "/extensions/KHR_materials_anisotropy/anisotropyTexture/extensions/KHR_texture_transform/rotation";
-		else if (target == DiffuseTransmissionMap)
+		else if (target == TargetTex::DiffuseTransmissionMap)
 			name = "/materials/" + std::to_string(mtlIdx) + "/extensions/KHR_materials_diffuse_transmission/diffuseTransmissionTexture/extensions/KHR_texture_transform/rotation";
-		else if (target == DiffuseTransmissionColorMap)
+		else if (target == TargetTex::DiffuseTransmissionColorMap)
 			name = "/materials/" + std::to_string(mtlIdx) + "/extensions/KHR_materials_diffuse_transmission/diffuseTransmissionColorTexture/extensions/KHR_texture_transform/rotation";
 
 		KeyFrameList1.sort();
@@ -821,46 +821,46 @@ BOOL glTFExporter_Core::CreateUVAnimation(Texmap *pSrcTex, UINT mtlIdx, TargetTe
 
 	if (KeyFrameList1.size() > 0) {
 		std::string name;
-		if (target == BaseColorMap)
+		if (target == TargetTex::BaseColorMap)
 			name = "/materials/" + std::to_string(mtlIdx) + "/pbrMetallicRoughness/baseColorTexture/extensions/KHR_texture_transform/offset";
-		else if (target == EmissiveMap)
+		else if (target == TargetTex::EmissiveMap)
 			name = "/materials/" + std::to_string(mtlIdx) + "/emissiveTexture/extensions/KHR_texture_transform/offset";
-		else if (target == MetalnessMap)
+		else if (target == TargetTex::MetalnessMap)
 			name = "/materials/" + std::to_string(mtlIdx) + "/pbrMetallicRoughness/metallicRoughnessTexture/extensions/KHR_texture_transform/offset";
-		else if (target == RoughnessMap)
+		else if (target == TargetTex::RoughnessMap)
 			name = "/materials/" + std::to_string(mtlIdx) + "/pbrMetallicRoughness/metallicRoughnessTexture/extensions/KHR_texture_transform/offset";
-		else if (target == NormalMap)
+		else if (target == TargetTex::NormalMap)
 			name = "/materials/" + std::to_string(mtlIdx) + "/normalTexture/extensions/KHR_texture_transform/offset";
-		else if (target == OcclusionMap)
+		else if (target == TargetTex::OcclusionMap)
 			name = "/materials/" + std::to_string(mtlIdx) + "/occlusionTexture/extensions/KHR_texture_transform/offset";
 
-		else if (target == ClearcoatMap)
+		else if (target == TargetTex::ClearcoatMap)
 			name = "/materials/" + std::to_string(mtlIdx) + "/extensions/KHR_materials_clearcoat/clearcoatTexture/extensions/KHR_texture_transform/offset";
-		else if (target == ClearcoatRoughnessMap)
+		else if (target == TargetTex::ClearcoatRoughnessMap)
 			name = "/materials/" + std::to_string(mtlIdx) + "/extensions/KHR_materials_clearcoat/clearcoatRoughnessTexture/extensions/KHR_texture_transform/offset";
-		else if (target == ClearcoatNormalMap)
+		else if (target == TargetTex::ClearcoatNormalMap)
 			name = "/materials/" + std::to_string(mtlIdx) + "/extensions/KHR_materials_clearcoat/clearcoatNormalTexture/extensions/KHR_texture_transform/offset";
-		else if (target == SheenColorMap)
+		else if (target == TargetTex::SheenColorMap)
 			name = "/materials/" + std::to_string(mtlIdx) + "/extensions/KHR_materials_sheen/sheenColorTexture/extensions/KHR_texture_transform/offset";
-		else if (target == SheenRoughnessMap)
+		else if (target == TargetTex::SheenRoughnessMap)
 			name = "/materials/" + std::to_string(mtlIdx) + "/extensions/KHR_materials_sheen/sheenRoughnessTexture/extensions/KHR_texture_transform/offset";
-		else if (target == SpecularMap)
+		else if (target == TargetTex::SpecularMap)
 			name = "/materials/" + std::to_string(mtlIdx) + "/extensions/KHR_materials_specular/specularTexture/extensions/KHR_texture_transform/offset";
-		else if (target == SpecularColorMap)
+		else if (target == TargetTex::SpecularColorMap)
 			name = "/materials/" + std::to_string(mtlIdx) + "/extensions/KHR_materials_specular/specularColorTexture/extensions/KHR_texture_transform/offset";
-		else if (target == TransmissionMap)
+		else if (target == TargetTex::TransmissionMap)
 			name = "/materials/" + std::to_string(mtlIdx) + "/extensions/KHR_materials_transmission/transmissionTexture/extensions/KHR_texture_transform/offset";
-		else if (target == VolumeThicknessMap)
+		else if (target == TargetTex::VolumeThicknessMap)
 			name = "/materials/" + std::to_string(mtlIdx) + "/extensions/KHR_materials_volume/thicknessTexture/extensions/KHR_texture_transform/offset";
-		else if (target == IridescenceMap)
+		else if (target == TargetTex::IridescenceMap)
 			name = "/materials/" + std::to_string(mtlIdx) + "/extensions/KHR_materials_iridescence/iridescenceTexture/extensions/KHR_texture_transform/offset";
-		else if (target == IridescenceThicknessMap)
+		else if (target == TargetTex::IridescenceThicknessMap)
 			name = "/materials/" + std::to_string(mtlIdx) + "/extensions/KHR_materials_iridescence/iridescenceThicknessTexture/extensions/KHR_texture_transform/offset";
-		else if (target == AnisotropyMap)
+		else if (target == TargetTex::AnisotropyMap)
 			name = "/materials/" + std::to_string(mtlIdx) + "/extensions/KHR_materials_anisotropy/anisotropyTexture/extensions/KHR_texture_transform/offset";
-		else if (target == DiffuseTransmissionMap)
+		else if (target == TargetTex::DiffuseTransmissionMap)
 			name = "/materials/" + std::to_string(mtlIdx) + "/extensions/KHR_materials_diffuse_transmission/diffuseTransmissionTexture/extensions/KHR_texture_transform/offset";
-		else if (target == DiffuseTransmissionColorMap)
+		else if (target == TargetTex::DiffuseTransmissionColorMap)
 			name = "/materials/" + std::to_string(mtlIdx) + "/extensions/KHR_materials_diffuse_transmission/diffuseTransmissionColorTexture/extensions/KHR_texture_transform/offset";
 
 		KeyFrameList1.sort();
@@ -873,6 +873,7 @@ BOOL glTFExporter_Core::CreateUVAnimation(Texmap *pSrcTex, UINT mtlIdx, TargetTe
 	return (KeyFrameList1.size() > 0);
 }
 //======================================================================
+//GetCOREInterface(COLORPIPELINEMGR_INTERFACE)
 //======================================================================
 BOOL glTFExporter_Core::CreateBaseColorAnimation(Control* pC, UINT mtlIdx, BOOL alpha)
 {
@@ -887,7 +888,7 @@ BOOL glTFExporter_Core::CreateBaseColorAnimation(Control* pC, UINT mtlIdx, BOOL 
 		CreateKeyFrameList(pC, KeyFrameList);
 	}
 
-	// 全キー同じ値ならアニメートしていないとする
+	// If all keys have the same value, it is considered not animated.
 	if (KeyFrameList.size() > 0) {
 		BOOL animate = FALSE;
 		Point4 baseC;
@@ -2057,7 +2058,7 @@ void glTFExporter_Core::SetColorAnimation(std::list<TimeValue>& KeyFrameList, Co
 	m_AnimationPointer_Used = TRUE;
 }
 
-
+/*
 //======================================================================
 //======================================================================
 Control* ConvertColorToFloatController(Control* pSrcC, UINT ch)
@@ -2075,3 +2076,4 @@ Control* ConvertColorToFloatController(Control* pSrcC, UINT ch)
 	}
 	return pDstC;
 }
+*/

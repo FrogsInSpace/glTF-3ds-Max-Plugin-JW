@@ -33,7 +33,7 @@ To build or use this project, the following environment is required:
 
 * **Microsoft Visual Studio 2017**: For 3ds Max 2020, 2021, and 2022
 * **Microsoft Visual Studio 2019**: For 3ds Max 2023, 2024, and 2025
-* **Microsoft Visual Studio 2022**: For 3ds Max 2026
+* **Microsoft Visual Studio 2022**: For 3ds Max 2026, and 2027
 
 ### Required SDK
 

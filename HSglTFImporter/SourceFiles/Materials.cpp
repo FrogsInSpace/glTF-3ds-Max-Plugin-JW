@@ -78,14 +78,13 @@ tstring glTFImporter_Core::CreateTextureFileName(cgltf_texture* tex, tstring &or
 			strncpy_s(buf, MAX_PATH, uri + 5, p - (uri + 5));
 			buf[p - (uri + 5)] = '\0';
 			const char* type = MimeTypes::getExtension(buf);
-			int outlength;
 			p = strchr(p, ',') + 1;
 			const char* endp = strchr(p, '=');
 			size_t len1 = endp - p;
 			size_t len2 = strlen(p);
 			if (len1 <= 0) len1 = len2;
-			int CharSize = (len1 < len2) ? len1 : len2; //endp - p;
-			int ByteSize = (CharSize * 3) / 4;
+			size_t CharSize = (len1 < len2) ? len1 : len2; //endp - p;
+			size_t ByteSize = (CharSize * 3) / 4;
 			//if (CharSize % 4 != 0) ByteSize += 1;
 			cgltf_options options = { 0 };
 

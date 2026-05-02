@@ -4,6 +4,7 @@
 #include <gamma.h>
 
 static BOOL s_CalcGamma = FALSE;
+static void CorrectBitmapGamma(BitmapTex*& pBmpTex, float gamma);
 
 //=============================================================================
 //=============================================================================
@@ -75,7 +76,7 @@ BitmapTex* MergeRGBChannelTexture(BitmapTex* pTexR, BitmapTex* pTexG, BitmapTex*
 	if (!PathFileExists(texFilePath.c_str())) {
 		return NULL;
 	}
-
+/*
 	if (s_CalcGamma)
 	{
 		gammaMgr.SetFileOutGamma(1.0f);
@@ -84,7 +85,7 @@ BitmapTex* MergeRGBChannelTexture(BitmapTex* pTexR, BitmapTex* pTexG, BitmapTex*
 	else {
 		gammaMgr.SetFileOutGamma(2.2f);
 	}
-
+*/
 	BitmapTex* pBmpTex = NewDefaultBitmapTex();
 	pBmpTex->SetMapName(texFilePath.c_str());
 	Bitmap* pOriginalBmp = pBmpTex->GetBitmap(0);
@@ -95,14 +96,12 @@ BitmapTex* MergeRGBChannelTexture(BitmapTex* pTexR, BitmapTex* pTexG, BitmapTex*
 	bi.SetType(BMM_TRUE_24);
 	bi.SetName(texFilePath.c_str());
 
-	//////////////////////////////////////
-		//BitmapTex *pJPGBmpTex = NewDefaultBitmapTex();
-		//pJPGBmpTex->SetMapName(jpgFilePath.c_str());
-		//BitmapInfo JPGbi = pOriginalBmp->GetBitmapInfo();
-		//JPGbi.SetName(jpgFilePath.c_str());
-
-	//////////////////////////////////////
-
+	/*
+	BitmapTex *pJPGBmpTex = NewDefaultBitmapTex();
+	pJPGBmpTex->SetMapName(jpgFilePath.c_str());
+	BitmapInfo JPGbi = pOriginalBmp->GetBitmapInfo();
+	JPGbi.SetName(jpgFilePath.c_str());
+	*/
 
 	for (int w = 0; w < bi.Width(); w++) {
 		for (int h = 0; h < bi.Height(); h++) {
@@ -143,8 +142,10 @@ BitmapTex* MergeRGBChannelTexture(BitmapTex* pTexR, BitmapTex* pTexG, BitmapTex*
 	//pOriginalBmp->Write(&JPGbi);
 	//pOriginalBmp->Close(&JPGbi);
 	//pOriginalBmp->DeleteThis();
+	//gammaMgr.SetFileOutGamma(2.2f);
 
-	gammaMgr.SetFileOutGamma(2.2f);
+	if (s_CalcGamma)
+		CorrectBitmapGamma(pBmpTex, 1.0f);
 
 	return pBmpTex;
 }
@@ -250,10 +251,10 @@ BitmapTex* MergeRGBChannelTexture(Texmap* pTexR, Texmap* pTexG, Texmap* pTexB, c
 	Bitmap* pBmpR = SetBitmapFromTexmap(pTexR, bi);
 	Bitmap* pBmpG = SetBitmapFromTexmap(pTexG, bi);
 	Bitmap* pBmpB = SetBitmapFromTexmap(pTexB, bi);
-
+/*
 	Bitmap* pSrcBitmap = NULL;
 	if (pBmpG) {
-		//pSrcBitmap = pBmpG;
+		pSrcBitmap = pBmpG;
 		Bitmap* p = TheManager->Create(&bi);
 		p->CopyImage(pBmpG, COPY_IMAGE_RESIZE_HI_QUALITY, 0);
 		pSrcBitmap = p;
@@ -270,11 +271,11 @@ BitmapTex* MergeRGBChannelTexture(Texmap* pTexR, Texmap* pTexG, Texmap* pTexB, c
 		p->CopyImage(pBmpR, COPY_IMAGE_RESIZE_HI_QUALITY, 0);
 		pSrcBitmap = p;
 	}
-
+*/
 	//CopyFile(bi.Name(), texFilePath.c_str(), FALSE);
 	BitmapTex* pBmpTex = CreateBitmapTex(texFilePath.c_str(), NULL, mapSize);
 	Bitmap* pDestBmp = pBmpTex->GetBitmap(0);
-
+	/*
 	gammaMgr.SetFileOutGamma(2.2f);
 	if (s_CalcGamma)
 	{
@@ -284,7 +285,7 @@ BitmapTex* MergeRGBChannelTexture(Texmap* pTexR, Texmap* pTexG, Texmap* pTexB, c
 	else {
 		gammaMgr.SetFileOutGamma(2.2f);
 	}
-
+	*/
 	int ww = bi.Width();
 	int hh = bi.Height();
 
@@ -327,7 +328,53 @@ BitmapTex* MergeRGBChannelTexture(Texmap* pTexR, Texmap* pTexG, Texmap* pTexB, c
 	if (pBmpG) pBmpG->DeleteThis();
 	if (pBmpB) pBmpB->DeleteThis();
 
-	gammaMgr.SetFileOutGamma(2.2f);
+	//gammaMgr.SetFileOutGamma(2.2f);
+	if (s_CalcGamma)
+		CorrectBitmapGamma(pBmpTex, 1.0f);
 
 	return pBmpTex;
+}
+
+//=============================================================================
+//=============================================================================
+void CorrectBitmapGamma(BitmapTex*& pBmpTex, float gamma)
+{
+	if (!pBmpTex) return;
+
+	IParamBlock2* pb2 = pBmpTex->GetParamBlock(0);
+	// get the bitmap parameter
+	int n = pb2->GetDesc()->NameToIndex(_T("bitmap"));
+	ParamID id = pb2->GetDesc()->IndextoID(n);
+	PBBitmap* pbBitmap = pb2->GetBitmap(id);
+
+#if MAX_RELEASE >= 26000
+	if (gamma == 1.0f) {
+		Bitmap* pBmp = pBmpTex->GetBitmap(0);
+		BitmapInfo* bi = &pBmp->GetBitmapInfo();
+
+		{
+			//auto cpm = MaxSDK::ColorManagement::IColorPipelineMgr::GetInstance();
+			MaxSDK::ColorManagement::IColorPipelineMgr* cpm = (MaxSDK::ColorManagement::IColorPipelineMgr*)GetCOREInterface(COLORPIPELINEMGR_INTERFACE);
+
+			auto settings = cpm->Settings();
+			if (settings->IsOCIOBased())
+			{
+				BitmapInfo bmi(*bi);
+				auto ret = bmi.SetRequestedColorSpace(settings->GetDataColorSpaceName(), MaxSDK::ColorManagement::ColSpaceSource::User);
+				bmi.SetName(pBmpTex->GetMapName());
+				bmi.ResetCustomFlag(BMM_CUSTOM_FILEGAMMA);
+				bmi.SetCustomFlag(BMM_CUSTOM_GAMMA);
+				bmi.SetCustomGamma(gamma);
+				pBmpTex->SetBitmapInfo(bmi);
+			}
+		}
+	}
+#else
+	pbBitmap->bi.ResetCustomFlag(BMM_CUSTOM_FILEGAMMA);
+	pbBitmap->bi.SetCustomFlag(BMM_CUSTOM_GAMMA);
+	pbBitmap->bi.SetCustomGamma(gamma);
+#endif
+
+	// now reload the bitmap from the disk.
+	pBmpTex->ReloadBitmapAndUpdate();
 }

@@ -18,16 +18,12 @@
  //***************************************************************************/
 
 #pragma once
-#pragma warning( disable: 4828 )
-
 
 #ifndef NOMINMAX
 #define NOMINMAX
 #endif
 
-#pragma warning( disable : 4535 )
 #pragma warning( disable : 4267 )
-#pragma warning( disable : 4919)
 
 
 #include <3dsmaxsdk_preinclude.h>
@@ -61,8 +57,6 @@
 #include <simpobj.h>
 #include <dummy.h>
 #include <decomp.h>
-//#include "wM3.h"
-//#include "shlwapi.h"
 #include <MaxOSLInterface.h>
 #include <splshape.h>
 #include <linshape.h>
@@ -79,7 +73,7 @@
 //using namespace tinygltf;
 
 
-#define HS_GLTF_EXPORTER_VER (_T("1.57a"))
+#define HS_GLTF_EXPORTER_VER (_T("2.00"))
 
 #define HSglTFExporter_CLASS_ID		Class_ID(0x38586030, 0x1b315b3e)
 #define HSglTF2Exporter_CLASS_ID	Class_ID(0x56337879, 0x5a732c12)
@@ -104,7 +98,6 @@
 #define Pencil4MaterialID			Class_ID(0x20160205, 0x81454de)
 #define OpenPBRMaterialID			Class_ID(0xf1551e33, 0x37fb1337)
 
-#define ColorCorrectTexID			Class_ID(COLORCORRECTION_CLASS_ID, 0x0)
 #define MixTexID					Class_ID(0x230, 0x0)
 
 //#define Arnold_StandardSufaceID		Class_ID(0x7e73161f, 0x62f74b4c)
@@ -136,8 +129,10 @@
 
 #ifdef UNICODE
 #define tstring std::wstring
+#define to_tstring(a) std::to_wstring(a)
 #else
 #define tstring std::string
+#define to_tstring(a) std::to_string(a)
 #endif
 
 inline const MCHAR* GetCustomAttrName(CustAttrib* p)
@@ -160,8 +155,8 @@ inline const MCHAR* GetCustomAttrName(CustAttrib* p)
 #define InteractiveLayerName (_T("HSInteractiveGraphLayer"))
 #define InteractiveNodeName (_T("HSInetractiveGraphNode"))
 
-enum TargetTex {
-	BaseColorMap,
+enum class TargetTex {
+	BaseColorMap = 0,
 	EmissiveMap,
 	MetalnessMap,
 	RoughnessMap,
@@ -193,170 +188,170 @@ struct AnimationStruct {
 //==========================================================
 //==========================================================
 struct TransmissionStruct {
-	Texmap* pTex;
-	float factor;
+	Texmap* pTex = nullptr;
+	float factor = 1.0f;
 };
 
 //==========================================================
 //==========================================================
 struct SpecularStruct {
-	float factor;		// : float
-	Texmap *pMap;		// : texturemap
-	Color color;		// : color
-	Texmap *pColMap;	// : texturemap
+	float factor = 0.0f;		// : float
+	Texmap *pMap = nullptr;		// : texturemap
+	Color color = Color(0.0f, 0.0f, 0.0f);	// : color
+	Texmap *pColMap = nullptr;	// : texturemap
 };
 
 //==========================================================
 //==========================================================
 struct VolumeStruct {
-	float thickness; 		// : float
-	Texmap *pThicknessMap;	// : texturemap
-	float distance; 		// : float
-	Color color; 			// : color
+	float thickness = 0.0f; 			// : float
+	Texmap *pThicknessMap = nullptr;	// : texturemap
+	float distance = 0.0f; 				// : float
+	Color color = Color(0.0f, 0.0f, 0.0f);	// : color
 };
 
 //==========================================================
 //==========================================================
 struct SheenStruct {
-	Color color; 			//: color
-	Texmap *pColMap;		//: texturemap
-	float roughness; 		//: float
-	Texmap *pRoughnessMap; //: texturemap
+	Color color = Color(0.0f, 0.0f, 0.0f);; 			// color
+	Texmap *pColMap = nullptr;		// texturemap
+	float roughness = 0.0f; 		// float
+	Texmap *pRoughnessMap = nullptr; // texturemap
 };
 
 //==========================================================
 //==========================================================
 struct ClearCoatStruct {
-	float factor; 			//: float
-	Texmap *pMap; 			//: texturemap
-	float roughness; 		//: float
-	Texmap *pRoughnessMap; 	//: texturemap
-	float normalValue;  	//: float
-	Texmap *pNormalMap; 	//: texturemap
+	float factor = 0.0f; 			//: float
+	Texmap *pMap = nullptr; 			//: texturemap
+	float roughness = 0.0f; 		//: float
+	Texmap *pRoughnessMap = nullptr; 	//: texturemap
+	float normalValue = 0.0f;  	//: float
+	Texmap *pNormalMap = nullptr; 	//: texturemap
 };
 
 //==========================================================
 //==========================================================
 struct UnlitStruct{
-	BOOL unlit;
+	BOOL unlit = FALSE;
 };
 
 //==========================================================
 //==========================================================
 struct IORStruct {
-	float ior;
+	float ior = 0.0f;
 };
 
 //==========================================================
 //==========================================================
 struct IridescenceStruct {
-	float factor;
-	float ior;
-	float minimum;
-	float maximum;
-	Texmap* texture;
-	Texmap* thicknessTexture;
+	float factor = 0.0f;
+	float ior = 0.0f;
+	float minimum = 0.0f;
+	float maximum = 0.0f;
+	Texmap* texture = nullptr;
+	Texmap* thicknessTexture = nullptr;
 };
 
 //==========================================================
 //==========================================================
 struct EmissiveStrengthStruct {
-	float strength;
+	float strength = 0.0f;
 };
 
 //==========================================================
 //==========================================================
 struct AnisotropyStruct {
-	float strength;
-	float rotation;
-	Texmap* texture; 			//: texturemap
+	float strength = 0.0f;
+	float rotation = 0.0f;
+	Texmap* texture = nullptr;	//: texturemap
 };
 
 //==========================================================
 //==========================================================
 struct DispersionStruct {
-	float dispersion;
+	float dispersion = 0.0f;
 };
 
 //==========================================================
 //==========================================================
 struct DiffuseTransmissionStruct {
-	Texmap* TransmissionColorTexture;
-	Texmap* TransmissionTexture;
-	float TransmissionFactor;
-	Color TransmissionColor;
+	Texmap* TransmissionColorTexture = nullptr;
+	Texmap* TransmissionTexture = nullptr;
+	float TransmissionFactor = 0.0f;
+	Color TransmissionColor = Color(0.0f, 0.0f, 0.0f);
 };
 
 //==========================================================
 //==========================================================
 struct PhysicsMaterials {
-	float staticFriction;
-	float dynamicFriction;
-	float restitution;
+	float staticFriction = 0.0f;
+	float dynamicFriction = 0.0f;
+	float restitution = 0.0f;
 	std::string restitutionCombine;
 };
 
 //==========================================================
 //==========================================================
 struct CollisionShapesStruct {
-	int type;
-	INode* node;
-	float param1;
-	float param2;
-	float param3;
-	float param4;
-	float param5;
+	int type = 0;
+	INode* node = nullptr;
+	float param1 = 0.0f;
+	float param2 = 0.0f;
+	float param3 = 0.0f;
+	float param4 = 0.0f;
+	float param5 = 0.0f;
 };
 
 //==========================================================
 //==========================================================
 struct WebpTextureStruct {
 	tstring originalPathStr;
-	float QualityFactor;
-	BOOL LossLess;
+	float QualityFactor = 0.0f;
+	BOOL LossLess = FALSE;
 };
 
 //==========================================================
 //==========================================================
 struct KTX2TextureStruct {
 	tstring originalPathStr;
-	int compression;    // 1-5 (Default:4
-	int quality;		// 1-255 Defailt:128
-	BOOL mipmap;
+	int compression = 0;    // 1-5 (Default:4
+	int quality = 0;		// 1-255 Defailt:128
+	BOOL mipmap = FALSE;
 
-	BOOL isSRGB;    // TRUE: VK_FORMAT_R8G8B8A8_SRGB / FALSE: _UNORM
-	BOOL useUASTC;  // TRUE: 高画質(UASTC/166) / FALSE: 高圧縮(ETC1S/163)
+	BOOL isSRGB = FALSE;    // TRUE: VK_FORMAT_R8G8B8A8_SRGB / FALSE: _UNORM
+	BOOL useUASTC = FALSE;  // TRUE: Hi reso(UASTC/166) / FALSE: Hi comp(ETC1S/163)
 };
 
 //==========================================================
 //==========================================================
 struct SelectabilityStruct {
-	BOOL selectable;
+	BOOL selectable = FALSE;
 };
 
 //==========================================================
 //==========================================================
 struct HoverabilityStruct {
-	BOOL hoverable;
+	BOOL hoverable = FALSE;
 };
 
 //==========================================================
 //==========================================================
 struct MaterialBumpStruct {
-	Texmap* bumpTexture;
-	float bumpFactor;
+	Texmap* bumpTexture = nullptr;
+	float bumpFactor = 0.0f;
 };
 
 //==========================================================
 //==========================================================
 struct vrayExtStruct {
-	float roughness;
+	float roughness = 0.0f;
 };
 
 //==========================================================
 //==========================================================
 struct InteractivityStruct {
-	DWORD id;//GetTickCount
+	DWORD id = 0;//GetTickCount
 };
 
 
@@ -364,27 +359,28 @@ struct InteractivityStruct {
 // 頂点属性情報
 //==========================================================
 struct VertexProp {
-	int faceID;
-	int corner;
-	int originalIdx;
-	int nrmID;
+	int faceID = 0;
+	int corner = 0;
+	int originalIdx = 0;
+	int nrmID = 0;
 	Point3 normal;
-	int uv1;
-	int uv2;
-	int vc;
+	int uv1 = 0;
+	int uv2 = 0;
+	int vc = 0;
 };
 
 //==========================================================
 // 頂点属性フラグ
 //==========================================================
 struct vertPropFlag {
-	BOOL VColorUsed;
-	BOOL mapCh1Used;
-	BOOL mapCh2Used;
-	IGameMesh* pGameMesh;
+	BOOL VColorUsed = FALSE;
+	BOOL mapCh1Used = FALSE;
+	BOOL mapCh2Used = FALSE;
+	IGameMesh* pGameMesh = nullptr;
 };
 
-
+inline const Matrix3 YupTM(Point3(1, 0, 0), Point3(0, 0, -1), Point3(0, 1, 0), Point3(0, 0, 0));
+//static Matrix3 YupTM(Point3(-1, 0, 0), Point3(0, 0, 1), Point3(0, 1, 0), Point3(0, 0, 0));
 
 
 extern HINSTANCE hInstance;
@@ -417,9 +413,6 @@ extern float GetW(const Point3& normal, const Point3& tangent, const Point3& bit
 
 extern void LogOutput(const std::wstring& str, int pcs=0);
 
-
-static Matrix3 YupTM(Point3(1, 0, 0), Point3(0, 0, -1), Point3(0, 1, 0), Point3(0, 0, 0));
-//static Matrix3 YupTM(Point3(-1, 0, 0), Point3(0, 0, 1), Point3(0, 1, 0), Point3(0, 0, 0));
 
 extern void GetMeshInfoXX(Mesh* pMesh);
 extern BOOL GetTangentTM(Mtl* pMtl, Matrix3& mtx);
@@ -499,7 +492,7 @@ public:
 	void SetVec2Animation(std::list<TimeValue>& KeyFrameList, Control* pC1, Control* pC2, std::string &name);
 	void SetColorAnimation(std::list<TimeValue>& KeyFrameList, Control* pC, std::string& name, BOOL alpha=TRUE);
 	inline int GetMeshIdFromNode(INode* pNode) {
-		return m_MeshMap[pNode->GetObjectRef()];
+		return pNode->GetObjectRef()? m_MeshMap[pNode->GetObjectRef()]:NULL;
 	}
 
 	void CreateSkin(INode *pNode, Modifier *pSkinMod);
@@ -676,7 +669,7 @@ public:
 	float m_TimeScale;
 	std::filesystem::path m_fullpath;
 	inline const tstring ExportFolder(void) const { return m_fullpath.parent_path(); }
-	inline int TextureTableCount(void) { return m_TextureTable.size(); }
+	inline size_t TextureTableCount(void) { return m_TextureTable.size(); }
 
 	BOOL IsInstanced(INode* pNode);
 	void ExportGPUInstanceSection(tinygltf::Scene& scene);

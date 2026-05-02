@@ -86,7 +86,8 @@ bool isNumber(const tstring& s)
 
 	try {
 		size_t pos;
-		std::stod(s, &pos);		// float  int  OK
+		[[maybe_unused]] double val = std::stod(s, &pos);		// float  int  OK
+		//(void)val;
 		return pos == s.size(); // Numeric
 	}
 	catch (...) {
@@ -114,7 +115,7 @@ Animatable* GetAnimByUniqueID(DWORD id)
 void ReplacePointerIndex(tstring &str, int index)
 {
 	tstring from = _T("/0/");
-	tstring to = _T("/")+std::to_wstring(index)+ _T("/");
+	tstring to = _T("/") + to_tstring(index)+ _T("/");
 
 	size_t start_pos = str.find(from);
 	if (start_pos != std::string::npos) {
@@ -154,7 +155,7 @@ int SetTypeTable(socketDataType type)
 	}
 	typeTable.push_back(type);
 
-	return typeTable.size()-1;
+	return (int)(typeTable.size()-1);
 }
 
 //======================================================================
@@ -198,7 +199,7 @@ int SetDeclarationTable(const std::string &op)
 
 	// 存在しない場合、新しく追加し、そのインデックスを返す
 	declarationTable.push_back(op);
-	return declarationTable.size() - 1;
+	return (int)(declarationTable.size() - 1);
 }
 
 //======================================================================
@@ -238,10 +239,10 @@ INode *GetParentNode(int nodeIdx, int socketIdx, tstring &socketName)
 		int numOutConnect;
 		pNode->GetUserPropInt(GRAPH_NUMOUT, numOutConnect);
 		for (int OutConnectIdx = 0; OutConnectIdx < numOutConnect; OutConnectIdx++) {
-			tstring str = _T("NumOutSub") + std::to_wstring(OutConnectIdx);
+			tstring str = _T("NumOutSub") + to_tstring(OutConnectIdx);
 			int NumOutSub = 0;
 			pNode->GetUserPropInt(str.c_str(), NumOutSub);
-			tstring SocketStr = _T("OutSocketParam") + std::to_wstring(OutConnectIdx);
+			tstring SocketStr = _T("OutSocketParam") + to_tstring(OutConnectIdx);
 			tstring SocketStr1 = SocketStr + _T("_name");
 			tstring SocketStr2 = SocketStr + _T("_type");
 			tstring SocketStr3 = SocketStr + _T("_value");
@@ -249,7 +250,7 @@ INode *GetParentNode(int nodeIdx, int socketIdx, tstring &socketName)
 			pNode->GetUserPropString(SocketStr1.c_str(), sname);
 			socketName = tstring(sname);
 			for (int subCnt = 0; subCnt < NumOutSub; subCnt++) {
-				tstring str = _T("OutConnect") + std::to_wstring(OutConnectIdx) + _T("_") + std::to_wstring(subCnt);
+				tstring str = _T("OutConnect") + to_tstring(OutConnectIdx) + _T("_") + to_tstring(subCnt);
 				tstring str2 = str + +_T("_") + _T("node");
 				tstring str3 = str + +_T("_") + _T("index");
 				int node2;
@@ -268,7 +269,7 @@ INode *GetParentNode(int nodeIdx, int socketIdx, tstring &socketName)
 //======================================================================
 INode *GetChildNode(INode *pNode, int socketIdx, int subIdx, TSTR &name)
 {
-	tstring str = _T("OutConnect") + std::to_wstring(socketIdx) + _T("_") + std::to_wstring(subIdx);
+	tstring str = _T("OutConnect") + to_tstring(socketIdx) + _T("_") + to_tstring(subIdx);
 	tstring str2 = str +_T("_node");
 	tstring str3 = str +_T("_index");
 
@@ -278,7 +279,7 @@ INode *GetChildNode(INode *pNode, int socketIdx, int subIdx, TSTR &name)
 	pNode->GetUserPropInt(str3.c_str(), index);
 	INode *pChNode = GetIndexedNode(node);
 	if(pChNode){
-		tstring str = _T("InSocketParam") + std::to_wstring(index);
+		tstring str = _T("InSocketParam") + to_tstring(index);
 		tstring str3 = str + _T("_name");
 		pChNode->GetUserPropString(str3.c_str(), name);
 	}
@@ -358,7 +359,7 @@ void glTFExporter_Core::CreateDeclarationExtensionInfo(INode *pNode, const std::
 		int numInConnect = 0;
 		pNode->GetUserPropInt(GRAPH_NUMIN, numInConnect);
 		for (int i = 0; i < numInConnect; i++) {
-			tstring str = _T("InSocketParam") + std::to_wstring(i);
+			tstring str = _T("InSocketParam") + to_tstring(i);
 			tstring str2 = str + _T("_name");
 			tstring str3 = str + _T("_type");
 			TSTR data1;
@@ -374,7 +375,7 @@ void glTFExporter_Core::CreateDeclarationExtensionInfo(INode *pNode, const std::
 		int numOutConnect;
 		pNode->GetUserPropInt(GRAPH_NUMOUT, numOutConnect);
 		for (int OutConnectIdx = 0; OutConnectIdx < numOutConnect; OutConnectIdx++) {
-			tstring str = _T("OutSocketParam") + std::to_wstring(OutConnectIdx);
+			tstring str = _T("OutSocketParam") + to_tstring(OutConnectIdx);
 			tstring str2 = str + _T("_name");
 			tstring str3 = str + _T("_type");
 			TSTR data1;
@@ -396,7 +397,7 @@ void glTFExporter_Core::CreateDeclarationExtensionInfo(INode *pNode, const std::
 //======================================================================
 void glTFExporter_Core::SetNodeTable(INode *pNode, tinygltf::Value::Array& nodes)
 {
-	int s = m_NodeMap.size();
+	size_t s = m_NodeMap.size();
 
 
 	BOOL PointerSegmentIDFound = FALSE;
@@ -426,7 +427,7 @@ void glTFExporter_Core::SetNodeTable(INode *pNode, tinygltf::Value::Array& nodes
 	int numInConnect = 0;
 	pNode->GetUserPropInt(GRAPH_NUMIN, numInConnect);
 	for (int i = 0; i < numInConnect; i++) {
-		tstring str = _T("InSocketParam") + std::to_wstring(i);
+		tstring str = _T("InSocketParam") + to_tstring(i);
 		tstring str2 = str + _T("_name");
 		tstring str3 = str + _T("_type");
 		tstring str4 = str + _T("_value");
@@ -506,7 +507,7 @@ void glTFExporter_Core::SetNodeTable(INode *pNode, tinygltf::Value::Array& nodes
 	pNode->GetUserPropInt(GRAPH_NUMOUT, numOutConnect);
 	tinygltf::Value::Object in_xf;
 	for (int i = 0; i < numOutConnect; i++) {
-		tstring str = _T("OutSocketParam") + std::to_wstring(i);
+		tstring str = _T("OutSocketParam") + to_tstring(i);
 		tstring str2 = str + _T("_name");
 		tstring str3 = str + _T("_type");
 		tstring str4 = str + _T("_value");
@@ -517,7 +518,7 @@ void glTFExporter_Core::SetNodeTable(INode *pNode, tinygltf::Value::Array& nodes
 		pNode->GetUserPropInt(str3.c_str(), type);
 
 		int subNum = 0;
-		tstring str5 = _T("NumOutSub") + std::to_wstring(i);
+		tstring str5 = _T("NumOutSub") + to_tstring(i);
 		pNode->GetUserPropInt(str5.c_str(), subNum);
 		for (int j = 0; j < subNum; j++) {
 			if (type == dataFlow) {
@@ -546,7 +547,7 @@ void glTFExporter_Core::SetNodeTable(INode *pNode, tinygltf::Value::Array& nodes
 	int numConfig = 0;
 	pNode->GetUserPropInt(GRAPH_NUMCONFIG, numConfig);
 	for (int i = 0; i < numConfig; i++) {
-		tstring str = _T("ConfigParam") + std::to_wstring(i);
+		tstring str = _T("ConfigParam") + to_tstring(i);
 		tstring str2 = str + _T("_name");
 		tstring str3 = str + _T("_type");
 		tstring str4 = str + _T("_value");
@@ -626,7 +627,7 @@ void glTFExporter_Core::SetNodeTable(INode *pNode, tinygltf::Value::Array& nodes
 				else if (nm == _T("event")) {
 					int index = findEventIndex(vl, type);
 					tinygltf::Value::Array val;
-					SetValueArray(std::to_wstring(index), (socketDataType)dataInt, val);
+					SetValueArray(to_tstring(index), (socketDataType)dataInt, val);
 					in_0.insert(std::make_pair("value", tinygltf::Value(val)));
 				}
 				else if (nm == _T("nodeIndex")) {
@@ -634,7 +635,7 @@ void glTFExporter_Core::SetNodeTable(INode *pNode, tinygltf::Value::Array& nodes
 					int index = ConvertNodeIndexToInt(vl);
 
 					tinygltf::Value::Array val;
-					SetValueArray(std::to_wstring(index), (socketDataType)type, val);
+					SetValueArray(to_tstring(index), (socketDataType)type, val);
 					in_0.insert(std::make_pair("value", tinygltf::Value(val)));
 				}
 				else {
@@ -646,7 +647,7 @@ void glTFExporter_Core::SetNodeTable(INode *pNode, tinygltf::Value::Array& nodes
 			else if (partA == _T("pointer")) {
 				if (nm == _T("type")) {
 					int x = SetTypeTable((socketDataType)_wtol(vl.data()));
-					vl = std::to_wstring(x).c_str();
+					vl = to_tstring(x).c_str();
 					tinygltf::Value::Array val;
 					SetValueArray(tstring(vl), (socketDataType)type, val);
 					in_0.insert(std::make_pair("value", tinygltf::Value(val)));
@@ -783,7 +784,7 @@ void glTFExporter_Core::SetEventTable(INode *pNode, tinygltf::Value::Array& even
 	int numValue;
 	pNode->GetUserPropInt(_T("HSValueCount"), numValue);
 	for (int i = 0; i < numValue; i++) {
-		tstring str = _T("HSEventValue") + std::to_wstring(i);
+		tstring str = _T("HSEventValue") + to_tstring(i);
 		tstring str2 = str + _T("_name");
 		tstring str3 = str + _T("_type");
 		tstring str4 = str + _T("_value");
@@ -957,7 +958,7 @@ int glTFExporter_Core::ConvertNodeIndexToInt(TSTR& val)
 		else if (pAnim->SuperClassID() == MATERIAL_CLASS_ID)
 			index = findMaterialIndex((Mtl*)pAnim);
 
-		val = std::to_wstring(index).c_str();
+		val = to_tstring(index).c_str();
 	}
 
 	return index;

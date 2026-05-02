@@ -20,7 +20,7 @@
 
 
 //#include "maxscript/maxscript.h"
-#include "simpobj.h"	// GenSphere に必要
+#include "simpobj.h"	// Required for GenSphere
 
 #define CGLTF_IMPLEMENTATION
 
@@ -1065,7 +1065,7 @@ BOOL glTFImporter_Core::ImportScene(void)
 	}
 #endif
 
-	// ビューレンダラがMetallnesに対応できるようにダミーで1つPBRマテリアルを作る
+	// Create a dummy PBR material so the viewport renderer can support metalness
 	Mtl* pDummyMtl = (Mtl*)GetCOREInterface()->CreateInstance(MATERIAL_CLASS_ID, PBRMetalMtlID);
 
 	SetMtlImportStatus(0);
@@ -1111,7 +1111,7 @@ BOOL glTFImporter_Core::ImportScene(void)
 			cgltf_scene* pScene = &m_glTF_data->scenes[i];
 			tstring sceneName;
 			if (!pScene->name)
-				sceneName = _T("scene") + std::to_wstring(i);
+				sceneName = _T("scene") + to_tstring(i);
 			else
 				sceneName = StringToWString(pScene->name);
 
@@ -1132,7 +1132,7 @@ BOOL glTFImporter_Core::ImportScene(void)
 		}
 		pLayerMan->SetCurrentLayer(defaultSceneName.c_str());
 	} else{
-		if (m_SceneChannel >= m_glTF_data->scenes_count)m_SceneChannel = m_glTF_data->scenes_count - 1;
+		if (m_SceneChannel >= m_glTF_data->scenes_count) m_SceneChannel = static_cast<int>(m_glTF_data->scenes_count - 1);
 		cgltf_scene* pScene = m_SceneMode==0 ? m_glTF_data->scene : &m_glTF_data->scenes[m_SceneChannel];
 		if (!pScene) pScene = m_glTF_data->scenes;
 		if (!pScene) return FALSE;
@@ -1277,7 +1277,7 @@ BOOL glTFImporter_Core::ImportScene(void)
 		AnimateOn();
 
 		if (m_AnimChannel == 0) {
-			int cnt = m_glTF_data->animations_count;
+			size_t cnt = m_glTF_data->animations_count;
 			for (int anim = 0; anim < cnt; anim++) {
 				INode *pRootNode = GetCOREInterface()->GetRootNode();
 				for (int i = 0; i < pRootNode->NumChildren(); i++) {
@@ -1444,7 +1444,7 @@ BOOL glTFImporter_Core::GetDataList(std::vector<float>& retVal, cgltf_accessor* 
 	cgltf_type type = acc->type;
 	cgltf_component_type componentType = acc->component_type;
 
-	UINT IdxCount = sparse->count;
+	size_t IdxCount = sparse->count;
 	cgltf_component_type IdxComponentType = sparse->indices_component_type;
 	cgltf_buffer_view *IdxBufferView = sparse->indices_buffer_view;
 	cgltf_buffer *IdxBuffer = IdxBufferView->buffer;
@@ -1727,10 +1727,10 @@ std::string WStringToString(std::wstring oWString, int code)
 	int iBufferSize = WideCharToMultiByte(code, 0, oWString.c_str(), -1, (char *)NULL, 0, NULL, NULL);
 	CHAR* cpMultiByte = new CHAR[iBufferSize];
 
-	// wstring → UTF8
+	// wstring -> UTF8
 	WideCharToMultiByte(code, 0, oWString.c_str(), -1, cpMultiByte, iBufferSize, NULL, NULL);
 
-	// stringの生成
+	// Construct the string
 	std::string oRet(cpMultiByte, cpMultiByte + iBufferSize - 1);
 
 	delete[] cpMultiByte;
@@ -1743,20 +1743,20 @@ std::string WStringToString(std::wstring oWString, int code)
 //======================================================================
 std::string UTF8toSjis(std::string srcUTF8)
 {
-	//Unicodeへ変換後の文字列長を得る
-	int lenghtUnicode = MultiByteToWideChar(CP_UTF8, 0, srcUTF8.c_str(), srcUTF8.size() + 1, NULL, 0);
+	// get string for Unicode conversion length
+	size_t lenghtUnicode = MultiByteToWideChar(CP_UTF8, 0, srcUTF8.c_str(), (int)(srcUTF8.size() + 1), NULL, 0);
 
-	//必要な分だけUnicode文字列のバッファを確保
+	// Keep buffer for Unicode string
 	wchar_t* bufUnicode = new wchar_t[lenghtUnicode];
 
-	//UTF8からUnicodeへ変換
-	MultiByteToWideChar(CP_UTF8, 0, srcUTF8.c_str(), srcUTF8.size() + 1, bufUnicode, lenghtUnicode);
+	//UTF8 -> Unicode
+	MultiByteToWideChar(CP_UTF8, 0, srcUTF8.c_str(), (int)(srcUTF8.size() + 1), bufUnicode, (int)lenghtUnicode);
 
 	int lengthSJis = WideCharToMultiByte(CP_ACP, 0, bufUnicode, -1, NULL, 0, NULL, NULL);
 
 	char* bufShiftJis = new char[lengthSJis];
 
-	WideCharToMultiByte(CP_ACP, 0, bufUnicode, lenghtUnicode + 1, bufShiftJis, lengthSJis, NULL, NULL);
+	WideCharToMultiByte(CP_ACP, 0, bufUnicode, (int)(lenghtUnicode + 1), bufShiftJis, lengthSJis, NULL, NULL);
 
 	std::string strSJis(bufShiftJis);
 
@@ -1907,7 +1907,7 @@ BOOL GetFileName(HWND hWnd, tstring &ret, FileType type)
 	OpenInfo.lpfnHook = NULL;
 	OpenInfo.lpTemplateName = NULL;
 
-	/* キャンセルされた場合は何もしないで抜ける */
+	//  If cancelled, do nothing and exit
 	if (GetOpenFileName(&OpenInfo) == 0) return FALSE;
 
 	ret = FileFullPath;
@@ -1922,7 +1922,7 @@ TCHAR HexToChar(TCHAR first, TCHAR second)
 {
 	TCHAR ret;
 
-	//16進数文字を16進数数字に変換
+	// Convert hex character to numeric value
 	if (first >= 'A') {
 		ret = first - 'A' + 10;
 	}
@@ -1930,10 +1930,10 @@ TCHAR HexToChar(TCHAR first, TCHAR second)
 		ret = first - '0';
 	}
 
-	//先の文字を上位ビットにシフト
+	// Shift the earlier character into the high bits
 	ret = ret << 4;
 
-	//後の文字を変換して追加
+	// Convert the later character and add it
 	if (second >= 'A') {
 		ret += second - 'A' + 10;
 	}
@@ -1953,9 +1953,9 @@ tstring urlDecode(tstring str)
 	tstring::size_type length = str.size();
 	TCHAR tmpChar[2];
 
-	//文字数分繰り返す
+	// Repeat for each character
 	for (tstring::size_type i = 0; i < length; i++) {
-		//+をスペースに変換
+		// Convert '+' to space
 		if (str[i] == '+') {
 			retStr += ' ';
 			//%付き文字の場合変換
@@ -1963,19 +1963,19 @@ tstring urlDecode(tstring str)
 		else if (str[i] == '%' && (i + 2) < length) {
 			tmpChar[0] = str[i + 1];
 			tmpChar[1] = str[i + 2];
-			//16進数文字かチェック
+			// Check if characters are hexadecimal
 			if (isxdigit(tmpChar[0]) && isxdigit(tmpChar[1])) {
 				i += 2;
 
-				//変換関数を呼び出して、結果を繋げる
+				// Call conversion function and append the result
 				retStr += HexToChar(tmpChar[0], tmpChar[1]);
 
-				//16進数文字ではない場合、%を繋げる
+				// If not hex digits, append '%'
 			}
 			else {
 				retStr += '%';
 			}
-			//当てはまらない時は、そのままの文字を繋げる
+			// Otherwise append the character as-is
 		}
 		else {
 			retStr += str[i];

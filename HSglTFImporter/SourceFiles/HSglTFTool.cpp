@@ -559,7 +559,7 @@ int CALLBACK CompareFunc(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSort) {
 //=============================================================================
 static LRESULT CALLBACK NodeIndexDlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-	int typeIdx;
+	//int typeIdx;
 	tstring valStr;
 
 	switch (msg) {
@@ -724,7 +724,7 @@ void NodeIndexDlgInit(HWND hWnd)
 
 		item.iSubItem = 1;
 		item.mask = LVIF_TEXT;
-		tstring str = p.second.index>0? std::to_wstring(p.second.index):_T("");
+		tstring str = p.second.index>0 ? to_tstring(p.second.index):_T("");
 		item.pszText = (LPWSTR)str.c_str();
 		ListView_SetItem(hListView, &item);
 
@@ -827,7 +827,7 @@ void FindDupIndex(HWND hWnd)
 
 			item.iSubItem = 1;
 			item.mask = LVIF_TEXT;
-			tstring str = std::to_wstring(p1.first);
+			tstring str = to_tstring(p1.first);
 			item.pszText = (LPWSTR)str.c_str();
 			ListView_SetItem(hListView, &item);
 		}

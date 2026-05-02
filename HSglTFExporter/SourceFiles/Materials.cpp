@@ -254,7 +254,7 @@ UINT glTFExporter_Core::CreateImage(const TCHAR *uri)
 	image.uri = WStringToString(buf);
 	m_model.images.push_back(image);
 
-	return m_imagePathTable.size()-1;
+	return (int)(m_imagePathTable.size() - 1);
 }
 
 //======================================================================
@@ -362,7 +362,7 @@ int glTFExporter_Core::findTextureIndex(Texmap* pTex, const TSTR& fname, BOOL KT
 			}
 			m_TextureTable.push_back(pTex);
 			m_model.textures.push_back(texture);
-			return m_model.textures.size() - 1;
+			return (int)(m_model.textures.size() - 1);
 		}
 	}
 	return -1;
@@ -415,7 +415,7 @@ int glTFExporter_Core::SetSampler(Texmap* pTex)
 	}
 
 	m_model.samplers.push_back(sampler);
-	return m_model.samplers.size() - 1;
+	return (int)(m_model.samplers.size() - 1);
 }
 
 #if 0

@@ -77,7 +77,7 @@ void glTFExporter_Core::CreateSkin(INode *pNode, Modifier *pSkinMod)
 	bfView.byteOffset = m_BufferByteOffset;
 	bfView.byteLength = acc.count * sizeof(float) * 4*4;
 
-	void *ptr = SecureMemory(bfView.byteLength);
+	void *ptr = SecureMemory((int)bfView.byteLength);
 	float *pmtx = (float*)((char*)ptr + bfView.byteOffset);
 	for (int i = 0; i < BoneNum;i++) {
 		Matrix3 tm = pISkin->GetBoneTm(i);
@@ -90,14 +90,14 @@ void glTFExporter_Core::CreateSkin(INode *pNode, Modifier *pSkinMod)
 		for(int j=0;j<16; j++)	*pmtx++ = (float)m[j];
 	}
 	m_model.bufferViews.push_back(bfView);
-	acc.bufferView = m_model.bufferViews.size() - 1;
+	acc.bufferView = (int)(m_model.bufferViews.size() - 1);
 	m_model.accessors.push_back(acc);
-	skin.inverseBindMatrices = m_model.accessors.size() - 1;
+	skin.inverseBindMatrices = (int)(m_model.accessors.size() - 1);
 
 	m_model.skins.push_back(skin);
 
 	UINT idx = m_NodeMap[pNode];
-	m_model.nodes[idx].skin = m_model.skins.size() - 1;
+	m_model.nodes[idx].skin = (int)(m_model.skins.size() - 1);
 }
 
 

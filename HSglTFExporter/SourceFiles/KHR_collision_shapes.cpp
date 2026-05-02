@@ -72,20 +72,20 @@ void glTFExporter_Core::CreateCollisionShape(INode *pNode, tinygltf::Node &node)
 	if (cs.type == 1) {			//Sphere
 		cs.param1 = pBlock0->GetFloat(31) / scl.x;
 		m_CollisionShapeTable.push_back(cs);
-		shapeIdx = m_CollisionShapeTable.size() - 1;
+		shapeIdx = (int)(m_CollisionShapeTable.size() - 1);
 	}
 	else if (cs.type == 2) {	//Box
 		cs.param1 = pBlock0->GetFloat(32) / scl.x;
 		cs.param2 = pBlock0->GetFloat(33) / scl.y;
 		cs.param3 = pBlock0->GetFloat(34) / scl.z;
 		m_CollisionShapeTable.push_back(cs);
-		shapeIdx = m_CollisionShapeTable.size() - 1;
+		shapeIdx = (int)(m_CollisionShapeTable.size() - 1);
 	}
 	else if (cs.type == 3) {	//Capsel
 		cs.param1 = pBlock0->GetFloat(31)/scl.x;
 		cs.param2 = pBlock0->GetFloat(34) / scl.x;
 		m_CollisionShapeTable.push_back(cs);
-		shapeIdx = m_CollisionShapeTable.size() - 1;
+		shapeIdx = (int)(m_CollisionShapeTable.size() - 1);
 	}
 	else if (cs.type == 4) {	//Convex
 	}
@@ -123,7 +123,7 @@ void glTFExporter_Core::CreateCollisionShape(INode *pNode, tinygltf::Node &node)
 		pm.restitution = rt;
 		pm.restitutionCombine = rc;
 		m_PhysicMtlTable.push_back(pm);
-		idx = m_PhysicMtlTable.size() - 1;
+		idx = (int)(m_PhysicMtlTable.size() - 1);
 	}
 
 	tinygltf::Value::Object obj;
@@ -180,7 +180,7 @@ void glTFExporter_Core::CreateCollisionShape(INode *pNode, tinygltf::Node &node)
 
 		if (shapeIdx < 0) {
 			v.insert(std::make_pair("convexHull", tinygltf::Value(false)));
-			UINT idx = m_model.nodes.size()+1;
+			size_t idx = m_model.nodes.size()+1;
 			v.insert(std::make_pair("node", tinygltf::Value((int)idx)));
 			o.insert(std::make_pair("geometry", tinygltf::Value(v)));
 		} else {
