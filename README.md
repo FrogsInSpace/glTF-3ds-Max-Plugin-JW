@@ -77,8 +77,8 @@ To enable this feature (3ds Max 2024 and later): Copy the tone map file located 
 
 * 3ds Max® is a registered trademark of Autodesk, Inc.
 * glTF™ is a registered trademark of Khronos Group Inc.
-* V-Ray® and Chaos Corona are registered trademarks of Chaos Software Ltd.
-* Pencil+® is registered trademarks of P SOFTHOUSE Co., Ltd.
+* V-Ray® and Chaos Corona® are registered trademarks of Chaos Software EOOD.
+* Pencil+® is a registered trademark of P SOFTHOUSE CO., LTD.
 
 ### 3rd Party Libraries
 
