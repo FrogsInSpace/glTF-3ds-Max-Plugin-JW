@@ -5,7 +5,7 @@ This project adds glTF™ (2.0) file access capabilities to Autodesk 3ds Max®, 
 ## Table of Contents
 
 1. [Introduction](#introduction)
-1. [User Documentation]()
+1. [User Documentation](#user-documentation)
 1. [Build Requirements](#build-requirements)
 1. [Installation](#installation)
 1. [Trademarks](#trademarks)
@@ -18,12 +18,10 @@ This project consists of two main plug-in build projects:
 
 ## User Documentation
 
-Documentation for end users is divided into sections:
-
-- **[Documentation Introduction](./User_Documentation/README.md)**
-- **[glTF Importer](./User_Documentation/ImporterDocumentation)** options for importing and formatting the scene for use in 3ds Max.
-- **[glTF Editing](./User_Documentation/EditingDocumentation)** tools within 3ds Max for editing and preparing glTF content.
-- **[glTF Exporter](./User_Documentation/ExporterDocumentation)** options for exporting the scene out from 3ds Max into glTF format. 
+**[End-User Documentation](./User_Documentation/README.md)** is divided into sections:
+- **glTF Importer** options for importing and formatting the scene for use in 3ds Max.
+- **glTF Editing** tools within 3ds Max for editing and preparing glTF content.
+- **glTF Exporter** options for exporting the scene out from 3ds Max into glTF format. 
 
 ## Build Requirements
 
