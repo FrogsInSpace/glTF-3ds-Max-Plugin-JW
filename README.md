@@ -1,125 +1,108 @@
-# glTF? Importer/Exporter for Autodesk 3ds MaxR
+# glTF 2.0 Importer/Exporter for Autodesk 3ds Max
 
-This project adds glTF? (2.0) file access capabilities to Autodesk 3ds MaxR, providing a seamless workflow for importing and exporting 3D content in the glTF format.
-
----
+This project adds glTF™ (2.0) file access capabilities to Autodesk 3ds Max®, providing seamless round-trip workflow for importing, editing, and exporting 3D content in glTF format.
 
 ## Table of Contents
-1. [Introduction](#introduction)
-2. [Features](#features)
-3. [Getting Started](#getting-started)
-4. [Building the Project](#building-the-project)
-5. [Installation](#installation)
-6. [Usage](#usage)
-7. [Advanced](#advanced)
-8. [W.I.P.](#wip)
 
----
+1. [Introduction](#introduction)
+1. [User Documentation]()
+1. [Build Requirements](#build-requirements)
+1. [Installation](#installation)
+1. [Trademarks](#trademarks)
 
 ## Introduction
+
 This project consists of two main plug-in build projects:
 * **HSglTFImporter**: A plug-in to import glTF files into 3ds Max scenes.
 * **HSglTFExporter**: A plug-in to export 3ds Max scene data to glTF files.
 
----
+## User Documentation
 
-## Features
+Documentation for end users is divided into sections:
 
-### Import
-* **Object Types**: Geometry (Mesh), Shape, Camera, Lights
-* **Format Types**: `*.gltf` + `*.bin`, `*.gltf` (embedded), `*.glb` (binary)
-* **Compression**: Draco compression supported
-* **Materials**: 
-    * 3ds Max Standard Materials (Scanline, PBR, Physical, glTF, Arnold)
-    * V-RayR and Chaos Corona materials
-* **Animation**: Object TRS, Morph weight, `KHR_animation_pointer`
-* **Vertex Deformation**: Skin, Morph
-* **Custom Attributes**: Scene, Node, and Material data (stored in `extras`)
+- **[Documentation Introduction](./User_Documentation/README.md)**
+- **[glTF Importer](./User_Documentation/ImporterDocumentation)** options for importing and formatting the scene for use in 3ds Max.
+- **[glTF Editing](./User_Documentation/EditingDocumentation)** tools within 3ds Max for editing and preparing glTF content.
+- **[glTF Exporter](./User_Documentation/ExporterDocumentation)** options for exporting the scene out from 3ds Max into glTF format. 
 
-### Export
-* **Object Types**: Geometry, Shape, Camera, Light
-* **Format Types**: `*.gltf` + `*.bin`, `*.gltf` (embedded), `*.glb` (binary)
-* **Compression**: Draco compression supported
-* **Supported Materials**:
-    * 3ds Max Standard Materials (Scanline, PBR, Physical, glTF, Arnold)
-    * V-RayR and Chaos Corona materials
-* **Animation**: Object TRS, Morph weight, `KHR_animation_pointer`
-* **Vertex Deformation**: Skin, Morph
-* **Custom Attributes**: Exports Scene, Node, and Material custom attributes (stored in `extras`)
-
----
-
-## Getting Started
+## Build Requirements
 
 To build or use this project, the following environment is required:
 
 ### Build Environment (Compiler)
+
 * **Microsoft Visual Studio 2017**: For 3ds Max 2020, 2021, and 2022
 * **Microsoft Visual Studio 2019**: For 3ds Max 2023, 2024, and 2025
 * **Microsoft Visual Studio 2022**: For 3ds Max 2026
 
 ### Required SDK
-* **Autodesk 3ds Max SDK**: Provided by Autodesk.
-Environment VariablesYou must set an environment variable pointing to the installation path of the SDK.
-Use the variable name corresponding to your specific 3ds Max version:
 
-3ds Max Version    Environment Variable Name
+* **Autodesk 3ds Max SDK**: Provided by Autodesk. 
 
-  2020 -------------- ADSK_3DSMAX_SDK_2020  
-  2021 -------------- ADSK_3DSMAX_SDK_2021  
-  2022 -------------- ADSK_3DSMAX_SDK_2022  
-  2023 -------------- ADSK_3DSMAX_SDK_2023  
-  2024 -------------- ADSK_3DSMAX_SDK_2024  
-  2025 -------------- ADSK_3DSMAX_SDK_2025  
-  2026 -------------- ADSK_3DSMAX_SDK_2026  
+### Environment Variables 
 
-### 3rd Party Libraries
-This project incorporates the following open-source libraries:
-* [KTX-Software](https://github.com/KhronosGroup/KTX-Software) (Apache 2.0)
-* [Draco](https://github.com/google/draco) (Apache 2.0)
-* [libwebp](https://chromium.googlesource.com/webm/libwebp) (BSD 3-Clause)
-* [JsonCpp](https://github.com/open-source-parsers/jsoncpp) (MIT)
-* [TinyGLTF](https://github.com/syoyo/tinygltf) (MIT)
-* [cgltf](https://github.com/jkuhlmann/cgltf) (MIT)
+You must set an environment variable pointing to the installation path of the SDK. Use the variable name corresponding to your specific 3ds Max version:
 
-*Note: TinyGLTF and cgltf may require modifications for specific glTF extension support.*
+| 3ds Max Version | Environment Variable Name |
+| --- | --- |
+| 2020 | ADSK_3DSMAX_SDK_2020 |
+| 2021 | ADSK_3DSMAX_SDK_2021 |
+| 2022 | ADSK_3DSMAX_SDK_2022 |
+| 2023 | ADSK_3DSMAX_SDK_2023 |
+| 2024 | ADSK_3DSMAX_SDK_2024 |
+| 2025 | ADSK_3DSMAX_SDK_2025 |
+| 2026 | ADSK_3DSMAX_SDK_2026 |
 
----
+### Building the Project
 
-## Building the Project
 The solution includes two primary build configurations:
 * **Release**: Production-ready build.
 * **Hybrid**: Optimized build with debug symbols (for development).
 
----
-
 ## Installation
+
 Once built, the following plug-in files are generated:
 1. `HSglTFImporter.dli`
 2. `HSglTFExporter.dlo`
 
 Copy these files into the `Plugins` folder of your 3ds Max installation directory.
 
-Khronos PBR Neutral Tone Mapping
-This importer includes a feature to switch the color map to Khronos PBR Neutral Tone when loading glTF files.
-To enable this feature (3ds Max 2024 and later):
-Copy the tone map file located in the Packages folder into your 3dsMax installation directory.
+### Khronos PBR Neutral Tone Mapping
 
----
+This importer includes a feature to switch the Color Management to use Khronos PBR Neutral Tone when loading glTF files.
 
-## Usage
-*(Detailed documentation on settings and workflows will be added soon.)*
+To enable this feature (3ds Max 2024 and later): Copy the tone map file located in the Packages folder into your 3ds Max installation directory.
 
-## Advanced
-*(Scripting and advanced configuration details to be added.)*
+## Trademarks
 
-## W.I.P.
-* Enhancing support for `KHR_physics_rigid_bodies` and `KHR_collision_shapes`.
-* khr_interactivity
+* 3ds Max® is a registered trademark of Autodesk, Inc.
+* glTF™ is a registered trademark of Khronos Group Inc.
+* V-Ray® and Chaos Corona are registered trademarks of Chaos Software Ltd.
+* Pencil+® is registered trademarks of P SOFTHOUSE Co., Ltd.
 
----
+### 3rd Party Libraries
 
-### Trademarks
-* 3ds Max is a registered trademark of Autodesk, Inc.
-* glTF is a registered trademark of Khronos Group Inc.
-* V-Ray and Chaos Corona are registered trademarks of Chaos Software Ltd.
+This project incorporates the following open-source libraries. We acknowledge and appreciate the contributions of these projects:
+
+* [KTX-Software](https://github.com/KhronosGroup/KTX-Software): Licensed under the Apache License 2.0. Copyright © 2013-2020 Mark Callow, The Khronos Group Inc.
+* [Draco](https://github.com/google/draco): Licensed under the Apache License 2.0. Copyright © 2016 Google Inc.
+* [libwebp](https://chromium.googlesource.com/webm/libwebp) / libsharpyuv: Licensed under the BSD 3-Clause License. Copyright (c) 2010, Google Inc. All rights reserved.
+* [JsonCpp](https://github.com/open-source-parsers/jsoncpp): Licensed under the MIT License or Public Domain. Copyright © 2007-2010 Baptiste Lepilleur and The JsonCpp Authors.
+* [TinyGLTF](https://github.com/syoyo/tinygltf): Licensed under the MIT License. Copyright © 2015-Present Syoyo Fujita. 
+* [cgltf](https://github.com/jkuhlmann/cgltf): Licensed under the MIT License. Copyright © 2018 Johannes Kuhlmann.
+
+*Note: TinyGLTF and cgltf may require modifications for specific glTF extension support.*
+
+For more information regarding these licenses, please refer to the documentation provided within the source repository.
+
+=========================================
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS
+IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
+TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
+TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
