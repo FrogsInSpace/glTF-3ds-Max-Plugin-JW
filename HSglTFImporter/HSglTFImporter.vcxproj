@@ -53,7 +53,6 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup>
-    <!-- <TargetName>HSglTFImporter</TargetName> -->
     <TargetName>$(ProjectName)_$(MaxSDKRelease)</TargetName>
     <TargetExt>.dli</TargetExt>
   </PropertyGroup>
@@ -99,7 +98,7 @@
       <AdditionalLibraryDirectories>$(MaxSDKPath)\lib\x64\Release;$(MaxSDKPath)\samples\modifiers\morpher\Lib\x64\Release;..\3rd_Party_Products</AdditionalLibraryDirectories>
       <ModuleDefinitionFile>.\SourceFiles\HSglTFImporter.def</ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <ProgramDatabaseFile>$(IntDir)HSglTFImporter.pdb</ProgramDatabaseFile>
+      <ProgramDatabaseFile>$(OutDir)$(TargetName).pdb</ProgramDatabaseFile>
       <SubSystem>Windows</SubSystem>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <DataExecutionPrevention>
@@ -203,7 +202,7 @@
     <ClInclude Include="Resource\resource.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="HSglTFImporter.def" />
+    <None Include="SourceFiles\HSglTFImporter.def" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource\HSglTFImporter.rc" />

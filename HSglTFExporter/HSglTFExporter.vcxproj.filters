@@ -111,10 +111,10 @@
     <ClInclude Include="Include\HSglTFExporter.h">
       <Filter>Header</Filter>
     </ClInclude>
+    <ClInclude Include="Resource\resource.h" />
     <ClInclude Include="Resource\resource.h">
       <Filter>Header</Filter>
     </ClInclude>
-    <ClInclude Include="Resource\resource.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Source Files">
@@ -134,5 +134,10 @@
     <ResourceCompile Include="Resource\HSglTFExporter.rc">
       <Filter>Resource</Filter>
     </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="SourceFiles\HSglTFExporter.def">
+      <Filter>Source Files</Filter>
+    </None>
   </ItemGroup>
 </Project>
