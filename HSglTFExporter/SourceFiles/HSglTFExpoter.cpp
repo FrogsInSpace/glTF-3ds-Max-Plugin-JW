@@ -67,6 +67,7 @@ static BOOL HH_ApplyScaling;
 static BOOL HH_ReferenceFileMode;
 static BOOL HH_Interactivity;
 static int HH_InteractiveGraphID;
+static BOOL HH_CubicSplineT;
 
 static BOOL Open_InstanceWithMtl;
 
@@ -426,6 +427,7 @@ INT_PTR CALLBACK HSglTFExporterOptionsDlgProc(HWND hWnd, UINT message, WPARAM wP
 		CheckDlgButton(hWnd, IDC_FTYPE_RADIO3, (HH_ExportFileType == 3));
 		CheckDlgButton(hWnd, IDC_ANIM_CHK, HH_ExportAnimation);
 		CheckDlgButton(hWnd, IDC_FULLFRAME_CHK, HH_FullFrame);
+		CheckDlgButton(hWnd, IDC_CUBICSPLINE_CHK, HH_CubicSplineT);
 		CheckDlgButton(hWnd, IDC_ANIMPTR_CHK, HH_AnimPointer);
 		CheckDlgButton(hWnd, IDC_WCLRMTL_CHK, HH_WireClrToMtl);
 		CheckDlgButton(hWnd, IDC_EXPORTUPROP_CHK, HH_ExportUserProp);
@@ -552,6 +554,7 @@ INT_PTR CALLBACK HSglTFExporterOptionsDlgProc(HWND hWnd, UINT message, WPARAM wP
 			}
 			HH_ExportAnimation = IsDlgButtonChecked(hWnd, IDC_ANIM_CHK);
 			HH_FullFrame = IsDlgButtonChecked(hWnd, IDC_FULLFRAME_CHK);
+			HH_CubicSplineT = IsDlgButtonChecked(hWnd, IDC_CUBICSPLINE_CHK);
 			HH_ExportTangent = IsDlgButtonChecked(hWnd, IDC_EXPORTTAN_CHK);
 			HH_ExportMorphNrm = IsDlgButtonChecked(hWnd, IDC_MORPHNRM_CHK);
 			HH_AnimPointer = IsDlgButtonChecked(hWnd, IDC_ANIMPTR_CHK);
@@ -903,6 +906,7 @@ BOOL glTFExporter_Core::ExportPreProcess(const TCHAR* filename, BOOL suppressPro
 	HH_ApplyScaling = MaxSDK::Util::GetPrivateProfileInt(_T("ExpSettings"), _T("ApplyScaling"), 0, profle);
 	HH_ReferenceFileMode = MaxSDK::Util::GetPrivateProfileInt(_T("ExpSettings"), _T("ReferenceFileMode"), 0, profle);
 	HH_Interactivity = MaxSDK::Util::GetPrivateProfileInt(_T("ExpSettings"), _T("Interactivity"), 0, profle);
+	HH_CubicSplineT	= MaxSDK::Util::GetPrivateProfileInt(_T("ExpSettings"), _T("CubicSplineT"), 0, profle);
 
 	HH_PostProcess = FALSE;
 
@@ -973,8 +977,9 @@ BOOL glTFExporter_Core::ExportPreProcess(const TCHAR* filename, BOOL suppressPro
 		MaxSDK::Util::WritePrivateProfileString(_T("ExpSettings"), _T("Collision"), buf, profle);
 		_stprintf_s(buf, MAX_PATH, _T("%d"), HH_Interactivity);
 		MaxSDK::Util::WritePrivateProfileString(_T("ExpSettings"), _T("Interactivity"), buf, profle);
+		_stprintf_s(buf, MAX_PATH, _T("%d"), HH_CubicSplineT);
+		MaxSDK::Util::WritePrivateProfileString(_T("ExpSettings"), _T("CubicSplineT"), buf, profle);
 	}
-
 	{
 #define MESSAGE_STR _T("Negative transform(Mirrored Object) detected, meshes may not export correctly to glTF.\nThe use of the ResetXForm utility is highly recommended.")
 		INodeTab tbl;
@@ -1055,6 +1060,7 @@ BOOL glTFExporter_Core::ExportPreProcess(const TCHAR* filename, BOOL suppressPro
 	m_ReferenceFileMode = HH_ReferenceFileMode;
 	m_InteractiveGraphID = HH_InteractiveGraphID;
 	m_ResetPivotTM = FALSE;
+	m_CubicSplineT = HH_CubicSplineT;
 
 	int dc = GetSpinnerPrecision();
 

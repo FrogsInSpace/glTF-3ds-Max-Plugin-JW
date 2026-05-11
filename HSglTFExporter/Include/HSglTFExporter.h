@@ -180,6 +180,29 @@ enum class TargetTex {
 
 //==========================================================
 //==========================================================
+struct AnimKeyInfo {
+	static constexpr int  LINEAR = 0;
+	static constexpr int  CUBICSPLINE = 1;
+	static constexpr int  STEP = 2;
+
+	Point3 val;
+	Quat rot;
+	Point3 inTan;
+	Point3 outTan;
+	Quat inTanQ;
+	Quat outTanQ;
+
+	Point4 clr4;
+	Point4 inTan4;
+	Point4 outTan4;
+
+	int i = 0;
+	float f = 0.0f;
+	int interpolation = 0;
+};
+
+//==========================================================
+//==========================================================
 struct AnimationStruct {
 	UINT samplerIdx;
 	tstring pointerStr;
@@ -735,6 +758,7 @@ public:
 	int m_ExportShapeObj;
 	BOOL m_ExportAnimation;
 	BOOL m_FullFrame;
+	BOOL m_CubicSplineT;
 	BOOL m_ExportTangent;
 	BOOL m_ExportMorphNrm;
 	int m_EncodeSpeed;

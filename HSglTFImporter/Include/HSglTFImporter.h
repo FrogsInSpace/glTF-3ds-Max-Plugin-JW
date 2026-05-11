@@ -380,7 +380,7 @@ public:
 
 	Control* CreateFloatController(const std::map<TimeValue, AnimKeyInfo>& KeyList, float scale=1.0f);
 	Control* CreateColorController(const std::map<TimeValue, AnimKeyInfo>& KeyList, cgltf_type type, Control *pOriginalC=NULL);
-	void SetXYZController(Control* pCtrl, cgltf_interpolation_type InterpType, TimeValue start);
+	void SetXYZController(Control* pCtrl, cgltf_interpolation_type InterpType, TimeValue start, const std::map<TimeValue, AnimKeyInfo>& KeyList, float scale = 1.0f);
 	void SetBaseColorController(Mtl* pMtl, Control* pCtrl, cgltf_interpolation_type InterpType, TimeValue start);
 	void SetNrmScaleController(Mtl* pMtl, Control* pCtrl, cgltf_interpolation_type InterpType, TimeValue start);
 	void SetMetalScaleController(Mtl* pMtl, Control* pCtrl, cgltf_interpolation_type InterpType, TimeValue start);
