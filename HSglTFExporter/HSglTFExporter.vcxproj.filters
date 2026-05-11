@@ -114,6 +114,7 @@
     <ClInclude Include="Resource\resource.h">
       <Filter>Header</Filter>
     </ClInclude>
+    <ClInclude Include="Resource\resource.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Source Files">

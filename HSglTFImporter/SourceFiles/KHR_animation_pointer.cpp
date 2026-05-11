@@ -154,7 +154,7 @@ void glTFImporter_Core::SetAnimationPointer(int animID)
 						if (m_LastTime < t) m_LastTime = t;
 					}
 					if (!PosKeyList.empty())
-						SetXYZController(pPosC, TransInterpType, PosKeyList.begin()->first);
+						SetXYZController(pPosC, TransInterpType, PosKeyList.begin()->first, PosKeyList);
 					//m_AnimationNodeTab.AppendNode(pNode);
 				}
 				else if (retPath[2] == "rotation") {
@@ -172,7 +172,7 @@ void glTFImporter_Core::SetAnimationPointer(int animID)
 						if (m_LastTime < t) m_LastTime = t;
 					}
 					if (!RotKeyList.empty())
-						SetXYZController(pRotC, RotInterpType, RotKeyList.begin()->first);
+						SetXYZController(pRotC, RotInterpType, RotKeyList.begin()->first, RotKeyList);
 
 				}
 				else if (retPath[2] == "scale") {
@@ -190,7 +190,7 @@ void glTFImporter_Core::SetAnimationPointer(int animID)
 						if (m_LastTime < t) m_LastTime = t;
 					}
 					if (!SclKeyList.empty())
-						SetXYZController(pSclC, ScaleInterpType, SclKeyList.begin()->first);
+						SetXYZController(pSclC, ScaleInterpType, SclKeyList.begin()->first, SclKeyList);
 				}
 				else if (retPath[2] == "weights") {
 					std::map<TimeValue, std::vector<float> > WeightKeyList;

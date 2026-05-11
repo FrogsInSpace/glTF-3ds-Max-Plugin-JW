@@ -1,6 +1,6 @@
 //{{NO_DEPENDENCIES}}
-// Microsoft Visual C++
-// HSglTFExporter.rc
+// Microsoft Visual C++ で生成されたインクルード ファイル。
+// HSglTFExporter.rc で使用
 //
 #define IDS_LIBDESCRIPTION              1
 #define IDS_CATEGORY                    2
@@ -34,6 +34,8 @@
 #define IDC_RGBBMP_CHK                  1030
 #define IDC_RESETXFORM_CHK              1030
 #define IDC_CREATEOCC_CHK               1031
+#define IDC_ANIMPTR_CHK2                1031
+#define IDC_CUBICSPLINE_CHK             1031
 #define IDC_MRO_RADIO1                  1032
 #define IDC_MRO_RADIO2                  1033
 #define IDC_MRO_RADIO3                  1034

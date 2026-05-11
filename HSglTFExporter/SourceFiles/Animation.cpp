@@ -163,6 +163,69 @@ void glTFExporter_Core::GetFullFrameAnimationFloat(Control* pC, std::list<TimeVa
 
 //======================================================================
 //======================================================================
+void GetXYZKeyInTanOutTanList(Control* pCtrl, std::map<TimeValue, AnimKeyInfo>& keyInfo)
+{
+	keyInfo.clear();
+
+	int num = pCtrl->NumKeys();
+
+	Control* pCX = pCtrl->GetXController();
+	Control* pCY = pCtrl->GetYController();
+	Control* pCZ = pCtrl->GetZController();
+	if (!pCX || !pCY || !pCZ) return;
+	if (pCX->ClassID() != Class_ID(HYBRIDINTERP_FLOAT_CLASS_ID, 0)) return;
+	if (pCY->ClassID() != Class_ID(HYBRIDINTERP_FLOAT_CLASS_ID, 0)) return;
+	if (pCZ->ClassID() != Class_ID(HYBRIDINTERP_FLOAT_CLASS_ID, 0)) return;
+
+	IKeyControl* pIkeyXCrl = GetKeyControlInterface(pCtrl->GetXController());
+	IKeyControl* pIkeyYCrl = GetKeyControlInterface(pCtrl->GetYController());
+	IKeyControl* pIkeyZCrl = GetKeyControlInterface(pCtrl->GetZController());
+	if (!pIkeyXCrl|| !pIkeyYCrl || !pIkeyZCrl) return;
+	if (pIkeyXCrl->GetNumKeys() != num) return;
+	if (pIkeyYCrl->GetNumKeys() != num) return;
+	if (pIkeyZCrl->GetNumKeys() != num) return;
+
+	for (int i = 0; i < num; i++) {
+		IBezFloatKey xKey;
+		pIkeyXCrl->GetKey(i, &xKey);
+		IBezFloatKey yKey;
+		pIkeyYCrl->GetKey(i, &yKey);
+		IBezFloatKey zKey;
+		pIkeyZCrl->GetKey(i, &zKey);
+
+
+		TimeValue t = pCtrl->GetKeyTime(i);
+
+		AnimKeyInfo info;
+
+		// --- InTangent (Hermite = Bezier_Deg / dt * 3) ---
+		if (i > 0) {
+			float dt_in = (float)(t - pCtrl->GetKeyTime(i - 1));// / (float)(GetTicksPerFrame() * GetFrameRate());
+			info.inTan = Point3(-(xKey.intan), -(yKey.intan), -(zKey.intan)) * dt_in / 3.0f;
+			//info.inTan = Point3(fabs(xKey.intan), fabs(yKey.intan), fabs(zKey.intan)) * dt_in / 3.0f;
+		}else{
+			info.inTan = Point3(0,0,0);
+		}
+
+
+		// --- OutTangent (Hermite = Bezier_Deg / dt * 3) ---
+		if (i < num - 1) {
+			float dt_out = (float)(pCtrl->GetKeyTime(i + 1) - t);// *(float)(GetTicksPerFrame() * GetFrameRate());
+			info.outTan = Point3((xKey.outtan), (yKey.outtan), (zKey.outtan)) * dt_out / 3.0f;
+			//info.outTan = Point3(fabs(xKey.outtan), fabs(yKey.outtan), fabs(zKey.outtan)) * dt_out / 3.0f;
+		} else {
+			info.outTan = Point3(0, 0, 0);
+		}
+
+		// --- Value ---
+		info.val = Point3(xKey.val, yKey.val, zKey.val);
+
+		keyInfo[t] = info;
+	}
+}
+
+//======================================================================
+//======================================================================
 void glTFExporter_Core::CreateKeyFrameList(Control *pCtrl, Tab<TimeValue> &KeyFrameList, BOOL Clear)
 {
 	if(Clear)
@@ -175,8 +238,10 @@ void glTFExporter_Core::CreateKeyFrameList(Control *pCtrl, Tab<TimeValue> &KeyFr
 			TimeValue t = pCtrl->GetKeyTime(i);
 			KeyFrameList.Append(1, &t);
 		}
+
 	}
 }
+
 //======================================================================
 //======================================================================
 void glTFExporter_Core::CreateKeyFrameList(Control* pCtrl, std::list<TimeValue>& KeyFrameList, BOOL Clear)
@@ -230,8 +295,12 @@ void glTFExporter_Core::CreateAnimationRec(INode *pNode)
 		}
 		//tinygltf::Node *node = m_NodeMap[pNode];
 		if (PosFrameList.Count() > 0) {
+			std::map<TimeValue, AnimKeyInfo> keyInfo;
+			if(m_CubicSplineT)
+				GetXYZKeyInTanOutTanList(pC->GetPositionController(), keyInfo);
+
 			tinygltf::AnimationSampler sampler;// = Create_glTFAnimSampler();
-			sampler.interpolation = "LINEAR";
+			sampler.interpolation = keyInfo.size()>0 ? "CUBICSPLINE" : "LINEAR";
 
 			tinygltf::Accessor accIn;
 			accIn.componentType = TINYGLTF_COMPONENT_TYPE_FLOAT;
@@ -265,6 +334,7 @@ void glTFExporter_Core::CreateAnimationRec(INode *pNode)
 			accOut.componentType = TINYGLTF_COMPONENT_TYPE_FLOAT;
 			accOut.type = TINYGLTF_TYPE_VEC3;
 			accOut.count = PosFrameList.Count();
+			if (keyInfo.size() > 0) accOut.count *= 3;
 
 			tinygltf::BufferView bfViewOut;
 			bfViewOut.buffer = 0;
@@ -277,6 +347,12 @@ void glTFExporter_Core::CreateAnimationRec(INode *pNode)
 #if MAX_RELEASE<=22000
 			for (int tt = 0; tt < PosFrameList.Count(); tt++) {
 				TimeValue fr = PosFrameList[tt];
+				if (keyInfo.size() > 0) {
+					Point3 inTan = keyInfo[fr].inTan * YupTM;
+					*pData++ = inTan.x * m_scale;
+					*pData++ = inTan.y * m_scale;
+					*pData++ = inTan.z * m_scale;
+				}
 				Matrix3 tm = pNode->GetNodeTM(fr);
 				if (pNode->GetParentNode()->IsRootNode()) tm = tm * YupTM;
 				else tm = tm * Inverse(pNode->GetParentTM(fr));
@@ -284,9 +360,22 @@ void glTFExporter_Core::CreateAnimationRec(INode *pNode)
 				*pData++ = parts.t.x * m_scale;
 				*pData++ = parts.t.y * m_scale;
 				*pData++ = parts.t.z * m_scale;
+				if (keyInfo.size() > 0) {
+					Point3 outTan = keyInfo[fr].outTan * YupTM;
+					*pData++ = outTan.x * m_scale;
+					*pData++ = outTan.y * m_scale;
+					*pData++ = outTan.z * m_scale;
+				}
+
 			}
 #else
 			for (auto fr : PosFrameList) {
+				if (keyInfo.size() > 0) {
+					Point3 inTan = keyInfo[fr].inTan * YupTM;
+					*pData++ = inTan.x * m_scale;
+					*pData++ = inTan.y * m_scale;
+					*pData++ = inTan.z * m_scale;
+				}
 				Matrix3 tm = pNode->GetNodeTM(fr);
 				if (pNode->GetParentNode()->IsRootNode()) tm = tm * YupTM;
 				else tm = tm * Inverse(pNode->GetParentTM(fr));
@@ -294,6 +383,12 @@ void glTFExporter_Core::CreateAnimationRec(INode *pNode)
 				*pData++ = parts.t.x * m_scale;
 				*pData++ = parts.t.y * m_scale;
 				*pData++ = parts.t.z * m_scale;
+				if (keyInfo.size() > 0) {
+					Point3 outTan = keyInfo[fr].outTan * YupTM;
+					*pData++ = outTan.x * m_scale;
+					*pData++ = outTan.y * m_scale;
+					*pData++ = outTan.z * m_scale;
+				}
 			}
 #endif
 			m_model.bufferViews.push_back(bfViewOut);
@@ -308,6 +403,8 @@ void glTFExporter_Core::CreateAnimationRec(INode *pNode)
 			channel.sampler = m_animation.samplers.size() - 1;
 			m_animation.channels.push_back(channel);
 		}
+
+
 		if (RotFrameList.Count() > 0) {
 			tinygltf::AnimationSampler sampler;// = Create_glTFAnimSampler();
 			sampler.interpolation = "LINEAR";
@@ -390,6 +487,8 @@ void glTFExporter_Core::CreateAnimationRec(INode *pNode)
 			channel.sampler = m_animation.samplers.size() - 1;
 			m_animation.channels.push_back(channel);
 		}
+
+
 		if (SclFrameList.Count() > 0) {
 			tinygltf::AnimationSampler sampler;// = Create_glTFAnimSampler();
 			sampler.interpolation = "LINEAR";

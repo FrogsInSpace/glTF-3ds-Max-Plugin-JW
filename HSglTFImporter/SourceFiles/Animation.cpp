@@ -21,6 +21,10 @@
 #include <istdplug.h>
 #include "define.h"
 
+#define IPOS_CONTROL_CLASS_ID		Class_ID(0x118f7e02,0xffee238a)
+
+static float GetSceneScale(void);
+
 Control* ConvertFloatToColorController(Control* pSrcC, UINT ch);
 
 //======================================================================
@@ -86,7 +90,6 @@ void glTFImporter_Core::GetPosAnimKeyFrameList(cgltf_animation_sampler *sampler,
 	AnimKeyInfo keyInfo;
 	PosKeyList.clear();
 	if (sampler->interpolation == cgltf_interpolation_type_cubic_spline) {
-		// TODO: CubicSpline InTan/OutTan not yet implemented(Position part)
 		std::vector<float>::iterator p = AnimationList.begin();
 		for (auto key : KeyFrames) {
 			float ix = *(p + 0);
@@ -396,76 +399,154 @@ Control* glTFImporter_Core::CreateColorController(const std::map<TimeValue, Anim
 //======================================================================
 // Create XYZ controler from Key Frame List
 //======================================================================
-void glTFImporter_Core::SetXYZController(Control *pCtrl, cgltf_interpolation_type InterpType, TimeValue start)
+void glTFImporter_Core::SetXYZController(Control *pCtrl, cgltf_interpolation_type InterpType, TimeValue start, const std::map<TimeValue, AnimKeyInfo>& KeyList, float scale)
 {
-	IKeyControl *pIkeyXCrl = GetKeyControlInterface(pCtrl->GetXController());
-	if (!pIkeyXCrl) return;
+	{
+		IKeyControl* pIkeyXCrl = GetKeyControlInterface(pCtrl->GetXController());
+		if (!pIkeyXCrl) return;
 
-	for (int i = 0; i < pIkeyXCrl->GetNumKeys(); i++) {
-		IBezFloatKey Key;
-		pIkeyXCrl->GetKey(i, &Key);
-		if (InterpType == cgltf_interpolation_type_cubic_spline) {
-			SetInTanType(Key.flags, BEZKEY_SMOOTH);
-			SetOutTanType(Key.flags, BEZKEY_SMOOTH);
-		}
-		if (InterpType == cgltf_interpolation_type_linear) {
-			SetInTanType(Key.flags, BEZKEY_LINEAR);
-			SetOutTanType(Key.flags, BEZKEY_LINEAR);
-		}
-		if (InterpType == cgltf_interpolation_type_step) {
-			SetInTanType(Key.flags, BEZKEY_STEP);
-			SetOutTanType(Key.flags, BEZKEY_STEP);
-		}
-		pIkeyXCrl->SetKey(i, &Key);
-	}
-	IKeyControl *pIkeyYCrl = GetKeyControlInterface(pCtrl->GetYController());
-	if (!pIkeyYCrl) return;
+		for (int i = 0; i < pIkeyXCrl->GetNumKeys(); i++) {
+			IBezFloatKey Key;
+			pIkeyXCrl->GetKey(i, &Key);
 
-	for (int i = 0; i < pIkeyYCrl->GetNumKeys(); i++) {
-		IBezFloatKey Key;
-		pIkeyYCrl->GetKey(i, &Key);
-		if (InterpType == cgltf_interpolation_type_cubic_spline) {
-			SetInTanType(Key.flags, BEZKEY_SMOOTH);
-			SetOutTanType(Key.flags, BEZKEY_SMOOTH);
-		}
-		if (InterpType == cgltf_interpolation_type_linear) {
-			SetInTanType(Key.flags, BEZKEY_LINEAR);
-			SetOutTanType(Key.flags, BEZKEY_LINEAR);
-		}
-		if (InterpType == cgltf_interpolation_type_step) {
-			SetInTanType(Key.flags, BEZKEY_STEP);
-			SetOutTanType(Key.flags, BEZKEY_STEP);
-		}
-		pIkeyYCrl->SetKey(i, &Key);
-	}
-	IKeyControl *pIkeyZCrl = GetKeyControlInterface(pCtrl->GetZController());
-	if (!pIkeyZCrl) return;
+			if (InterpType == cgltf_interpolation_type_cubic_spline) {
+				TimeValue t = Key.time;
+				if (KeyList.find(t) == KeyList.end()) continue;
+				const auto& info = KeyList.at(t);
 
-	for (int i = 0; i < pIkeyZCrl->GetNumKeys(); i++) {
-		IBezFloatKey Key;
-		pIkeyZCrl->GetKey(i, &Key);
-		if (InterpType == cgltf_interpolation_type_cubic_spline) {
-			SetInTanType(Key.flags, BEZKEY_SMOOTH);
-			SetOutTanType(Key.flags, BEZKEY_SMOOTH);
+				Key.inLength = 0.0f;
+				Key.outLength = 0.0f;
+				Key.intan = 0.0f;
+				Key.outtan = 0.0f;
+
+				// Apply actual InTan/OutTan values.
+				// Scale by dt to convert from "per-second rate" to "per-interval delta."
+
+				if (i > 0) {
+					Key.inLength = 0.333333f;
+					IBezFloatKey KeyIn;
+					pIkeyXCrl->GetKey(i - 1, &KeyIn);
+					Key.intan = info.inTan.x / (t - KeyIn.time) * 3.0f * -scale;
+				}
+				if (i < pIkeyXCrl->GetNumKeys() - 1) {
+					Key.outLength = 0.333333f;
+					IBezFloatKey KeyOut;
+					pIkeyXCrl->GetKey(i + 1, &KeyOut);
+					Key.outtan = info.outTan.x / (KeyOut.time - t) * 3.0f * scale;
+				}
+
+				SetInTanType(Key.flags, BEZKEY_USER);
+				SetOutTanType(Key.flags, BEZKEY_USER);
+			}
+
+			else if (InterpType == cgltf_interpolation_type_linear) {
+				SetInTanType(Key.flags, BEZKEY_LINEAR);
+				SetOutTanType(Key.flags, BEZKEY_LINEAR);
+			}
+			else if (InterpType == cgltf_interpolation_type_step) {
+				SetInTanType(Key.flags, BEZKEY_STEP);
+				SetOutTanType(Key.flags, BEZKEY_STEP);
+			}
+			pIkeyXCrl->SetKey(i, &Key);
 		}
-		if (InterpType == cgltf_interpolation_type_linear) {
-			SetInTanType(Key.flags, BEZKEY_LINEAR);
-			SetOutTanType(Key.flags, BEZKEY_LINEAR);
-		}
-		if (InterpType == cgltf_interpolation_type_step) {
-			SetInTanType(Key.flags, BEZKEY_STEP);
-			SetOutTanType(Key.flags, BEZKEY_STEP);
-		}
-		pIkeyZCrl->SetKey(i, &Key);
 	}
 
-	// 読み込み開始フレームが0でないのに0フレームにキーが置かれるためのキー削除
+	{
+		IKeyControl* pIkeyZCrl = GetKeyControlInterface(pCtrl->GetZController());
+		if (!pIkeyZCrl) return;
+
+		for (int i = 0; i < pIkeyZCrl->GetNumKeys(); i++) {
+			IBezFloatKey Key;
+			pIkeyZCrl->GetKey(i, &Key);
+
+			if (InterpType == cgltf_interpolation_type_cubic_spline) {
+				TimeValue t = Key.time;
+				if (KeyList.find(t) == KeyList.end()) continue;
+				const auto& info = KeyList.at(t);
+
+				// Handle length（Default = 1/3）
+				Key.inLength = 0.0f;
+				Key.outLength = 0.0f;
+				Key.intan = 0.0f;
+				Key.outtan = 0.0f;
+
+				if (i > 0) {
+					Key.inLength = 0.333333f;
+					IBezFloatKey KeyIn;
+					pIkeyZCrl->GetKey(i - 1, &KeyIn);
+					Key.intan = info.inTan.y / (t - KeyIn.time) * 3.0f * -scale;
+				}
+				if (i < pIkeyZCrl->GetNumKeys() - 1) {
+					Key.outLength = 0.333333f;
+					IBezFloatKey KeyOut;
+					pIkeyZCrl->GetKey(i + 1, &KeyOut);
+					Key.outtan = info.outTan.y / (KeyOut.time - t) * 3.0f * scale;
+				}
+
+				SetInTanType(Key.flags, BEZKEY_USER);
+				SetOutTanType(Key.flags, BEZKEY_USER);
+			}
+			else if (InterpType == cgltf_interpolation_type_linear) {
+				SetInTanType(Key.flags, BEZKEY_LINEAR);
+				SetOutTanType(Key.flags, BEZKEY_LINEAR);
+			}
+			else if (InterpType == cgltf_interpolation_type_step) {
+				SetInTanType(Key.flags, BEZKEY_STEP);
+				SetOutTanType(Key.flags, BEZKEY_STEP);
+			}
+			pIkeyZCrl->SetKey(i, &Key);
+		}
+	}
+
+	{
+		IKeyControl* pIkeyYCrl = GetKeyControlInterface(pCtrl->GetYController());
+		if (!pIkeyYCrl) return;
+
+		for (int i = 0; i < pIkeyYCrl->GetNumKeys(); i++) {
+			IBezFloatKey Key;
+			pIkeyYCrl->GetKey(i, &Key);
+
+			if (InterpType == cgltf_interpolation_type_cubic_spline) {
+				TimeValue t = Key.time;
+				if (KeyList.find(t) == KeyList.end()) continue;
+				const auto& info = KeyList.at(t);
+
+				Key.inLength = 0.0f;
+				Key.intan = 0.0f;
+				Key.intan = 0.0f;
+				Key.outtan = 0.0f;
+
+				if (i > 0) {
+					Key.inLength = 0.333333f;
+					IBezFloatKey KeyIn;
+					pIkeyYCrl->GetKey(i - 1, &KeyIn);
+					Key.intan = -info.inTan.z / (t - KeyIn.time) * 3.0f * -scale;
+				}
+				if (i < pIkeyYCrl->GetNumKeys() - 1) {
+					Key.outLength = 0.333333f;
+					IBezFloatKey KeyOut;
+					pIkeyYCrl->GetKey(i + 1, &KeyOut);
+					Key.outtan = -info.outTan.z / (KeyOut.time - t) * 3.0f * scale;
+				}
+
+				SetInTanType(Key.flags, BEZKEY_USER);
+				SetOutTanType(Key.flags, BEZKEY_USER);
+			}
+			else if (InterpType == cgltf_interpolation_type_linear) {
+				SetInTanType(Key.flags, BEZKEY_LINEAR);
+				SetOutTanType(Key.flags, BEZKEY_LINEAR);
+			}
+			else if (InterpType == cgltf_interpolation_type_step) {
+				SetInTanType(Key.flags, BEZKEY_STEP);
+				SetOutTanType(Key.flags, BEZKEY_STEP);
+			}
+			pIkeyYCrl->SetKey(i, &Key);
+		}
+	}
+
+	// Cleanup: Remove auto-generated key at frame 0 when the actual animation starts later.
 	if (start != 0) {
 		pCtrl->DeleteKeyAtTime(0);
-		//IBezFloatKey Key;
-		//pIkeyXCrl->GetKey(0, &Key);
-		//pIkeyYCrl->GetKey(0, &Key);
-		//pIkeyZCrl->GetKey(0, &Key);
 	}
 }
 
@@ -1981,8 +2062,9 @@ void glTFImporter_Core::SetAnimationRec(INode *pNode, int animIdx)
 			if (m_StartTime > t) m_StartTime = t;
 			if (m_LastTime < t) m_LastTime = t;
 		}
-		SetXYZController(pSclC, ScaleInterpType, SclKeyList.begin()->first);
+		SetXYZController(pSclC, ScaleInterpType, SclKeyList.begin()->first, SclKeyList);
 	}
+
 	if (RotKeyList.size() > 0) {
 		if (m_UseQuatCtrl) {
 			Control* pRotC = (Control*)GetCOREInterface()->CreateInstance(CTRL_ROTATION_CLASS_ID, Class_ID(LININTERP_ROTATION_CLASS_ID, 0x0));
@@ -2005,11 +2087,12 @@ void glTFImporter_Core::SetAnimationRec(INode *pNode, int animIdx)
 				if (m_StartTime > t) m_StartTime = t;
 				if (m_LastTime < t) m_LastTime = t;
 			}
-			SetXYZController(pRotC, RotInterpType, RotKeyList.begin()->first);
+			SetXYZController(pRotC, RotInterpType, RotKeyList.begin()->first, RotKeyList);
 		}
 	}
+
 	if (PosKeyList.size() > 0) {
-		Control *pPosC = (Control*)GetCOREInterface()->CreateInstance(CTRL_POSITION_CLASS_ID, Class_ID(0x118f7e02, 0xffee238a));
+		Control *pPosC = (Control*)GetCOREInterface()->CreateInstance(CTRL_POSITION_CLASS_ID, IPOS_CONTROL_CLASS_ID);
 		pNode->GetTMController()->SetPositionController(pPosC);
 		for (const auto &key : PosKeyList) {
 			TimeValue t = key.first;
@@ -2018,7 +2101,8 @@ void glTFImporter_Core::SetAnimationRec(INode *pNode, int animIdx)
 			if (m_StartTime > t) m_StartTime = t;
 			if (m_LastTime < t) m_LastTime = t;
 		}
-		SetXYZController(pPosC, TransInterpType, PosKeyList.begin()->first);
+		float scale = GetSceneScale();
+		SetXYZController(pPosC, TransInterpType, PosKeyList.begin()->first, PosKeyList, scale);
 	}
 
 	if (WeightKeyList.size() > 0) {
@@ -2087,8 +2171,32 @@ Control* ConvertFloatToColorController(Control* pSrcC, UINT ch)
 	}
 	return pDstC;
 }
+//======================================================================
+//======================================================================
+float GetSceneScale(void)
+{
+	float scale = 1.0f;
 
+	int type = 0;
+#if MAX_RELEASE < 24000
+	GetMasterUnitInfo(&type, &scale);
+#else
+	GetSystemUnitInfo(&type, &scale);
+#endif
+	switch (type)
+	{
+	case UNITS_INCHES:		scale /= 0.0254f;	break;
+	case UNITS_FEET:		scale /= 0.3048f;	break;
+	case UNITS_MILES:		scale /= 1609.34f;	break;
+	case UNITS_MILLIMETERS:	scale /= 0.001f;	break;
+	case UNITS_CENTIMETERS:	scale /= 0.01f;		break;
+	case UNITS_METERS:		scale /= 1.0f;		break;
+	case UNITS_KILOMETERS:	scale /= 1000.0f;	break;
+	default:				scale /= 1.0f;		break;
+	}
 
+	return scale;
+}
 
 
 
