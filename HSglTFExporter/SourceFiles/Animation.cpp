@@ -169,6 +169,50 @@ void GetXYZKeyInTanOutTanList(Control* pCtrl, std::map<TimeValue, AnimKeyInfo>& 
 
 	int num = pCtrl->NumKeys();
 
+	if (pCtrl->ClassID() == Class_ID(HYBRIDINTERP_POSITION_CLASS_ID, 0)) {
+		IKeyControl* pIkeyCrl = GetKeyControlInterface(pCtrl);
+		if (!pIkeyCrl || pIkeyCrl->GetNumKeys() != num) return;
+
+		for (int i = 0; i < num; i++) {
+			IBezPoint3Key pt3Key;
+			pIkeyCrl->GetKey(i, &pt3Key);
+
+			TimeValue t = pCtrl->GetKeyTime(i);
+
+			AnimKeyInfo info;
+
+			// --- InTangent (Hermite = Bezier_Deg / dt * 3) ---
+			if (i > 0) {
+				float dt_in = (float)(t - pCtrl->GetKeyTime(i - 1));// / (float)(GetTicksPerFrame() * GetFrameRate());
+				info.inTan = -pt3Key.intan * dt_in / 3.0f;
+			}
+			else {
+				info.inTan = Point3(0, 0, 0);
+			}
+
+			// --- OutTangent (Hermite = Bezier_Deg / dt * 3) ---
+			if (i < num - 1) {
+				float dt_out = (float)(pCtrl->GetKeyTime(i + 1) - t);// *(float)(GetTicksPerFrame() * GetFrameRate());
+				info.outTan = pt3Key.outtan * dt_out / 3.0f;
+			}
+			else {
+				info.outTan = Point3(0, 0, 0);
+			}
+
+			// --- Value ---
+			info.val = pt3Key.val;
+
+			keyInfo[t] = info;
+		}
+
+		return;
+	}
+
+
+
+
+
+
 	Control* pCX = pCtrl->GetXController();
 	Control* pCY = pCtrl->GetYController();
 	Control* pCZ = pCtrl->GetZController();

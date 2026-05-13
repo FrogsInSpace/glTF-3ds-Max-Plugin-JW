@@ -15,7 +15,7 @@ glTF 1.0 is not supported.
 * **Format Types**: `*.gltf` + `*.bin` + textures, `*.gltf` (embedded), `*.glb` (binary)
 * **Object Types**: Geometry (Mesh), Spline, Shape, Camera, Lights
 * **Compression**: Draco compression supported
-* **Materials**: Scanline, PBR, Physical, glTF, Arnold, V-Ray, Corona, Pencil+4, USD
+* **Materials**: Scanline, PBR, Physical, glTF, Arnold, V-Ray, Corona, USD
     * glTF Material is not supported in 3ds Max 2021/2022
 * **Animation**: Object TRS, LINEAR/STEP interpolation, Morph weight, `KHR_animation_pointer`
 * **Vertex Deformation**: Skin, Morph
@@ -32,7 +32,7 @@ glTF 1.0 is not supported.
 - 3ds Max 2020/2021 do not support V-Ray/Corona Materials.
 
 - The following features are not implemented in the current version:
-  - CUBICSPLINE animation interpolation
+  - CUBICSPLINE(Rotate, Scale) animation interpolation
 
 - There is a limit to the number of primitive attributes that can be
 supported:
