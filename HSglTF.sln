@@ -10,6 +10,8 @@ EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Hybrid-Max2025|x64 = Hybrid-Max2025|x64
+		Hybrid-Max2026|x64 = Hybrid-Max2026|x64
+		Hybrid-Max2027|x64 = Hybrid-Max2027|x64
 		Release-Max2020|x64 = Release-Max2020|x64
 		Release-Max2021|x64 = Release-Max2021|x64
 		Release-Max2022|x64 = Release-Max2022|x64
@@ -22,6 +24,10 @@ Global
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{97D49973-99A4-41B9-B601-8E129D18F026}.Hybrid-Max2025|x64.ActiveCfg = Hybrid-Max2025|x64
 		{97D49973-99A4-41B9-B601-8E129D18F026}.Hybrid-Max2025|x64.Build.0 = Hybrid-Max2025|x64
+		{97D49973-99A4-41B9-B601-8E129D18F026}.Hybrid-Max2026|x64.ActiveCfg = Hybrid-Max2026|x64
+		{97D49973-99A4-41B9-B601-8E129D18F026}.Hybrid-Max2026|x64.Build.0 = Hybrid-Max2026|x64
+		{97D49973-99A4-41B9-B601-8E129D18F026}.Hybrid-Max2027|x64.ActiveCfg = Hybrid-Max2027|x64
+		{97D49973-99A4-41B9-B601-8E129D18F026}.Hybrid-Max2027|x64.Build.0 = Hybrid-Max2027|x64
 		{97D49973-99A4-41B9-B601-8E129D18F026}.Release-Max2020|x64.ActiveCfg = Release-Max2020|x64
 		{97D49973-99A4-41B9-B601-8E129D18F026}.Release-Max2020|x64.Build.0 = Release-Max2020|x64
 		{97D49973-99A4-41B9-B601-8E129D18F026}.Release-Max2021|x64.ActiveCfg = Release-Max2021|x64
@@ -40,6 +46,10 @@ Global
 		{97D49973-99A4-41B9-B601-8E129D18F026}.Release-Max2027|x64.Build.0 = Release-Max2027|x64
 		{4DCC8EB2-9C05-48F9-B619-34A40F7D84C1}.Hybrid-Max2025|x64.ActiveCfg = Hybrid-Max2025|x64
 		{4DCC8EB2-9C05-48F9-B619-34A40F7D84C1}.Hybrid-Max2025|x64.Build.0 = Hybrid-Max2025|x64
+		{4DCC8EB2-9C05-48F9-B619-34A40F7D84C1}.Hybrid-Max2026|x64.ActiveCfg = Hybrid-Max2026|x64
+		{4DCC8EB2-9C05-48F9-B619-34A40F7D84C1}.Hybrid-Max2026|x64.Build.0 = Hybrid-Max2026|x64
+		{4DCC8EB2-9C05-48F9-B619-34A40F7D84C1}.Hybrid-Max2027|x64.ActiveCfg = Hybrid-Max2027|x64
+		{4DCC8EB2-9C05-48F9-B619-34A40F7D84C1}.Hybrid-Max2027|x64.Build.0 = Hybrid-Max2027|x64
 		{4DCC8EB2-9C05-48F9-B619-34A40F7D84C1}.Release-Max2020|x64.ActiveCfg = Release-Max2020|x64
 		{4DCC8EB2-9C05-48F9-B619-34A40F7D84C1}.Release-Max2020|x64.Build.0 = Release-Max2020|x64
 		{4DCC8EB2-9C05-48F9-B619-34A40F7D84C1}.Release-Max2021|x64.ActiveCfg = Release-Max2021|x64

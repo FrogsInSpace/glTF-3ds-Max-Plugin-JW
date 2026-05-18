@@ -7,6 +7,14 @@
     <ConfigurationType>DynamicLibrary</ConfigurationType>
   </PropertyGroup>
   <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Hybrid-Max2027|x64">
+      <Configuration>Hybrid-Max2027</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Hybrid-Max2026|x64">
+      <Configuration>Hybrid-Max2026</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
     <ProjectConfiguration Include="Hybrid-Max2025|x64">
       <Configuration>Hybrid-Max2025</Configuration>
       <Platform>x64</Platform>
