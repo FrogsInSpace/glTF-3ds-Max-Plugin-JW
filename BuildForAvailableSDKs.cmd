@@ -1,6 +1,15 @@
 @echo off
 setlocal enabledelayedexpansion
 
+REM Check for Visual Studio x64 dev environment
+if /I NOT "%VSCMD_ARG_TGT_ARCH%"=="x64" (
+	echo.
+	echo ##############################################
+    echo Visual Studio x64 environment not initialized!
+	echo ##############################################
+    goto :Failed
+)
+
 REM Loop through existing 3ds Max SDKs (2020 -> 2027)
 for /L %%V in (2020,1,2027) do (
 
