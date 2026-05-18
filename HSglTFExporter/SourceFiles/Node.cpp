@@ -115,9 +115,11 @@ void glTFExporter_Core::CreateSceneData(tinygltf::Scene &scene, int XRefIdx, ILa
 		int numRootnode = GetCOREInterface()->GetRootNode()->NumChildren();
 		for (int i = 0; i < numRootnode; i++) {
 			INode* pNode = GetCOREInterface()->GetRootNode()->GetChildNode(i);
-			// インタラクティブレイヤ内のノードは出力しない
+			
+			// skip nodes within the interactive layer.
 			//if (m_pInteractiveGraphLayer == (ILayer*)pNode->GetReference(NODE_LAYER_REF)) continue;
-			if (std::find(m_InteractiveLayerTable.begin(), m_InteractiveLayerTable.end(), (ILayer*)pNode->GetReference(NODE_LAYER_REF)) != m_InteractiveLayerTable.end()) continue;
+			if (std::find(m_InteractiveLayerTable.begin(), m_InteractiveLayerTable.end(), (ILayer*)pNode->GetReference(NODE_LAYER_REF)) != m_InteractiveLayerTable.end()) 
+				continue;
 
 			if (pLayer) {
 				if (pLayer != (ILayer*)pNode->GetReference(NODE_LAYER_REF)) continue;
@@ -1423,18 +1425,18 @@ int GetMirroredNode(INodeTab &tbl)
 }
 
 //=============================================================================
-// Node より TriObjectを返す
+// Create TriObject for Node
 //=============================================================================
 TriObject* GetTriObjectFromNode(INode *pNode, TimeValue t, int &deleteIt)
 {
 	deleteIt = FALSE;
-	// ノードよりオブジェクトを取り出す
+	// extract the object 
 	Object *pObj = pNode->EvalWorldState(t).obj;
-	// このオブジェクトが TriObject に変換可能か調べる(幾何オブジェクトは通常変換可能)
+	// Check if we can convert to TriObject 
 	if (pObj->CanConvertToType(Class_ID(TRIOBJ_CLASS_ID, 0))) {
 		TriObject *pTri = (TriObject *)pObj->ConvertToType(t, Class_ID(TRIOBJ_CLASS_ID, 0));
-		// このオブジェクト(pObj)と ConvertToType() のオブジェクトのポインタ(pTri)が
-		// 等しくない場合は使用後に pTri は削除すること
+			
+		 // if necessary, signal caller to delete the returned TriObject after use.
 		if (pObj != pTri) deleteIt = TRUE;
 		return pTri;
 	}
@@ -1444,18 +1446,18 @@ TriObject* GetTriObjectFromNode(INode *pNode, TimeValue t, int &deleteIt)
 }
 #if 0
 //=============================================================================
-// Node より ShapeObjectを返す
+// Create SplineShape for Node
 //=============================================================================
 SplineShape* GetShapeObjectFromNode(INode* pNode, TimeValue t, int& deleteIt)
 {
 	deleteIt = FALSE;
-	// ノードよりオブジェクトを取り出す
+	// extract the object 
 	Object* pObj = pNode->EvalWorldState(t).obj;
-	// このオブジェクトが TriObject に変換可能か調べる(幾何オブジェクトは通常変換可能)
+	// Check if we can convert to SplineShape
 	if (pObj->CanConvertToType(splineShapeClassID)) {
 		SplineShape* pShape = (SplineShape*)pObj->ConvertToType(t, splineShapeClassID);
-		// このオブジェクト(pObj)と ConvertToType() のオブジェクトのポインタ(pTri)が
-		// 等しくない場合は使用後に pShape は削除すること
+		
+		// if necessary, signal caller to delete the returned SplineShape after use.
 		if (pObj != pShape) deleteIt = TRUE;
 		return pShape;
 	}
@@ -1465,18 +1467,18 @@ SplineShape* GetShapeObjectFromNode(INode* pNode, TimeValue t, int& deleteIt)
 }
 #else
 //=============================================================================
-// Node より ShapeObjectを返す
+// Create SplineShape for Node
 //=============================================================================
 LinearShape* GetShapeObjectFromNode(INode* pNode, TimeValue t, int& deleteIt)
 {
 	deleteIt = FALSE;
-	// ノードよりオブジェクトを取り出す
+	// extract the object 
 	Object* pObj = pNode->EvalWorldState(t).obj;
-	// このオブジェクトが TriObject に変換可能か調べる(幾何オブジェクトは通常変換可能)
+	// Check if we can convert to SplineShape
 	if (pObj->CanConvertToType(linearShapeClassID)) {
 		LinearShape* pShape = (LinearShape*)pObj->ConvertToType(t, linearShapeClassID);
-		// このオブジェクト(pObj)と ConvertToType() のオブジェクトのポインタ(pTri)が
-		// 等しくない場合は使用後に pShape は削除すること
+
+		// if necessary, signal caller to delete the returned SplineShape after use.
 		if (pObj != pShape) deleteIt = TRUE;
 		return pShape;
 	}

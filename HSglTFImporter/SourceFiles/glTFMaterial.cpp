@@ -24,7 +24,7 @@
 //=============================================================================
 void glTFImporter_Core::CreateglTFMaterial(void)
 {
-	// ビューレンダラがMetallnesに対応できるようにダミーで1つPBRマテリアルを作る
+	// Create a dummy PBR material so that the view renderer can support Metallnes.
 	//Mtl* pDummyMtl = (Mtl*)GetCOREInterface()->CreateInstance(MATERIAL_CLASS_ID, PBRMetalMtlID);
 
 	for (int i = 0; i < m_glTF_data->materials_count; i++) {

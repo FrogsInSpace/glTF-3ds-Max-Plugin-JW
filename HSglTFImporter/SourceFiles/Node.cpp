@@ -230,7 +230,7 @@ INode* glTFImporter_Core::CreateMaxNode(cgltf_node* node, INode* pParent)
 				pCompositeMtl = (StdMat*)GetCOREInterface()->CreateInstance(MATERIAL_CLASS_ID, CompositeMtlClassID);
 		}
 
-		// マップを持つプリミティブと持たないプリミティブが混在する可能性があるので
+		// There is a possibility that primitives with maps and primitives without maps will be mixed together.
 		for (int i = 0; i < mesh->primitives_count; i++) {
 			cgltf_primitive* pr = &mesh->primitives[i];
 
@@ -326,7 +326,7 @@ INode* glTFImporter_Core::CreateMaxNode(cgltf_node* node, INode* pParent)
 			}
 		}
 
-		// 面の設定
+		// Face settings
 		size_t FaceNum = 0;
 		if ((pr->type == cgltf_primitive_type_triangles) ||
 			(pr->type == cgltf_primitive_type_triangle_strip) ||
@@ -424,7 +424,7 @@ INode* glTFImporter_Core::CreateMaxNode(cgltf_node* node, INode* pParent)
 		}
 		*/
 
-		// ShapeLineの設定
+		// Setting ShapeLine
 		if ((pr->type == cgltf_primitive_type_lines) ||
 			(pr->type == cgltf_primitive_type_line_loop)||
 			(pr->type == cgltf_primitive_type_line_strip)) {
@@ -450,8 +450,8 @@ INode* glTFImporter_Core::CreateMaxNode(cgltf_node* node, INode* pParent)
 					Point3 p2 = ShapePointVector[static_cast<int>(KnotIdList[idx + 1])];
 					pSpline->AddKnot(SplineKnot(KTYPE_AUTO, LTYPE_LINE, p1, p1, p1));
 					pSpline->AddKnot(SplineKnot(KTYPE_AUTO, LTYPE_LINE, p2, p2, p2));
-					pSpline->SetClosed(0);			// こちらのスプラインは開曲線
-					pSpline->ComputeBezPoints();	// スプラインの内部情報を更新するために必要
+					pSpline->SetClosed(0);			// spline is an open curve.
+					pSpline->ComputeBezPoints();	// update internal spline data
 				}
 			}
 			else if (pr->type == cgltf_primitive_type_line_loop) {
@@ -460,8 +460,8 @@ INode* glTFImporter_Core::CreateMaxNode(cgltf_node* node, INode* pParent)
 					Point3 p1 = ShapePointVector[(UINT)idx];
 					pSpline->AddKnot(SplineKnot(KTYPE_AUTO, LTYPE_LINE, p1, p1, p1));
 				}
-				pSpline->SetClosed(1);			// こちらのスプラインは閉曲線
-				pSpline->ComputeBezPoints();	// スプラインの内部情報を更新するために必要
+				pSpline->SetClosed(1);			// spline is a closed curve.
+				pSpline->ComputeBezPoints();	// update internal spline data
 			}
 			else if (pr->type == cgltf_primitive_type_line_strip) {
 				Spline3D* pSpline = NewShape.NewSpline();
@@ -470,17 +470,17 @@ INode* glTFImporter_Core::CreateMaxNode(cgltf_node* node, INode* pParent)
 					pSpline->AddKnot(SplineKnot(KTYPE_AUTO, LTYPE_LINE, p1, p1, p1));
 				}
 				if (KnotIdList[0] == KnotIdList[KnotIdList.size() - 1]) {
-					pSpline->SetClosed(1);			// こちらのスプラインは閉曲線
+					pSpline->SetClosed(1);			// spline is a closed curve
 				}
 				else {
-					pSpline->SetClosed(0);			// こちらのスプラインは開曲線
+					pSpline->SetClosed(0);			// spline is a open curve
 				}
-				pSpline->ComputeBezPoints();	// スプラインの内部情報を更新するために必要
+				pSpline->ComputeBezPoints();	// update internal spline data
 			}
 
 		}
 
-		// 頂点法線の設定
+		// Setting vertex normals
 		std::vector<float> NormalList;
 		if (mc) {
 			DracoDecodeProc(mc->buffer_view, NormalList, DracoDecodeType::NORMAL);
@@ -621,7 +621,7 @@ INode* glTFImporter_Core::CreateMaxNode(cgltf_node* node, INode* pParent)
 			if(mId>0) RescaleUVOffset(mtlIdTable[mId-1], RectUV);
 		}
 
-		// 頂点UV2の設定
+		// Vertex UV2 settings
 		std::vector<float> texCoord2List;
 		if (mc) {
 			//DracoTest(mc->buffer_view, texCoord2List, DracoDecodeType::TEX_COORD);
@@ -770,7 +770,7 @@ INode* glTFImporter_Core::CreateMaxNode(cgltf_node* node, INode* pParent)
 			for (auto m : mtlIdTable) {
 				pNewMtl->SetSubMtlAndName(idx++, m, m->GetName());
 			}
-			pNewMtl->RemoveMtl(0);	// 1つ目が余計
+			pNewMtl->RemoveMtl(0);	// The first one is unnecessary
 			pNode->SetMtl(pNewMtl);
 		}
 	}
@@ -787,7 +787,7 @@ INode* glTFImporter_Core::CreateMaxNode(cgltf_node* node, INode* pParent)
 }
 
 //======================================================================
-// オブジェクト作成
+// Create object
 //======================================================================
 void glTFImporter_Core::CreateNodeInfosRec(cgltf_node *node, INode *targetParent)
 {

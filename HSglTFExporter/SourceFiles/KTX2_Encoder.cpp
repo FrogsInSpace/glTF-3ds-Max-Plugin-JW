@@ -88,9 +88,9 @@ BOOL glTFExporter_Core::KTX2Encode(Texmap* pTex, KTX2TextureStruct& toKTX)
     BitmapInfo bi = pBmp->GetBitmapInfo();
 
 #if MAX_RELEASE > 26000
-	tstring retname = GetCOREInterface()->GetDir(APP_SYSTEM_IMAGE_DIR).data(); // Maxのパス取得に合わせて調整
+	tstring retname = GetCOREInterface()->GetDir(APP_SYSTEM_IMAGE_DIR).data();
 #else
-	tstring retname = GetCOREInterface()->GetDir(APP_SYSTEM_IMAGE_DIR); // Maxのパス取得に合わせて調整
+	tstring retname = GetCOREInterface()->GetDir(APP_SYSTEM_IMAGE_DIR);
 #endif
 	retname += _T("\\") + tstring(std::filesystem::path(bi.Filename()).stem().c_str()) + _T(".ktx2");
     toKTX.originalPathStr = retname;

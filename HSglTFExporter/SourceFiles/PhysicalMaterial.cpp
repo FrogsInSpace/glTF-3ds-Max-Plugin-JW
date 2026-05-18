@@ -60,10 +60,11 @@ void glTFExporter_Core::PhysicalMaterial(MtlBase *pMtl, tinygltf::Material &mate
 				}
 				material.alphaMode = "MASK";
 			}
-			// pTex とｐAlphaTexが異なる場合、アルファマップを置き換えたテクスチャを作る
-			// ※まだ作ってません
+			// If pTex and pAlphaTex are different, create a texture with the alpha map replaced.
+			// *Not yet created
 			if(pTex != pAlphaMap && pAlphaMap)
 				pTex = ReplaceAlphamap(pTex, pAlphaMap);
+			
 			CreateBaseColorTexture(material, pTex);
 		}
 	}

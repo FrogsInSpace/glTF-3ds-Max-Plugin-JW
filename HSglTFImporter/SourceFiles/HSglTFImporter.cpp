@@ -230,7 +230,7 @@ public:
 	FPInterfaceDesc* GetDesc();
 };
 //======================================================================
-// プラグイン記述子
+// Plugin descriptor
 //======================================================================
 class HSglTFImporterClassDesc : public ClassDesc2 
 {
@@ -1791,7 +1791,7 @@ std::wstring StringToWString(const char *oStringOrg, int code)
 	// UTF8 → wstring
 	MultiByteToWideChar(code, 0, oString, -1, cpUCS2, iBufferSize);
 
-	// stringの生成
+	// string generation
 	std::wstring oRet(cpUCS2, cpUCS2 + iBufferSize - 1);
 
 	delete[] cpUCS2;
@@ -1958,7 +1958,7 @@ tstring urlDecode(tstring str)
 		// Convert '+' to space
 		if (str[i] == '+') {
 			retStr += ' ';
-			//%付き文字の場合変換
+			//Converts characters with % prefixes
 		}
 		else if (str[i] == '%' && (i + 2) < length) {
 			tmpChar[0] = str[i + 1];

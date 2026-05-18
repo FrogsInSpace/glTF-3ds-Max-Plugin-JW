@@ -65,7 +65,7 @@ void glTFExporter_Core::SetCustomAttribute(tinygltf::Value::Object &params, ICus
 			if (pParamBlk == NULL) continue;
 
 			for (int x = 0; x < pParamBlk->NumParams(); x++) {
-				try {	// GetParamDef()、GetLocalName() でエラーになる場合があります
+				try {	// GetParamDef()、GetLocalName() - This may result in an error.
 					ParamID id = pParamBlk->IndextoID(x);
 					ParamDef def = pParamBlk->GetParamDef(id);
 					std::string str = WStringToString(pParamBlk->GetLocalName(id).data());
@@ -661,7 +661,7 @@ std::vector<tstring> StripString(const tstring &s, TCHAR delim)
 }
 
 //----------------------------------------------------------
-// 複数のユーザ属性文字列を分解し、テーブル展開する
+// Decompose multiple user attribute strings and expand them into a map.
 //----------------------------------------------------------
 int AnalyzeAttrBuf(TSTR &attrBuf, std::map<tstring, tstring> &attrMap)
 {

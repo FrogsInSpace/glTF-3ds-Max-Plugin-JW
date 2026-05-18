@@ -42,7 +42,7 @@ static void SetAttributes(Mtl* pSmat, ULONG flag = 0xffffffff, BOOL enableFlag=F
 
 
 //===================================================
-// プラグインクラス定義
+// Plugin class definition
 //===================================================
 class HSglTFTool : public UtilityObj {
 public:
@@ -71,7 +71,7 @@ public:
 static HSglTFTool theHSglTFToolt;
 
 //===================================================
-// クラス記述子
+// Class descriptor
 //===================================================
 class HSglTFToolClassDesc:public ClassDesc2 {
 public:
@@ -513,7 +513,7 @@ void HSglTFTool::RemoveAttr(HWND hWnd)
 //===================================================
 //===================================================
 
-// ソート用パラメータ
+// Sorting parameters
 struct SortParam {
 	HWND hListView;
 	int  column;
@@ -598,12 +598,12 @@ static LRESULT CALLBACK NodeIndexDlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPA
 					HWND hListView = GetDlgItem(hWnd, IDC_NODEINDEX_LIST);
 					NMLISTVIEW* pnmv = (NMLISTVIEW*)lParam;
 
-					static bool ascending = true;  // クリックごとに昇順/降順切替
+					static bool ascending = true;  // Toggle ascending/descending order with each click
 					SortParam param = { hListView, pnmv->iSubItem, ascending };
 
 					ListView_SortItems(hListView, CompareFunc, (LPARAM)&param);
 
-					ascending = !ascending; // 次回は逆順
+					ascending = !ascending; // Next time, we'll do it in reverse order.
 				}
 				break;
 			}
@@ -666,7 +666,7 @@ void SetNodeIndexListRec(INode* pNode)
 	}
 }
 //=============================================================================
-// Variableテーブルダイアログ
+// Variable table dialog
 //=============================================================================
 void HSglTFTool::NodeIndexDlg(HWND hWnd)
 {

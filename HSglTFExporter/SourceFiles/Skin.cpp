@@ -20,7 +20,7 @@
 #include "HSglTFExporter.h"
 
 //======================================================================
-// テーブル内のトップノードを見つける
+// Find the top node in the table
 //======================================================================
 INode *findRootNode(std::vector<INode*> &tbl)
 {
@@ -30,7 +30,7 @@ INode *findRootNode(std::vector<INode*> &tbl)
 	return *tbl.begin();
 }
 //======================================================================
-// Skin ボーンの最上位ボーンインデクスを返す
+// Returns the index of the topmost bone in the Skin bones.
 //======================================================================
 int glTFExporter_Core::GetRootNodeBoneID(ISkin* pISkin)
 {
@@ -48,7 +48,7 @@ int glTFExporter_Core::GetRootNodeBoneID(ISkin* pISkin)
 
 
 //======================================================================
-// Skin割り当て
+// Skin Assignment
 //======================================================================
 void glTFExporter_Core::CreateSkin(INode *pNode, Modifier *pSkinMod)
 {
