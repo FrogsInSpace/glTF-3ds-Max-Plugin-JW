@@ -15,10 +15,10 @@ glTF 1.0 is not supported.
 * **Format Types**: `*.gltf` + `*.bin` + textures, `*.gltf` (embedded), `*.glb` (binary)
 * **Object Types**: Geometry (Mesh), Spline, Shape, Camera, Lights
 * **Compression**: Draco compression supported
-* **Materials**: Scanline, PBR, Physical, glTF, Arnold, V-Ray, Corona, Pencil+4, USD
+* **Materials**: Scanline, PBR, Physical, glTF, Arnold, V-Ray, Corona, USD
     * glTF Material is not supported in 3ds Max 2021/2022
     * Material variants (only for materials supported by MtlSwitcher)
-* **Animation**: Object TRS, LINEAR/STEP interpolation, Morph weight, `KHR_animation_pointer`
+* **Animation**: Object TRS, LINEAR/STEP/CUBICSPLINE(Translate) interpolation, Morph weight, `KHR_animation_pointer`
 * **Vertex Deformation**: Skin, Morph
 * **Custom Attributes**: Scene, Node, and Material data (stored in `extras`)
 
@@ -26,9 +26,8 @@ glTF 1.0 is not supported.
 
 The following functions are not implemented in the current version
 
-- Output of KTX2 compressed image files
 
-- BezierSpline, Step animation interpolation 
+- Step animation interpolation 
 
 - Multi channel animation
 
@@ -111,6 +110,7 @@ the data size.
 
 ![Checkbox UI element](images/ui-checkbox.png) `KHR_animation_pointer` = Turn this switch ON if you want to output animations other than object motion and morph weighting. See [KHR_animation_pointer](https://github.com/KhronosGroup/glTF/blob/main/extensions/2.0/Khronos/KHR_animation_pointer/README.md) for details.
 
+![Checkbox UI element](images/ui-checkbox.png) `CUBICSPLINE(Translate)` = Translational animations using Bezier controllers are exported with CUBICSPLINE interpolation.
 
 #### Morph Target
 
@@ -122,6 +122,9 @@ the data size.
 Export the current scene as a glTF multi-scene. See [Exporting Multiple
 Scenes]() for details.
 
+#### Interactivity
+![Checkbox UI element](images/ui-checkbox.png) `Interactivity` For KHR_interactivity extension output
+*Currently not enabled.
 
 
 ## glTF Export Processing 
@@ -133,8 +136,9 @@ display of vertex color is turned on in the object properties.
 
 ### Animation Interpolation
 
-Only linear interpolation is supported for animation output. Other
-interpolation types will be converted to linear.
+Translational animations using Bezier controllers are exported with CUBICSPLINE interpolation.*
+*Bezier Position or Position XYZ + Bezier Float. For Position XYZ, the keyframe positions of the X, Y, and Z controllers must be aligned.
+Due to CUBICSPLINE constraints, the tangent handle length of Bezier keys is fixed at 0.333. As a result, Slow-in/Fast-out tangents or user-defined tangents with a handle length other than 0.333 will not be exported correctly. Other than animation, linear interpolation is supported for animation output. Other interpolation types will be converted to linear.
 
 To output animations without keys (such as expression controllers), turn
 on Bake Animation. 
