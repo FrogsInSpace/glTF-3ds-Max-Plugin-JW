@@ -134,7 +134,11 @@ void glTFImporter_Core::SetAnimationPointer(int animID)
 				INode* pNode = m_NodeMap[node];
 				if (!pNode) continue;
 
+#ifdef MAX_RELEASE_R24
+				Matrix3 mtx;
+#else
 				Matrix3 mtx(1);
+#endif 
 				if (pNode->GetParentNode()->IsRootNode())
 					mtx = YupTM;
 

@@ -221,7 +221,11 @@ INode* CreateAssetRec(cgltf_node* node, INode* pParent, float scale)
 		pRootNode->SetXRefParent(index, pNode);
 	}
 
+#ifdef MAX_RELEASE_R24
+	Matrix3 tm;
+#else
 	Matrix3 tm(1);
+#endif
 
 	if (node->has_matrix) {
 		float* mtx = node->matrix;

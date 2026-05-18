@@ -185,7 +185,8 @@ tstring glTFImporter_Core::CreateTextureFileName(cgltf_texture* tex, tstring &or
 
 		if (str.rfind(_T(".")) == std::string::npos) {
 			TCHAR buf[1000];
-			_stprintf_s(buf, sizeof(buf), _T("%s_%d.%s"), str.c_str(), (UINT)m_TextureMap.size(), StringToWString(type).c_str());
+			// JW: crashed due to sizeof(),  DragonDispersion.glb
+			_stprintf_s(buf, _countof(buf), _T("%s_%d.%s"), str.c_str(), (UINT)m_TextureMap.size(), StringToWString(type).c_str()); 
 			str = tstring(buf);
 		}
 		//char name[MAX_PATH];

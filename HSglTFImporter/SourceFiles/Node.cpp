@@ -167,7 +167,12 @@ INode* glTFImporter_Core::CreateMaxNode(cgltf_node* node, INode* pParent)
 	//UINT primId = 0;
 	StdMat* pCompositeMtl = NULL;
 
+#ifdef MAX_RELEASE_R24
+	Matrix3 parentTM;
+#else
 	Matrix3 parentTM(1);
+#endif 
+
 	if (pParent) {
 		parentTM = pParent->GetNodeTM(0);
 		parentTM.SetTrans(Point3(0, 0, 0));
@@ -786,7 +791,11 @@ INode* glTFImporter_Core::CreateMaxNode(cgltf_node* node, INode* pParent)
 //======================================================================
 void glTFImporter_Core::CreateNodeInfosRec(cgltf_node *node, INode *targetParent)
 {
+#ifdef MAX_RELEASE_R24
+	Matrix3 tm;
+#else
 	Matrix3 tm(1);
+#endif 
 
 	if (node->has_matrix) {
 		float *mtx = node->matrix;
