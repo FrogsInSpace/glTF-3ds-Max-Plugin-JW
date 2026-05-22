@@ -7,6 +7,8 @@
 **/ipch/
 **/x64/
 **/src/Generated/
+*.dli
+*.dle
 *.suo
 *.log
 *.aps
