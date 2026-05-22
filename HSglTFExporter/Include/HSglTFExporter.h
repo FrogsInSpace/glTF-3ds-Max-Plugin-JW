@@ -348,14 +348,20 @@ struct KTX2TextureStruct {
 
 //==========================================================
 //==========================================================
+struct VisibilityStruct {
+	BOOL visible = TRUE;
+};
+
+//==========================================================
+//==========================================================
 struct SelectabilityStruct {
-	BOOL selectable = FALSE;
+	BOOL selectable = TRUE;
 };
 
 //==========================================================
 //==========================================================
 struct HoverabilityStruct {
-	BOOL hoverable = FALSE;
+	BOOL hoverable = TRUE;
 };
 
 //==========================================================
@@ -578,6 +584,7 @@ public:
 	BOOL CreateLightOutAngleAnimation(Control* pC, UINT nodeIdx);
 	BOOL CreateLightInAngleAnimation(Control* pC, UINT nodeIdx);
 
+	BOOL CreateVisibilityNode(tinygltf::Node& node, const VisibilityStruct& str, BOOL animated);
 	BOOL CreateSelectabilityNode(tinygltf::Node& node, const SelectabilityStruct& str, BOOL animated);
 	BOOL CreateHoverabilityNode(tinygltf::Node& node, const HoverabilityStruct& str, BOOL animated);
 
@@ -671,6 +678,7 @@ public:
 	BOOL SetWebpTextureParams(MtlBase* pTex, WebpTextureStruct& str);
 	BOOL SetKTX2TextureParams(MtlBase* pTex, KTX2TextureStruct& str);
 
+	BOOL SetVisibilityParams(INode* pNode, VisibilityStruct& str);
 	BOOL SetSelectabilityParams(INode* pNode, SelectabilityStruct& str);
 	BOOL SetHoverabilityParams(INode* pNode, HoverabilityStruct& str);
 	BOOL SetInteractivityParams(ReferenceTarget* pRef, InteractivityStruct& str);
@@ -810,6 +818,7 @@ public:
 	BOOL m_TextureWebp_Used;
 	BOOL m_MaterialBump_Used;
 	BOOL m_Interactivity_Used;
+	BOOL m_Visibility_Used;
 	BOOL m_Selectability_Used;
 	BOOL m_Hoverability_Used;
 	BOOL m_TexBasisu_Used;

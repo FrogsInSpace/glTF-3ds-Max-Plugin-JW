@@ -96,10 +96,10 @@
     <ClInclude Include="Include\HSglTFImporter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="resource.h">
+    <ClInclude Include="Include\define.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Include\define.h">
+    <ClInclude Include="Resource\resource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

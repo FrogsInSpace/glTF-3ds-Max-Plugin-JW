@@ -12,7 +12,7 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectName>HSglTFImporter2027</ProjectName>
-    <ProjectGuid>{4DCC8EB2-9C05-48F9-B619-34A40F7D84C1}</ProjectGuid>
+    <ProjectGuid>{4B02B18F-95B6-4A73-92BB-4FCDDA7842B9}</ProjectGuid>
     <RootNamespace>Test</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
@@ -200,7 +200,7 @@
   <ItemGroup>
     <ClInclude Include="Include\define.h" />
     <ClInclude Include="Include\HSglTFImporter.h" />
-    <ClInclude Include="resource.h" />
+    <ClInclude Include="Resource\resource.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="HSglTFImporter.def" />

@@ -96,13 +96,13 @@
     <ClInclude Include="Include\HSglTFImporter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="resource.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Include\define.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Include\jsmn.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Resource\resource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

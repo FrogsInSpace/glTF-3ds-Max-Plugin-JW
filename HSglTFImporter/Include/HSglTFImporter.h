@@ -258,7 +258,7 @@ struct HoverabilityStruct {
 };
 
 struct VisibilityStruct {
-	BOOL hidden;
+	BOOL visible;
 };
 
 struct InteractivityStruct {
@@ -353,6 +353,7 @@ public:
 	INode* CreateMaxNode(cgltf_node *node, INode* pParent);
 	INode* CreateCamera(cgltf_node *node);
 	INode* CreateLight(cgltf_node *node);
+	void AttacheNodeExtentions(INode* pNode, cgltf_node* node);
 
 	BOOL FindAnimationChannels(cgltf_node *node, cgltf_animation *animation, std::vector<size_t> &ChannelList);
 	BOOL FindMtlAnimationChannels(cgltf_material* mtl, cgltf_animation* animation, std::vector<size_t>& ChannelList);
@@ -487,7 +488,7 @@ public:
 	BOOL KTX2ImageCreater(const tstring &ktxname, tstring& retname);
 	cgltf_texture *GetglTFTexByTexmap(Texmap* pTex);
 
-	int GetCustAttrPBlock(ReferenceTarget* pRef, tstring& AttName, IParamBlock2* &pBlock);
+	int GetCustAttrPBlock(ReferenceTarget* pRef, const tstring& AttName, IParamBlock2* &pBlock);
 
 	void SetSceneProperties(void);
 	void AttacheSceneProp(std::vector<custAttrParam>& attrTbl);

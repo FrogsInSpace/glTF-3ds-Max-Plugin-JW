@@ -173,6 +173,12 @@ tinygltf::Node glTFExporter_Core::CreateNodeDataRec(INode *pNode, BOOL recursive
 	node.name = WStringToString(pNode->GetName());
 
 	{
+		VisibilityStruct str;
+		if (SetVisibilityParams(pNode, str)) {
+			CreateVisibilityNode(node, str, TRUE);
+		}
+	}
+	{
 		SelectabilityStruct str;
 		if (SetSelectabilityParams(pNode, str)) {
 			CreateSelectabilityNode(node, str, TRUE);
@@ -1264,6 +1270,20 @@ UINT glTFExporter_Core::CreateInstanceMeshWithMtl(INode *pNode)
 	//int x = mesh.primitives[0].material;
 	m_model.meshes.push_back(mesh);
 	return m_model.meshes.size() - 1;
+}
+//======================================================================
+//======================================================================
+BOOL glTFExporter_Core::CreateVisibilityNode(tinygltf::Node& node, const VisibilityStruct& str, BOOL animated)
+{
+	tinygltf::Value::Object obj;
+	bool b = str.visible;
+	obj.insert(std::make_pair("visible", tinygltf::Value(b)));
+
+	tinygltf::Value val(obj);
+	node.extensions.insert(std::make_pair("KHR_node_visibility", val));
+
+	m_Visibility_Used = TRUE;
+	return TRUE;
 }
 //======================================================================
 //======================================================================
