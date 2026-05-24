@@ -19,6 +19,92 @@
 LANGUAGE LANG_JAPANESE, SUBLANG_DEFAULT
 #pragma code_page(932)
 
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+3 TEXTINCLUDE 
+BEGIN
+    "\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// AFX_DIALOG_LAYOUT
+//
+
+IDD_DIALOG1 AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE
+BEGIN
+    IDS_LIBDESCRIPTION      "glTF Importer"
+    IDS_CATEGORY            "HS Tools"
+    IDS_CLASS_NAME          "HSglTFImporter"
+    IDS_CLASS_NAME2         "HSglTFTool"
+END
+
+#endif    // “ú–{Œê (“ú–{) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
+// ‰pŒê resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+LANGUAGE LANG_ENGLISH, SUBLANG_NEUTRAL
+#pragma code_page(1252)
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// AFX_DIALOG_LAYOUT
+//
+
+IDD_PANEL AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+IDD_EXPORT_DIALOG AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+IDD_PROGRESS_DLG AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+IDD_TOOL_DLG AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+IDD_NODEINDEX_DLG1 AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+IDD_NODEEXTENSION_DLG AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+
 /////////////////////////////////////////////////////////////////////////////
 //
 // Dialog
@@ -123,18 +209,13 @@ BEGIN
     LTEXT           "",IDC_PHYSIC_COUNT,119,78,66,12
 END
 
-IDD_TOOL_DLG DIALOGEX 0, 0, 104, 146
+IDD_TOOL_DLG DIALOGEX 0, 0, 104, 97
 STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD | WS_VISIBLE | WS_SYSMENU
-FONT 8, "MS Shell Dlg", 400, 0, 0x1
+FONT 12, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    PUSHBUTTON      "Set Mtl Attrs",IDC_ATCATTR_BTN,18,7,79,18
-    GROUPBOX        "Node Extention",IDC_STATIC,7,27,90,86
-    CONTROL         "Selectability",IDC_SEL_CHK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,20,36,59,11
-    CONTROL         "Hoverability",IDC_HOV_CHK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,20,46,64,11
-    PUSHBUTTON      "Set extentions",IDC_NODEATTR_BTN,14,57,76,16
-    PUSHBUTTON      "Remove extentions",IDC_DELATTR_BTN,14,75,76,16
-    PUSHBUTTON      "Node Index...",IDC_NODEINDEX_BTN,14,93,76,16
-    PUSHBUTTON      "Remove attr",IDC_REMOVE_SELECTED_BTN,10,114,76,16
+    PUSHBUTTON      "Set Extensions to Mtl / Image encode params to Tex in the Scene",IDC_ATCATTR_BTN,4,7,93,35,BS_CENTER | BS_MULTILINE
+    PUSHBUTTON      "Node Extension editor...",IDC_NODEINDEX_BTN,4,69,93,21,BS_CENTER | BS_MULTILINE
+    PUSHBUTTON      "Remove Mtl/Tex attr...",IDC_REMOVE_SELECTED_BTN,4,44,93,20
 END
 
 IDD_GLTFX_DLG DIALOGEX 0, 0, 155, 40
@@ -146,19 +227,23 @@ BEGIN
     LTEXT           "",IDC_GLTFX_STATIC,7,18,141,13
 END
 
-IDD_NODEINDEX_DLG DIALOGEX 0, 0, 203, 170
+IDD_NODEEXTENSION_DLG DIALOGEX 0, 0, 179, 216
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
-CAPTION "Object Proc Checker"
+CAPTION "Node Extention"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    DEFPUSHBUTTON   "Close",IDOK,115,144,81,19
-    CONTROL         "",IDC_NODEINDEX_LIST,"SysListView32",LVS_REPORT | LVS_SHOWSELALWAYS | LVS_ALIGNLEFT | LVS_NOSORTHEADER | WS_BORDER | WS_TABSTOP,7,7,189,95,WS_EX_RIGHT
-    PUSHBUTTON      "Remove node Index",IDC_DEL_BTN,122,105,74,17
-    GROUPBOX        "Object Extention",IDC_STATIC,7,108,104,55
-    CONTROL         "KHR_node_selectability",IDC_SELECT_CHK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,17,123,91,8
-    CONTROL         "KHR_node_visibility",IDC_VISIBLE_CHK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,17,135,84,8
-    CONTROL         "KHR_node_hoverability",IDC_HOVER_CHK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,17,146,87,8
-    PUSHBUTTON      "Find Dup Index",IDC_FIND_DUP_BTN,117,121,79,16
+    CONTROL         "",IDC_NODEINDEX_LIST,"SysListView32",LVS_REPORT | LVS_SHOWSELALWAYS | LVS_ALIGNLEFT | LVS_NOSORTHEADER | WS_BORDER | WS_TABSTOP,0,7,179,89,WS_EX_RIGHT
+    GROUPBOX        "Node Extension",IDC_STATIC,0,99,179,53
+    CONTROL         "KHR_node_visibility",IDC_VISIBLE_CHK,"Button",BS_AUTOCHECKBOX | BS_PUSHLIKE | WS_TABSTOP,6,135,90,12
+    CONTROL         "KHR_node_selectability",IDC_SELECT_CHK,"Button",BS_AUTOCHECKBOX | BS_PUSHLIKE | WS_TABSTOP,6,108,90,12
+    CONTROL         "KHR_node_hoverability",IDC_HOVER_CHK,"Button",BS_AUTOCHECKBOX | BS_PUSHLIKE | WS_TABSTOP,6,121,90,12
+    PUSHBUTTON      "Set Extention",IDC_NODEATTR_BTN,104,110,60,20,BS_CENTER | BS_MULTILINE
+    GROUPBOX        "Extention value",IDC_STATIC,0,155,179,23
+    CONTROL         "Vis",IDC_VIS_CHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,56,165,20,10
+    CONTROL         "Sel",IDC_SEL_CHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,165,20,10
+    CONTROL         "Hov",IDC_HOV_CHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,30,165,24,10
+    PUSHBUTTON      "Set Value",IDC_SETVAL_BUTTON,104,162,60,15
+    DEFPUSHBUTTON   "Close",IDOK,0,193,179,19
 END
 
 
@@ -188,10 +273,10 @@ BEGIN
 
     IDD_TOOL_DLG, DIALOG
     BEGIN
-        LEFTMARGIN, 7
+        LEFTMARGIN, 4
         RIGHTMARGIN, 97
         TOPMARGIN, 7
-        BOTTOMMARGIN, 139
+        BOTTOMMARGIN, 90
     END
 
     IDD_GLTFX_DLG, DIALOG
@@ -202,85 +287,14 @@ BEGIN
         BOTTOMMARGIN, 33
     END
 
-    IDD_NODEINDEX_DLG, DIALOG
+    IDD_NODEEXTENSION_DLG, DIALOG
     BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 196
-        VERTGUIDE, 44
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 163
+        BOTTOMMARGIN, 212
     END
 END
 #endif    // APSTUDIO_INVOKED
 
-
-#ifdef APSTUDIO_INVOKED
-/////////////////////////////////////////////////////////////////////////////
-//
-// TEXTINCLUDE
-//
-
-3 TEXTINCLUDE 
-BEGIN
-    "\r\n"
-    "\0"
-END
-
-#endif    // APSTUDIO_INVOKED
-
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// AFX_DIALOG_LAYOUT
-//
-
-IDD_PANEL AFX_DIALOG_LAYOUT
-BEGIN
-    0
-END
-
-IDD_EXPORT_DIALOG AFX_DIALOG_LAYOUT
-BEGIN
-    0
-END
-
-IDD_PROGRESS_DLG AFX_DIALOG_LAYOUT
-BEGIN
-    0
-END
-
-IDD_TOOL_DLG AFX_DIALOG_LAYOUT
-BEGIN
-    0
-END
-
-IDD_DIALOG1 AFX_DIALOG_LAYOUT
-BEGIN
-    0
-END
-
-IDD_NODEINDEX_DLG AFX_DIALOG_LAYOUT
-BEGIN
-    0
-END
-
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// String Table
-//
-
-STRINGTABLE
-BEGIN
-    IDS_LIBDESCRIPTION      "glTF Importer"
-    IDS_CATEGORY            "HS Tools"
-    IDS_CLASS_NAME          "HSglTFImporter"
-    IDS_PARAMS              "Parameters"
-    IDS_SPIN                "Spin"
-    IDS_CLASS_NAME2         "HSglTFTool"
-END
-
-#endif    // “ú–{Œê (“ú–{) resources
+#endif    // ‰pŒê resources
 /////////////////////////////////////////////////////////////////////////////
 
 

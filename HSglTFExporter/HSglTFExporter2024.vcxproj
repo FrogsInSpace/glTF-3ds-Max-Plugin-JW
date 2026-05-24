@@ -205,7 +205,7 @@
   <ItemGroup>
     <ClInclude Include="Include\define.h" />
     <ClInclude Include="Include\HSglTFExporter.h" />
-    <ClInclude Include="resource.h" />
+    <ClInclude Include="Resource\resource.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="HSglTFExporter.def" />

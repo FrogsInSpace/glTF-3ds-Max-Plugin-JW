@@ -497,6 +497,21 @@ BOOL glTFExporter_Core::SetVRayExtParams(MtlBase* pMtl, vrayExtStruct& str)
 
 //==========================================================
 //==========================================================
+BOOL glTFExporter_Core::SetVisibilityParams(INode* pNode, VisibilityStruct& str)
+{
+	str.visible = TRUE;
+
+	IParamBlock2* pBlock = GetCustAttrPBlock(pNode->GetObjectRef(), tstring(_T("Visibility")));
+	if (!pBlock) return FALSE;
+	//if (pBlock->GetInt(1, m_time) == 0) return FALSE;
+
+	pBlock->GetValueByName(_T("visible"), m_time, str.visible, FOREVER, 0);
+
+	return TRUE;
+}
+
+//==========================================================
+//==========================================================
 BOOL glTFExporter_Core::SetSelectabilityParams(INode* pNode, SelectabilityStruct& str)
 {
 	str.selectable = TRUE;

@@ -14,7 +14,7 @@
 #define IDD_PROGRESS_DLG                104
 #define IDD_TOOL_DLG                    106
 #define IDD_DIALOG1                     108
-#define IDD_NODEINDEX_DLG               110
+#define IDD_NODEEXTENSION_DLG           111
 #define IDC_CLOSEBUTTON                 1000
 #define IDC_MATCHANIM_CHK               1001
 #define IDC_ANIM_CHK                    1002
@@ -69,28 +69,30 @@
 #define IDC_SCN_BTN3                    1056
 #define IDC_ROT_COMBO                   1057
 #define IDC_ROTCTL_STATIC               1059
-#define IDC_CHECK1                      1060
 #define IDC_LOG_CHK                     1060
-#define IDC_SEL_CHK                     1060
-#define IDC_SELECT_CHK                  1060
-#define IDC_FLAT_HIR_CHK                1061
-#define IDC_HOV_CHK                     1061
-#define IDC_VISIBLE_CHK                 1061
-#define IDC_NODEATTR_BTN                1062
-#define IDC_HOVER_CHK                   1062
-#define IDC_DELATTR_BTN                 1063
-#define IDC_NODEINDEX_BTN               1064
-#define IDC_NODEINDEX_BTN2              1065
-#define IDC_REMOVE_SELECTED_BTN         1065
-#define IDC_APPLYSCL_CHK                1067
-#define IDC_PROGRESS1                   1068
-#define IDC_GLTFX_STATIC                1069
-#define IDC_CHECK2                      1070
-#define IDC_CM_CHECK                    1070
-#define IDC_NODEINDEX_LIST              1071
-#define IDC_DEL_BTN                     1072
-#define IDC_BUTTON1                     1073
-#define IDC_FIND_DUP_BTN                1074
+#define IDC_SEL_CHK                     1061
+#define IDC_SELECT_CHK                  1062
+#define IDC_FLAT_HIR_CHK                1063
+#define IDC_HOV_CHK                     1064
+#define IDC_VISIBLE_CHK                 1065
+#define IDC_HOVER_CHK                   1066
+#define IDC_NODEATTR_BTN                1067
+#define IDC_DELATTR_BTN                 1068
+#define IDC_NODEINDEX_BTN               1069
+#define IDC_REMOVE_SELECTED_BTN         1070
+#define IDC_VIS_CHK                     1071
+#define IDC_APPLYSCL_CHK                1072
+#define IDC_PROGRESS1                   1073
+#define IDC_GLTFX_STATIC                1074
+#define IDC_CM_CHECK                    1076
+#define IDC_VIS_CHECK                   1077
+#define IDC_NODEINDEX_LIST              1078
+#define IDC_SEL_CHECK                   1080
+#define IDC_BUTTON1                     1081
+#define IDC_SETVAL_BUTTON               1081
+#define IDC_HOV_CHECK                   1082
+#define IDC_BUTTON2                     1084
+#define IDC_ADD_BUTTON                  1085
 #define IDC_NODE_COUNT                  1120
 #define IDC_MTL_COUNT                   1121
 #define IDC_TEX_COUNT                   1122
@@ -115,9 +117,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        112
+#define _APS_NEXT_RESOURCE_VALUE        113
 #define _APS_NEXT_COMMAND_VALUE         40001
-#define _APS_NEXT_CONTROL_VALUE         1075
+#define _APS_NEXT_CONTROL_VALUE         1076
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

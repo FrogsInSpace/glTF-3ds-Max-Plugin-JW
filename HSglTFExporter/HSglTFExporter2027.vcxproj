@@ -12,7 +12,7 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectName>HSglTFExporter2027</ProjectName>
-    <ProjectGuid>{97D49973-99A4-41B9-B601-8E129D18F026}</ProjectGuid>
+    <ProjectGuid>{27551FC9-20F4-4167-826F-157116A6C04B}</ProjectGuid>
     <RootNamespace>Test</RootNamespace>
     <WindowsTargetPlatformVersion>10.0.19041.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
@@ -205,7 +205,6 @@
   <ItemGroup>
     <ClInclude Include="Include\define.h" />
     <ClInclude Include="Include\HSglTFExporter.h" />
-    <ClInclude Include="resource.h" />
     <ClInclude Include="Resource\resource.h" />
   </ItemGroup>
   <ItemGroup>

@@ -475,7 +475,7 @@ INode* glTFImporter_Core::CreateMaxNode(cgltf_node* node, INode* pParent)
 
 		}
 
-		// 頂点法線の設定
+		// Set the Vertex nodr
 		std::vector<float> NormalList;
 		if (mc) {
 			DracoDecodeProc(mc->buffer_view, NormalList, DracoDecodeType::NORMAL);
@@ -770,6 +770,8 @@ INode* glTFImporter_Core::CreateMaxNode(cgltf_node* node, INode* pParent)
 		}
 	}
 
+	AttacheNodeExtentions(pNode, node);
+
 	if (ViewVertColor) {
 		pNode->SetCVertMode(TRUE);
 		pNode->SetShadeCVerts(TRUE);
@@ -782,7 +784,7 @@ INode* glTFImporter_Core::CreateMaxNode(cgltf_node* node, INode* pParent)
 }
 
 //======================================================================
-// オブジェクト作成
+// Create Node Object
 //======================================================================
 void glTFImporter_Core::CreateNodeInfosRec(cgltf_node *node, INode *targetParent)
 {
@@ -996,3 +998,29 @@ void glTFImporter_Core::CreateNodeInfosRec(cgltf_node *node, INode *targetParent
 	}
 }
 
+//======================================================================
+// Attache Extention params 
+//======================================================================
+void glTFImporter_Core::AttacheNodeExtentions(INode* pNode, cgltf_node* node)
+{
+	if (!pNode || !node) return;
+
+	if (node->has_node_visibility) {
+		VisibilityStruct str;
+		str.visible = node->visibility.visible;
+		CreateVisibilityAttr(pNode, str, TRUE);
+	}
+
+	if (node->has_node_hoverability) {
+		HoverabilityStruct str;
+		str.hoverable = node->hoverabilty.hoverable;
+		CreateHoverabilityAttr(pNode, str, TRUE);
+	}
+
+	if (node->has_node_selectability) {
+		SelectabilityStruct str;
+		str.selectable = node->selectability.selectable;
+		CreateSelectabilityAttr(pNode, str, TRUE);
+	}
+
+}

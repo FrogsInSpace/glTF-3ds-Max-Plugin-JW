@@ -793,6 +793,8 @@ cgltf_texture *glTFImporter_Core::GetglTFTexByTexmap(Texmap* pTex)
 }
 
 
+//=============================================================================
+//=============================================================================
 Point2 ApplyGltfTextureTransform(Texmap* pBmpTex, const cgltf_texture_view* textview, TimeValue t)
 {
 	Point2 offset(0.0f, 0.0f);
@@ -801,10 +803,10 @@ Point2 ApplyGltfTextureTransform(Texmap* pBmpTex, const cgltf_texture_view* text
 	StdUVGen* pUVGen = GetUVGen(pBmpTex);
 	if (!pUVGen) return offset;
 
-	// UVセット番号（Map Channel は +1）
+	// UV chanel （Map Channel +1）
 	pUVGen->SetMapChannel(textview->texcoord + 1);
 
-	// サンプラの tiling 設定
+	// Sampler's tiling setting
 	UINT tiling = 0;
 	cgltf_sampler* pSampler = textview->texture->sampler;
 	if (pSampler) {
@@ -815,7 +817,7 @@ Point2 ApplyGltfTextureTransform(Texmap* pBmpTex, const cgltf_texture_view* text
 		pUVGen->SetTextureTiling(tiling);
 	}
 
-	// Transformが存在しない or 無効化されている場合
+	// Transform not found or disabled
 	if (!textview->has_transform) return offset;
 
 	// glTF transform情報
@@ -825,7 +827,7 @@ Point2 ApplyGltfTextureTransform(Texmap* pBmpTex, const cgltf_texture_view* text
 	offset.x = textview->transform.offset[0];
 	offset.y = textview->transform.offset[1];
 
-	// glTFは(0.5, 0.5)回転、3ds Maxは(0.0, 0.0)回転のため、オフセット補正
+	// Adjust offset (Rptate origin: glTF=[0.5, 0.5], 3ds Max=[0.0, 0.0])
 	float pivotU = 0.5f;
 	float pivotV = 0.5f;
 
@@ -838,11 +840,11 @@ Point2 ApplyGltfTextureTransform(Texmap* pBmpTex, const cgltf_texture_view* text
 	offset.x += dU;
 	offset.y += dV;
 
-	// スケールが1未満のときに中心がずれるので補正
+	// if scale<1.0, adjust scale origin
 	if (sclU != 0.0f) offset.x = offset.x / sclU;
 	if (sclV != 0.0f) offset.y = offset.y / sclV;
 
-	// UVGenに設定
+	//Set  UVGen
 	pUVGen->SetUOffs(offset.x, t);
 	pUVGen->SetVOffs(offset.y, t);
 	pUVGen->SetUScl(sclU, t);
@@ -856,7 +858,7 @@ Point2 ApplyGltfTextureTransform(Texmap* pBmpTex, const cgltf_texture_view* text
 	return offset;
 }
 
-#if 1	// オリジナル
+#if 1	// Original
 //=============================================================================
 //=============================================================================
 Point2 glTFImporter_Core::SetTextureUVoffset(Texmap *pBmpTex, cgltf_texture_view *textview)
@@ -870,18 +872,29 @@ Point2 glTFImporter_Core::SetTextureUVoffset(Texmap *pBmpTex, cgltf_texture_view
 	StdUVGen* pUVGen = GetUVGen(pBmpTex);
 	if (pUVGen) pUVGen->SetMapChannel(textview->texcoord + 1);
 
-	UINT Tiling = 0;
-	cgltf_sampler* pSampler = textview->texture->sampler;
-	if (pSampler) {
-		if (pSampler->wrap_s == 10497) Tiling += U_WRAP;
-		if (pSampler->wrap_t == 10497) Tiling += V_WRAP;
-		if (pSampler->wrap_s == 33648) Tiling += U_WRAP + U_MIRROR;
-		if (pSampler->wrap_t == 33648) Tiling += V_WRAP + V_MIRROR;
-		if (pUVGen) {
-			pUVGen->SetTextureTiling(Tiling);
-			int mapCh = textview->texcoord + 1;
-			pUVGen->SetMapChannel(mapCh);
+	float sclU = 1.0f;
+	float sclV = 1.0f;
+
+	cgltf_sampler* sampler = textview->texture->sampler;
+	if (sampler && pUVGen) {
+		UINT Tiling = 0;
+		if (sampler->wrap_s == 10497) Tiling += U_WRAP;
+		if (sampler->wrap_t == 10497) Tiling += V_WRAP;
+		if (sampler->wrap_s == 33648) {
+			Tiling += U_WRAP + U_MIRROR;
+			//sclU = -1.0f;
 		}
+		if (sampler->wrap_t == 33648) {
+			Tiling += V_WRAP + V_MIRROR;
+			//sclV = -1.0f;
+		}
+
+		pUVGen->SetUScl(sclU, m_time);
+		pUVGen->SetVScl(sclV, m_time);
+
+		pUVGen->SetTextureTiling(Tiling);
+		int mapCh = textview->texcoord + 1;
+		pUVGen->SetMapChannel(mapCh);
 	}
 
 	if (!textview->has_transform) return offset;
@@ -891,8 +904,8 @@ Point2 glTFImporter_Core::SetTextureUVoffset(Texmap *pBmpTex, cgltf_texture_view
 
 	offset.x = textview->transform.offset[0];
 	offset.y = textview->transform.offset[1];
-	float sclU = textview->transform.scale[0];
-	float sclV = textview->transform.scale[1];
+	sclU *= textview->transform.scale[0];
+	sclV *= textview->transform.scale[1];
 	float rot = textview->transform.rotation;
 
 	float localoffsetU = -0.5f * cos(rot) + 0.5f * sin(rot) + 0.5f;
@@ -924,13 +937,15 @@ Point2 glTFImporter_Core::SetTextureUVoffset(Texmap *pBmpTex, cgltf_texture_view
 		pUVGen->SetVScl(sclV, m_time);
 		pUVGen->SetWAng(rot, m_time);
 	}
+
 	if (pBmpTex->ClassID() == bmptexClassID) {
 		((BitmapTex*)pBmpTex)->ReloadBitmapAndUpdate();
 	}
+
 	return offset;
 }
 
-#else // Geminio版
+#else // Gemini
 //=============================================================================
 //=============================================================================
 Point2 glTFImporter_Core::SetTextureUVoffset(Texmap* pBmpTex, cgltf_texture_view* textview)
@@ -998,8 +1013,6 @@ void glTFImporter_Core::RescaleUVOffset(Mtl *pMtl, Box2D &rect)
 {
 	return;
 
-#ifndef _DEBUG
-#endif
 
 	Point2 CropSize;
 	CropSize.x = rect.max.x - rect.min.x;

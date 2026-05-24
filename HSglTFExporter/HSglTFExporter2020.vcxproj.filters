@@ -105,13 +105,13 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="resource.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Include\HSglTFExporter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Include\define.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Resource\resource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

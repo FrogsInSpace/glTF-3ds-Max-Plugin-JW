@@ -111,9 +111,6 @@
     <ClInclude Include="Include\HSglTFExporter.h">
       <Filter>Header</Filter>
     </ClInclude>
-    <ClInclude Include="resource.h">
-      <Filter>Header</Filter>
-    </ClInclude>
     <ClInclude Include="Resource\resource.h" />
   </ItemGroup>
   <ItemGroup>

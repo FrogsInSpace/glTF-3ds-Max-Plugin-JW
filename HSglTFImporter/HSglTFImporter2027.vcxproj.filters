@@ -93,13 +93,13 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="resource.h">
-      <Filter>Header</Filter>
-    </ClInclude>
     <ClInclude Include="Include\HSglTFImporter.h">
       <Filter>Header</Filter>
     </ClInclude>
     <ClInclude Include="Include\define.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Resource\resource.h">
       <Filter>Header</Filter>
     </ClInclude>
   </ItemGroup>
