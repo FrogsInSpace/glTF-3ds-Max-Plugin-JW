@@ -185,8 +185,7 @@ tstring glTFImporter_Core::CreateTextureFileName(cgltf_texture* tex, tstring &or
 
 		if (str.rfind(_T(".")) == std::string::npos) {
 			TCHAR buf[1000];
-			// JW: crashed due to sizeof(),  DragonDispersion.glb
-			_stprintf_s(buf, _countof(buf), _T("%s_%d.%s"), str.c_str(), (UINT)m_TextureMap.size(), StringToWString(type).c_str()); 
+			_stprintf_s(buf, sizeof(buf), _T("%s_%d.%s"), str.c_str(), (UINT)m_TextureMap.size(), StringToWString(type).c_str());
 			str = tstring(buf);
 		}
 		//char name[MAX_PATH];
@@ -794,6 +793,8 @@ cgltf_texture *glTFImporter_Core::GetglTFTexByTexmap(Texmap* pTex)
 }
 
 
+//=============================================================================
+//=============================================================================
 Point2 ApplyGltfTextureTransform(Texmap* pBmpTex, const cgltf_texture_view* textview, TimeValue t)
 {
 	Point2 offset(0.0f, 0.0f);
@@ -802,10 +803,10 @@ Point2 ApplyGltfTextureTransform(Texmap* pBmpTex, const cgltf_texture_view* text
 	StdUVGen* pUVGen = GetUVGen(pBmpTex);
 	if (!pUVGen) return offset;
 
-	// UV set number (Map Channel is +1)
+	// UV chanel （Map Channel +1）
 	pUVGen->SetMapChannel(textview->texcoord + 1);
 
-	// Sampler tiling settings
+	// Sampler's tiling setting
 	UINT tiling = 0;
 	cgltf_sampler* pSampler = textview->texture->sampler;
 	if (pSampler) {
@@ -816,17 +817,17 @@ Point2 ApplyGltfTextureTransform(Texmap* pBmpTex, const cgltf_texture_view* text
 		pUVGen->SetTextureTiling(tiling);
 	}
 
-	// If the Transform does not exist or is disabled
+	// Transform not found or disabled
 	if (!textview->has_transform) return offset;
 
-	// glTF transform information
+	// glTF transform情報
 	float sclU = textview->transform.scale[0];
 	float sclV = textview->transform.scale[1];
 	float rot = textview->transform.rotation;
 	offset.x = textview->transform.offset[0];
 	offset.y = textview->transform.offset[1];
 
-	// glTF rotates around (0.5, 0.5) and 3ds Max rotates around (0.0, 0.0), therefore offset correction is necessary.
+	// Adjust offset (Rptate origin: glTF=[0.5, 0.5], 3ds Max=[0.0, 0.0])
 	float pivotU = 0.5f;
 	float pivotV = 0.5f;
 
@@ -839,16 +840,16 @@ Point2 ApplyGltfTextureTransform(Texmap* pBmpTex, const cgltf_texture_view* text
 	offset.x += dU;
 	offset.y += dV;
 
-	// The center shifts when the scale is less than 1, so it needs to be corrected.
+	// if scale<1.0, adjust scale origin
 	if (sclU != 0.0f) offset.x = offset.x / sclU;
 	if (sclV != 0.0f) offset.y = offset.y / sclV;
 
-	// Setup UVGen
+	//Set  UVGen
 	pUVGen->SetUOffs(offset.x, t);
 	pUVGen->SetVOffs(offset.y, t);
 	pUVGen->SetUScl(sclU, t);
 	pUVGen->SetVScl(sclV, t);
-	pUVGen->SetWAng(rot, t); // expects radians
+	pUVGen->SetWAng(rot, t); // 3ds MaxのWAngはラジアン単位でOK
 
 	if (pBmpTex->ClassID() == bmptexClassID) {
 		((BitmapTex*)pBmpTex)->ReloadBitmapAndUpdate();
@@ -857,7 +858,7 @@ Point2 ApplyGltfTextureTransform(Texmap* pBmpTex, const cgltf_texture_view* text
 	return offset;
 }
 
-#if 1	// original
+#if 1	// Original
 //=============================================================================
 //=============================================================================
 Point2 glTFImporter_Core::SetTextureUVoffset(Texmap *pBmpTex, cgltf_texture_view *textview)
@@ -871,18 +872,29 @@ Point2 glTFImporter_Core::SetTextureUVoffset(Texmap *pBmpTex, cgltf_texture_view
 	StdUVGen* pUVGen = GetUVGen(pBmpTex);
 	if (pUVGen) pUVGen->SetMapChannel(textview->texcoord + 1);
 
-	UINT Tiling = 0;
-	cgltf_sampler* pSampler = textview->texture->sampler;
-	if (pSampler) {
-		if (pSampler->wrap_s == 10497) Tiling += U_WRAP;
-		if (pSampler->wrap_t == 10497) Tiling += V_WRAP;
-		if (pSampler->wrap_s == 33648) Tiling += U_WRAP + U_MIRROR;
-		if (pSampler->wrap_t == 33648) Tiling += V_WRAP + V_MIRROR;
-		if (pUVGen) {
-			pUVGen->SetTextureTiling(Tiling);
-			int mapCh = textview->texcoord + 1;
-			pUVGen->SetMapChannel(mapCh);
+	float sclU = 1.0f;
+	float sclV = 1.0f;
+
+	cgltf_sampler* sampler = textview->texture->sampler;
+	if (sampler && pUVGen) {
+		UINT Tiling = 0;
+		if (sampler->wrap_s == 10497) Tiling += U_WRAP;
+		if (sampler->wrap_t == 10497) Tiling += V_WRAP;
+		if (sampler->wrap_s == 33648) {
+			Tiling += U_WRAP + U_MIRROR;
+			//sclU = -1.0f;
 		}
+		if (sampler->wrap_t == 33648) {
+			Tiling += V_WRAP + V_MIRROR;
+			//sclV = -1.0f;
+		}
+
+		pUVGen->SetUScl(sclU, m_time);
+		pUVGen->SetVScl(sclV, m_time);
+
+		pUVGen->SetTextureTiling(Tiling);
+		int mapCh = textview->texcoord + 1;
+		pUVGen->SetMapChannel(mapCh);
 	}
 
 	if (!textview->has_transform) return offset;
@@ -892,8 +904,8 @@ Point2 glTFImporter_Core::SetTextureUVoffset(Texmap *pBmpTex, cgltf_texture_view
 
 	offset.x = textview->transform.offset[0];
 	offset.y = textview->transform.offset[1];
-	float sclU = textview->transform.scale[0];
-	float sclV = textview->transform.scale[1];
+	sclU *= textview->transform.scale[0];
+	sclV *= textview->transform.scale[1];
 	float rot = textview->transform.rotation;
 
 	float localoffsetU = -0.5f * cos(rot) + 0.5f * sin(rot) + 0.5f;
@@ -925,13 +937,15 @@ Point2 glTFImporter_Core::SetTextureUVoffset(Texmap *pBmpTex, cgltf_texture_view
 		pUVGen->SetVScl(sclV, m_time);
 		pUVGen->SetWAng(rot, m_time);
 	}
+
 	if (pBmpTex->ClassID() == bmptexClassID) {
 		((BitmapTex*)pBmpTex)->ReloadBitmapAndUpdate();
 	}
+
 	return offset;
 }
 
-#else // Geminio version
+#else // Gemini
 //=============================================================================
 //=============================================================================
 Point2 glTFImporter_Core::SetTextureUVoffset(Texmap* pBmpTex, cgltf_texture_view* textview)
@@ -962,30 +976,30 @@ Point2 glTFImporter_Core::SetTextureUVoffset(Texmap* pBmpTex, cgltf_texture_view
 					uvGen->SetMapChannel(mapCh);
 				}
 
-				// 1. Setting the tiling (scale)
+				// 1. タイリング（スケール）の設定
 				uvGen->SetUScl(scaleU, t);
 				uvGen->SetVScl(scaleV, t);
 
-				// 2. Rotation Settings
-				// glTF rotates counterclockwise around the origin (0,0).
-				// Max's WAng is similar, but the coordinate system is inverted vertically, 
-				// so correction of the rotation direction and center may be necessary.
+				// 2. 回転の設定
+				// glTFは原点(0,0)中心の反時計回り。
+				// MaxのWAngも同様だが、座標系が上下反転しているため、
+				// 回転方向や中心の補正が必要な場合があります。
 				uvGen->SetWAng(rot, t);
 
-				// 3. Offset Calculation
-				// In Max's UVGen, the Offset value is treated as "1 unit after tiling",
-				// so the following formula is standard when there is no rotation:
+				// 3. オフセットの計算
+				// MaxのUVGenでは、Offset値は「タイリング後の1単位」として扱われるため
+				// 回転がない場合は以下の式が標準的です。
 				p2.x = offU;
-				// V direction: Convert glTF's "offset from top edge" to Max's "offset from bottom edge"
-				// Further consider the tiling (height) and adjust the starting point to the bottom edge.
+				// V方向：glTFの「上端からのオフセット」を、Maxの「下端からのオフセット」に変換
+				// さらにタイリング（高さ）分を考慮して、開始点を下端基準へ。
 				p2.y = 1.0f - scaleV - offV;
 				uvGen->SetUOffs(p2.x, t);
 				uvGen->SetVOffs(p2.y, t);
 
-				// 4. Important: Setting the origin of the coordinate system
-				// If you need to set the rotation and scaling center to (0,0) to conform to the glTF specifications,
-				// Check the following flag (uncomment if necessary)
-				// uvGen->SetFlag(U_OFFSET, 0);
+				// 4. 重要：座標系の原点設定
+				// glTFの仕様に合わせるため、回転・スケールの中心を(0,0)にする必要がある場合、
+				// 以下のフラグを確認してください（必要に応じてコメント解除）
+				// uvGen->SetFlag(U_OFFSET, 0); 
 			}
 		}
 	}
@@ -999,8 +1013,6 @@ void glTFImporter_Core::RescaleUVOffset(Mtl *pMtl, Box2D &rect)
 {
 	return;
 
-#ifndef _DEBUG
-#endif
 
 	Point2 CropSize;
 	CropSize.x = rect.max.x - rect.min.x;

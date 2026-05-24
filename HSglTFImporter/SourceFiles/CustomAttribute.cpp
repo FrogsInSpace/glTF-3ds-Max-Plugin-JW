@@ -32,7 +32,7 @@ bool isNumber(const char* str)
 
 //==========================================================
 //==========================================================
-int glTFImporter_Core::GetCustAttrPBlock(ReferenceTarget* pRef, tstring& AttName, IParamBlock2* &pBlock)
+int glTFImporter_Core::GetCustAttrPBlock(ReferenceTarget* pRef, const tstring& AttName, IParamBlock2* &pBlock)
 {
 	pBlock = NULL;
 
@@ -1161,9 +1161,9 @@ void glTFImporter_Core::CreateVisibilityAttr(INode* pNode, const VisibilityStruc
 	std::vector<custAttrParam> attrTbl;
 	custAttrParam param;
 
-	param.name = std::string("hidden");
+	param.name = std::string("visible");
 	param.type = TYPE_BOOL;
-	param.iParam = str.hidden;
+	param.iParam = str.visible;
 	attrTbl.push_back(param);
 
 	Class_ID retID = AttacheCustAttr(pNode, attrTbl, _T("Visibility"));

@@ -42,7 +42,7 @@ static void SetAttributes(Mtl* pSmat, ULONG flag = 0xffffffff, BOOL enableFlag=F
 
 
 //===================================================
-// Plugin class definition
+// Define Plugin class
 //===================================================
 class HSglTFTool : public UtilityObj {
 public:
@@ -59,7 +59,8 @@ public:
 
 	void DoTest(HWND hWnd);
 	void SetNodeAttr(HWND hWnd);
-	void RemoveNodeAttr(HWND hWnd);
+	void SetNodeExtentionValue(HWND hWnd);
+	//void RemoveNodeAttr(HWND hWnd);
 	void NodeIndexDlg(HWND hWnd);
 	void RemoveAttr(HWND hWnd);
 	FPInterfaceDesc* GetDesc();
@@ -71,7 +72,7 @@ public:
 static HSglTFTool theHSglTFToolt;
 
 //===================================================
-// Class descriptor
+// クラス記述子
 //===================================================
 class HSglTFToolClassDesc:public ClassDesc2 {
 public:
@@ -159,14 +160,9 @@ static HSglTFToolActionsIMP HSglTFToolActionsFP(HSGLTFTOOL_INTERFACE_ID, _T("HSg
 FPInterfaceDesc* HSglTFTool::GetDesc() { return &HSglTFToolActionsFP; }
 
 
-
-
-
-
-
-
-
-
+//===================================================
+// Tool Panel callback
+//===================================================
 static BOOL CALLBACK MyDlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	switch (msg) {
@@ -178,19 +174,14 @@ static BOOL CALLBACK MyDlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam
 		case IDC_ATCATTR_BTN:
 			theHSglTFToolt.DoTest(hWnd);
 			break;
-		case IDC_NODEATTR_BTN:
-			theHSglTFToolt.SetNodeAttr(hWnd);
-			break;
-		case IDC_DELATTR_BTN:
-			theHSglTFToolt.RemoveNodeAttr(hWnd);
-			break;
+
 		case IDC_NODEINDEX_BTN:
 			theHSglTFToolt.NodeIndexDlg(hWnd);
 			break;
+
 		case IDC_REMOVE_SELECTED_BTN:
 			theHSglTFToolt.RemoveAttr(hWnd);
 			break;
-
 		}
 		break;
 
@@ -201,8 +192,8 @@ static BOOL CALLBACK MyDlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam
 }
 
 
-
-
+//===================================================
+//===================================================
 //--- HSglTFTool -------------------------------------------------------
 HSglTFTool::HSglTFTool()
 {
@@ -360,7 +351,7 @@ void SetAttributes(Mtl* pSmat, ULONG flag, BOOL enableFlag)
 	else  if (pSmat->ClassID() == CoronaMaterialID) {
 	}
 
-
+	//---------------------------------------------------------------
 	for (int i = 0; i < pSmat->NumSubTexmaps(); i++) {
 		Texmap* pTex = pSmat->GetSubTexmap(i);
 		if (!pTex) continue;
@@ -396,30 +387,9 @@ void HSglTFTool::DoTest(HWND hWnd)
 	}
 }
 
-
 //===================================================
 //===================================================
-void SetNodeAttributes(INode* pNode, BOOL sel, BOOL hov, BOOL vis)
-{
-	if (!pNode) return;
-
-	SelectabilityStruct selStr;
-	HoverabilityStruct hovStr;
-	VisibilityStruct visStr;
-
-	selStr.selectable = FALSE;
-	hovStr.hoverable = FALSE;
-	visStr.hidden = FALSE;
-
-	glTFImporter_Core app;
-	if(sel) app.CreateSelectabilityAttr(pNode, selStr, FALSE);
-	if (hov) app.CreateHoverabilityAttr(pNode, hovStr, FALSE);
-	if (vis) app.CreateVisibilityAttr(pNode, visStr, FALSE);
-}
-
-//===================================================
-//===================================================
-void RemoveNodeAttributes(INode *pNode)
+void RemoveNodeAttributes(INode *pNode,  const tstring &ExtentionName)
 {
 	if (!pNode) return;
 	ICustAttribContainer* pContainer = pNode->GetObjectRef()->GetCustAttribContainer();
@@ -427,6 +397,12 @@ void RemoveNodeAttributes(INode *pNode)
 
 	glTFImporter_Core app;
 	IParamBlock2 *pBlock = NULL;
+	int idx = app.GetCustAttrPBlock(pNode->GetObjectRef(), ExtentionName, pBlock);
+	if (idx >= 0) {
+		pContainer->RemoveCustAttrib(idx);
+	}
+
+/*
 	int idx = app.GetCustAttrPBlock(pNode->GetObjectRef(), tstring(_T("Selectability")), pBlock);
 	if (idx>=0) {
 		pContainer->RemoveCustAttrib(idx);
@@ -439,40 +415,27 @@ void RemoveNodeAttributes(INode *pNode)
 	if (idx >= 0) {
 		pContainer->RemoveCustAttrib(idx);
 	}
+*/
 }
 
+/*
 //===================================================
-//===================================================
-void HSglTFTool::SetNodeAttr(HWND hWnd)
-{
-	GetCOREInterface()->ClearNodeSelection();
-
-	if(!GetCOREInterface()->DoHitByNameDialog()) return;
-	BOOL sel = IsDlgButtonChecked(hWnd, IDC_SEL_CHK);
-	BOOL hov = IsDlgButtonChecked(hWnd, IDC_HOV_CHK);
-	BOOL vis = FALSE;
-	for (int i = -0; i < GetCOREInterface()->GetSelNodeCount();i++) {
-		INode* pNode = GetCOREInterface()->GetSelNode(i);
-		SetNodeAttributes(pNode, sel, hov, vis);
-	}
-}
-
-//===================================================
+// Remove Extensions from selected Nodes
 //===================================================
 void HSglTFTool::RemoveNodeAttr(HWND hWnd)
 {
-	GetCOREInterface()->ClearNodeSelection();
+	//GetCOREInterface()->ClearNodeSelection();
+	//if (!GetCOREInterface()->DoHitByNameDialog()) return;
 
-	if (!GetCOREInterface()->DoHitByNameDialog()) return;
-	BOOL sel = IsDlgButtonChecked(hWnd, IDC_SEL_CHK);
-	BOOL hov = IsDlgButtonChecked(hWnd, IDC_HOV_CHK);
-	BOOL vis = FALSE;
+	//BOOL sel = IsDlgButtonChecked(hWnd, IDC_SEL_CHK);
+	//BOOL hov = IsDlgButtonChecked(hWnd, IDC_HOV_CHK);
+	//BOOL vis = FALSE;
 	for (int i = -0; i < GetCOREInterface()->GetSelNodeCount(); i++) {
 		INode* pNode = GetCOREInterface()->GetSelNode(i);
 		RemoveNodeAttributes(pNode);
 	}
 }
-
+*/
 //===================================================
 //===================================================
 void HSglTFTool::RemoveAttr(HWND hWnd)
@@ -483,10 +446,10 @@ void HSglTFTool::RemoveAttr(HWND hWnd)
 	if (!ok) return;
 	if (!tvp.anim || !tvp.client) return;
 
-	if (tvp.anim->SuperClassID() == BASENODE_CLASS_ID) {
-		RemoveNodeAttributes((INode*)tvp.anim);
-		return;
-	}
+	//if (tvp.anim->SuperClassID() == BASENODE_CLASS_ID) {
+	//	RemoveNodeAttributes((INode*)tvp.anim);
+	//	return;
+	//}
 
 	if (tvp.anim->SuperClassID() == MATERIAL_CLASS_ID ||
 		tvp.anim->SuperClassID() == TEXMAP_CLASS_ID) {
@@ -510,10 +473,11 @@ void HSglTFTool::RemoveAttr(HWND hWnd)
 //
 //
 //***************************************************
-//===================================================
-//===================================================
 
-// Sorting parameters
+//===================================================
+// Struct definitions
+//===================================================
+// Paramerts for sorting
 struct SortParam {
 	HWND hListView;
 	int  column;
@@ -521,22 +485,23 @@ struct SortParam {
 };
 
 struct nodePropStr {
-	BOOL Sel;
-	BOOL Hov;
-	BOOL Vis;
-	DWORD index;
+	int Sel;
+	int Hov;
+	int Vis;
+	//DWORD index;
 
-	nodePropStr(): Sel(FALSE), Hov(FALSE),Vis(FALSE), index(0) {}
+	nodePropStr(): Sel(-1), Hov(-1),Vis(-1)  {}
 };
 
 static std::map<INode*, nodePropStr> s_NodeIndexMap;
 
+//===================================================
+// Local functions
+//===================================================
 static void NodeIndexDlgInit(HWND hWnd);
-static BOOL DeleteNodeIndex(HWND hWnd);
-static void SelectNodeIndexItem(HWND hWnd);
-static void SetSelectability(HWND hWnd);
-static void FindDupIndex(HWND hWnd);
-
+//static void SelectNodeIndexItem(HWND hWnd);
+//static void SetSelectability(HWND hWnd);
+//static void FindDupIndex(HWND hWnd);
 
 
 //======================================================================
@@ -553,9 +518,8 @@ int CALLBACK CompareFunc(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSort) {
 	return pSort->ascending ? cmp : -cmp;
 }
 
-
 //=============================================================================
-// 
+// Unique Index setting dialog
 //=============================================================================
 static LRESULT CALLBACK NodeIndexDlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
@@ -573,16 +537,15 @@ static LRESULT CALLBACK NodeIndexDlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPA
 
 	case WM_COMMAND:
 		switch (wParam) {
-		case IDC_SELECT_CHK:
-			SetSelectability(hWnd);
-			return TRUE;
-		case IDC_DEL_BTN:
-			DeleteNodeIndex(hWnd);
-			return TRUE;
-		case IDC_FIND_DUP_BTN:
-			FindDupIndex(hWnd);
-			return TRUE;
+		case IDC_NODEATTR_BTN:
+			theHSglTFToolt.SetNodeAttr(hWnd);
+			break;
+		case IDC_SETVAL_BUTTON:
+			theHSglTFToolt.SetNodeExtentionValue(hWnd);
+			break;
+
 		case IDOK:
+		case IDCANCEL:
 			EndDialog(hWnd, 1);
 			return TRUE;
 		}
@@ -591,40 +554,24 @@ static LRESULT CALLBACK NodeIndexDlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPA
 		if (LOWORD(wParam) == IDC_NODEINDEX_LIST) {
 			switch ((UINT)((LPNMHDR)lParam)->code) {
 			case NM_CLICK:
-				SelectNodeIndexItem(hWnd);
+				//SelectNodeIndexItem(hWnd);
 				break;
 			case LVN_COLUMNCLICK:
 				{
 					HWND hListView = GetDlgItem(hWnd, IDC_NODEINDEX_LIST);
 					NMLISTVIEW* pnmv = (NMLISTVIEW*)lParam;
 
-					static bool ascending = true;  // Toggle ascending/descending order with each click
+					static bool ascending = true;  // クリックごとに昇順/降順切替
 					SortParam param = { hListView, pnmv->iSubItem, ascending };
 
 					ListView_SortItems(hListView, CompareFunc, (LPARAM)&param);
 
-					ascending = !ascending; // Next time, we'll do it in reverse order.
+					ascending = !ascending; // 次回は逆順
 				}
 				break;
 			}
 		}
 	}
-
-	return FALSE;
-}
-
-//======================================================================
-//======================================================================
-BOOL GetUniqueID(ReferenceTarget* pRef, DWORD& id)
-{
-	FPInterface* p = GetInterface(SCENE_IMPORT_CLASS_ID, HSglTFImporter_CLASS_ID, HSGLTFIMP_INTERFACE_ID);
-	if (!p) return FALSE;
-	FunctionID fid = p->FindFn(_T("GetUniqueIndex"));
-
-	FPValue result;
-	FPParams params(2, TYPE_REFTARG, pRef, TYPE_DWORD_BR, &id);
-	p->Invoke(fid, result, &params);
-	if (result.b) return TRUE;
 
 	return FALSE;
 }
@@ -643,20 +590,26 @@ void SetNodeIndexListRec(INode* pNode)
 
 	nodePropStr prop;
 
-	DWORD id = 0;
-	if (GetUniqueID(pNode, id)) {
-		prop.index = id;
-	}
+	//DWORD id = 0;
+	//if (GetUniqueID(pNode, id)) {
+	//	prop.index = id;
+	//}
 
 	if (pNode->GetObjectRef()) {
 		glTFImporter_Core app;
 		IParamBlock2* pBlock = NULL;
-		int idx = app.GetCustAttrPBlock(pNode->GetObjectRef(), tstring(_T("Selectability")), pBlock);
-		if (idx >= 0) prop.Sel = TRUE;
-		idx = app.GetCustAttrPBlock(pNode->GetObjectRef(), tstring(_T("Hoverability")), pBlock);
-		if (idx >= 0) prop.Hov = TRUE;
-		idx = app.GetCustAttrPBlock(pNode->GetObjectRef(), tstring(_T("Visibility")), pBlock);
-		if (idx >= 0) prop.Vis = TRUE;
+		app.GetCustAttrPBlock(pNode->GetObjectRef(), tstring(_T("Selectability")), pBlock);
+		if (pBlock) {
+			pBlock->GetValueByName(_T("Selectable"), 0, prop.Sel, FOREVER, 0);
+		}
+		app.GetCustAttrPBlock(pNode->GetObjectRef(), tstring(_T("Hoverability")), pBlock);
+		if (pBlock) {
+			pBlock->GetValueByName(_T("Hoverable"), 0, prop.Hov, FOREVER, 0);
+		}
+		app.GetCustAttrPBlock(pNode->GetObjectRef(), tstring(_T("Visibility")), pBlock);
+		if (pBlock) {
+			pBlock->GetValueByName(_T("visible"), 0, prop.Vis, FOREVER, 0);
+		}
 
 		s_NodeIndexMap[pNode] = prop;
 	}
@@ -666,12 +619,47 @@ void SetNodeIndexListRec(INode* pNode)
 	}
 }
 //=============================================================================
-// Variable table dialog
+// Launch Unique Index Dialog
 //=============================================================================
 void HSglTFTool::NodeIndexDlg(HWND hWnd)
 {
-	INT_PTR ret = ::DialogBoxParam(hInstance, MAKEINTRESOURCE(IDD_NODEINDEX_DLG), hWnd, NodeIndexDlgProc, 0);
+	INT_PTR ret = ::DialogBoxParam(hInstance, MAKEINTRESOURCE(IDD_NODEEXTENSION_DLG), hWnd, NodeIndexDlgProc, 0);
+}
 
+//=============================================================================
+//=============================================================================
+void SetList(HWND hListView)
+{
+	int index = 0;
+	for (auto p : s_NodeIndexMap) {
+		LVITEM item;
+		item.iItem = index++;
+		item.mask = LVIF_TEXT | LVIF_PARAM;
+		item.cchTextMax = MAX_PATH;
+
+		item.iSubItem = 0;
+		item.pszText = (LPWSTR)p.first->GetName();
+		item.lParam = (LPARAM)p.first;
+		ListView_InsertItem(hListView, &item);
+
+		item.iSubItem = 1;
+		item.mask = LVIF_TEXT;
+		tstring str = p.second.Sel > 0 ? _T("On") : (p.second.Sel == 0 ? _T("Off") : _T(""));
+		item.pszText = (LPWSTR)str.c_str();
+		ListView_SetItem(hListView, &item);
+
+		item.iSubItem = 2;
+		item.mask = LVIF_TEXT;
+		str = p.second.Hov > 0 ? _T("On") : (p.second.Hov == 0 ? _T("Off") : _T(""));
+		item.pszText = (LPWSTR)str.c_str();
+		ListView_SetItem(hListView, &item);
+
+		item.iSubItem = 3;
+		item.mask = LVIF_TEXT;
+		str = p.second.Vis > 0 ? _T("On") : (p.second.Vis == 0 ? _T("Off") : _T(""));
+		item.pszText = (LPWSTR)str.c_str();
+		ListView_SetItem(hListView, &item);
+	}
 }
 
 //=============================================================================
@@ -686,221 +674,151 @@ void NodeIndexDlgInit(HWND hWnd)
 	LV_COLUMN lColumn;
 	lColumn.mask = LVCF_FMT | LVCF_SUBITEM | LVCF_WIDTH | LVCF_TEXT; //| LVCF_DEFAULTWIDTH;
 	lColumn.fmt = LVCFMT_RIGHT;
-	lColumn.pszText = const_cast<TCHAR*>(_T("Name"));
+	lColumn.pszText = _T("Name");
 	lColumn.cx = 90;
 	lColumn.iSubItem = 0;
 	ListView_InsertColumn(hListView, 0, &lColumn);
-	lColumn.pszText = const_cast<TCHAR*>(_T("nodeIndex"));
-	lColumn.cx = 80;
+	lColumn.pszText = _T("Sel");
+	lColumn.cx = 35;
 	lColumn.iSubItem = 1;
 	ListView_InsertColumn(hListView, 1, &lColumn);
-	lColumn.pszText = const_cast<TCHAR*>(_T("Sel"));
+	lColumn.pszText = _T("Hov");
 	lColumn.cx = 35;
 	lColumn.iSubItem = 2;
-	ListView_InsertColumn(hListView, 2, &lColumn);
-	lColumn.pszText = const_cast<TCHAR*>(_T("Hov"));
+	ListView_InsertColumn(hListView, 2, &lColumn);	lColumn.pszText = _T("Vis");
 	lColumn.cx = 35;
 	lColumn.iSubItem = 3;
 	ListView_InsertColumn(hListView, 3, &lColumn);
-	lColumn.pszText = const_cast<TCHAR*>(_T("Vis"));
-	lColumn.cx = 35;
-	lColumn.iSubItem = 4;
-	ListView_InsertColumn(hListView, 4, &lColumn);
 
 	s_NodeIndexMap.clear();
 	SetNodeIndexListRec(GetCOREInterface()->GetRootNode());
 
-	int index = 0;
-	for (auto p : s_NodeIndexMap) {
-		LVITEM item;
-		item.iItem = index++;
-		item.mask = LVIF_TEXT| LVIF_PARAM;
-		item.cchTextMax = MAX_PATH;
-
-		item.iSubItem = 0;
-		item.pszText = (LPWSTR)p.first->GetName();
-		item.lParam = (LPARAM)p.first;
-		ListView_InsertItem(hListView, &item);
-
-		item.iSubItem = 1;
-		item.mask = LVIF_TEXT;
-		tstring str = p.second.index>0 ? to_tstring(p.second.index):_T("");
-		item.pszText = (LPWSTR)str.c_str();
-		ListView_SetItem(hListView, &item);
-
-		item.iSubItem = 2;
-		item.mask = LVIF_TEXT;
-		str = p.second.Sel ? _T("*") : _T("");
-		item.pszText = (LPWSTR)str.c_str();
-		ListView_SetItem(hListView, &item);
-
-		item.iSubItem = 3;
-		item.mask = LVIF_TEXT;
-		str = p.second.Hov ? _T("*") : _T("");
-		item.pszText = (LPWSTR)str.c_str();
-		ListView_SetItem(hListView, &item);
-
-		item.iSubItem = 4;
-		item.mask = LVIF_TEXT;
-		str = p.second.Vis ? _T("*") : _T("");
-		item.pszText = (LPWSTR)str.c_str();
-		ListView_SetItem(hListView, &item);
-	}
+	SetList(hListView);
 
 	//ListView_SortItems(hListViewWnd, CompareFunc, (LPARAM)0);
 }
 
-//=============================================================================
-//=============================================================================
-void SelectNodeIndexItem(HWND hWnd)
+//===================================================
+//===================================================
+void GetSelectedListViewItemTable(HWND hListView, std::vector<INode*> &NodeTbl, std::vector<int> &SelIdxTbl)
 {
-	HWND hListView = GetDlgItem(hWnd, IDC_NODEINDEX_LIST);
-	if (ListView_GetSelectedCount(hListView) != 1) return;
-	int idx = ListView_GetSelectionMark(hListView);
+	int iPos = -1;
+	while (true) {
+		iPos = ListView_GetNextItem(hListView, iPos, LVNI_SELECTED);
+		if (iPos == -1) break;
+
+		LVITEM lvi = { 0 };
+		lvi.mask = LVIF_PARAM;
+		lvi.iItem = iPos;
+		lvi.iSubItem = 0;
+
+		if (ListView_GetItem(hListView, &lvi)) {
+			LPARAM lParam = lvi.lParam;
+
+			if (lParam != NULL) {
+				NodeTbl.push_back(reinterpret_cast<INode*>(lParam));
+				SelIdxTbl.push_back(iPos);
+			}
+		}
+	}
 }
 
+//===================================================
+// Add Extensions to selected Nodes
+//===================================================
+void HSglTFTool::SetNodeAttr(HWND hWnd)
+{
+	HWND hListView = GetDlgItem(hWnd, IDC_NODEINDEX_LIST);
+
+	std::vector<INode*> NodeTbl;
+	std::vector<int> SelIdxTbl;
+	GetSelectedListViewItemTable(hListView, NodeTbl, SelIdxTbl);
+
+	SelectabilityStruct selStr;
+	HoverabilityStruct hovStr;
+	VisibilityStruct visStr;
+
+	for (auto pNode : NodeTbl) {
+
+		glTFImporter_Core app;
+		if (IsDlgButtonChecked(hWnd, IDC_SELECT_CHK))
+			app.CreateSelectabilityAttr(pNode, selStr, FALSE);
+		else
+			RemoveNodeAttributes(pNode, _T("Selectability"));
+
+		if (IsDlgButtonChecked(hWnd, IDC_HOVER_CHK))
+			app.CreateHoverabilityAttr(pNode, hovStr, FALSE);
+		else
+			RemoveNodeAttributes(pNode, _T("Hoverability"));
+
+		if (IsDlgButtonChecked(hWnd, IDC_VISIBLE_CHK))
+			app.CreateVisibilityAttr(pNode, visStr, FALSE);
+		else
+			RemoveNodeAttributes(pNode, _T("Visibility"));
+	}
+
+	ListView_DeleteAllItems(hListView);
+	s_NodeIndexMap.clear();
+	SetNodeIndexListRec(GetCOREInterface()->GetRootNode());
+	SetList(hListView);
+
+	UINT state = LVIS_SELECTED | LVIS_FOCUSED;
+	UINT mask = LVIS_SELECTED | LVIS_FOCUSED;
+	for (auto idx : SelIdxTbl) {
+		ListView_SetItemState(hListView, idx, state, mask);
+	}
+}
+
+//=============================================================================
+//=============================================================================
+void HSglTFTool::SetNodeExtentionValue(HWND hWnd)
+{
+	HWND hListView = GetDlgItem(hWnd, IDC_NODEINDEX_LIST);
+
+	std::vector<INode*> NodeTbl;
+	std::vector<int> SelIdxTbl;
+	GetSelectedListViewItemTable(hListView, NodeTbl, SelIdxTbl);
+
+	BOOL SelVal = IsDlgButtonChecked(hWnd, IDC_SEL_CHECK);
+	BOOL HovVal = IsDlgButtonChecked(hWnd, IDC_HOV_CHECK);
+	BOOL VisVal = IsDlgButtonChecked(hWnd, IDC_VIS_CHECK);
+
+	for (auto pNode : NodeTbl) {
+		glTFImporter_Core app;
+		IParamBlock2* pBlock = NULL;
+		app.GetCustAttrPBlock(pNode->GetObjectRef(), _T("Selectability"), pBlock);
+		if (pBlock) {
+			pBlock->SetValueByName(_T("Selectable"), SelVal, 0, 0);
+		}
+		app.GetCustAttrPBlock(pNode->GetObjectRef(), _T("Hoverability"), pBlock);
+		if (pBlock) {
+			pBlock->SetValueByName(_T("Hoverable"), HovVal, 0, 0);
+		}
+		app.GetCustAttrPBlock(pNode->GetObjectRef(), _T("Visibility"), pBlock);
+		if (pBlock) {
+			pBlock->SetValueByName(_T("Visible"), VisVal, 0, 0);
+		}
+	}
+
+	ListView_DeleteAllItems(hListView);
+	s_NodeIndexMap.clear();
+	SetNodeIndexListRec(GetCOREInterface()->GetRootNode());
+	SetList(hListView);
+
+	UINT state = LVIS_SELECTED | LVIS_FOCUSED;
+	UINT mask = LVIS_SELECTED | LVIS_FOCUSED;
+	for (auto idx : SelIdxTbl) {
+		ListView_SetItemState(hListView, idx, state, mask);
+	}
+}
+
+//=============================================================================
+//=============================================================================
 void SubNodeRec(INode* pNode, std::map<DWORD, std::vector<ReferenceTarget*>>& tbl)
 {
 	if (pNode) {
-		DWORD id = 0;
-		if (GetUniqueID(pNode, id)) tbl[id].push_back(pNode);
-
 		for (int i = 0; i < pNode->NumChildren(); i++) {
 			SubNodeRec(pNode->GetChildNode(i), tbl);
 		}
 	}
-}
-void SubMtlRec(Mtl* pMtl, std::map<DWORD, std::vector<ReferenceTarget*>>& tbl)
-{
-	if (pMtl) {
-		DWORD id = 0;
-		if (GetUniqueID(pMtl, id)) tbl[id].push_back(pMtl);
-
-		for (int i = 0; i < pMtl->NumSubMtls(); i++) {
-			SubMtlRec(pMtl->GetSubMtl(i), tbl);
-		}
-	}
-}
-//=============================================================================
-//=============================================================================
-void FindDupIndex(HWND hWnd)
-{
-	std::map<DWORD, std::vector<ReferenceTarget*>> tbl;
-	tbl.clear();
-
-	INode* pRoot = GetCOREInterface()->GetRootNode();
-	for (int i = 0; i < pRoot->NumChildren();i++) {
-		SubNodeRec(pRoot->GetChildNode(i), tbl);
-	}
-	MtlBaseLib* sceneLib = GetCOREInterface()->GetSceneMtls();
-	for (int i = 0; i < sceneLib->Count(); ++i) {
-		MtlBase* pMtl = (*sceneLib)[i];
-		if (pMtl) {
-			if (pMtl->SuperClassID() == MATERIAL_CLASS_ID) {
-				DWORD id = 0;
-				if (GetUniqueID(pMtl, id)) tbl[id].push_back(pMtl);
-			}
-		}
-	}
-
-	HWND hListView = GetDlgItem(hWnd, IDC_NODEINDEX_LIST);
-	ListView_DeleteAllItems(hListView);
-
-	int index = 0;
-	for (auto p1 : tbl) {
-		if (p1.second.size() == 1) continue;
-
-		for (auto p2 : p1.second) {
-
-			LVITEM item;
-			item.iItem = index++;
-			item.mask = LVIF_TEXT | LVIF_PARAM;
-			item.cchTextMax = MAX_PATH;
-
-			item.iSubItem = 0;
-			if(p2->SuperClassID()==BASENODE_CLASS_ID)
-				item.pszText = (LPWSTR)((INode*)p2)->GetName();
-			else if (p2->SuperClassID() == MATERIAL_CLASS_ID)
-				item.pszText = (LPWSTR)((Mtl*)p2)->GetName().data();
-			item.lParam = (LPARAM)p2;
-			ListView_InsertItem(hListView, &item);
-
-			item.iSubItem = 1;
-			item.mask = LVIF_TEXT;
-			tstring str = to_tstring(p1.first);
-			item.pszText = (LPWSTR)str.c_str();
-			ListView_SetItem(hListView, &item);
-		}
-	}
-
-
-}
-
-//=============================================================================
-//=============================================================================
-BOOL DeleteNodeIndex(HWND hWnd)
-{
-	HWND hListView = GetDlgItem(hWnd, IDC_NODEINDEX_LIST);
-	if (ListView_GetSelectedCount(hListView)==0) return FALSE;
-	//int idx = ListView_GetSelectionMark(hListView);
-
-	FPInterface* p = GetInterface(SCENE_IMPORT_CLASS_ID, HSglTFImporter_CLASS_ID, HSGLTFIMP_INTERFACE_ID);
-	if (!p) return FALSE;
-	FunctionID fid = p->FindFn(_T("RemoveUniqueIndex"));
-
-	int num = ListView_GetItemCount(hListView);
-	for (int i = 0; i < num; i++) {
-
-		UINT state = ListView_GetItemState(hListView, i, LVIS_SELECTED);
-		if ((state & LVIS_SELECTED) == 0) continue;
-
-		LVITEM item;
-		item.iItem = i;
-		item.mask = LVIF_PARAM;
-		item.iSubItem = 0;
-		ListView_GetItem(hListView, &item);
-		INode* pNode = (INode*)item.lParam;
-
-		FPValue result;
-		FPParams params(1, TYPE_REFTARG, pNode);
-		p->Invoke(fid, result, &params);
-		//if (result.b) return TRUE;
-
-
-		item.mask = LVIF_TEXT;
-		item.iSubItem = 1;
-		ListView_SetItemText(hListView, i, 1, const_cast<TCHAR*>(_T("")));
-	}
-
-	return TRUE;
-}
-
-//=============================================================================
-//=============================================================================
-void SetSelectability(HWND hWnd)
-{
-	HWND hListView = GetDlgItem(hWnd, IDC_NODEINDEX_LIST);
-	if (ListView_GetSelectedCount(hListView) == 0) return;
-
-	BOOL chk = IsDlgButtonChecked(hWnd, IDC_SELECT_CHK);
-
-	int num = ListView_GetItemCount(hListView);
-	for (int i = 0; i < num; i++) {
-
-		UINT state = ListView_GetItemState(hListView, i, LVIS_SELECTED);
-		if ((state & LVIS_SELECTED) == 0) continue;
-
-		LVITEM item;
-		item.iItem = i;
-		item.mask = LVIF_PARAM;
-		item.iSubItem = 0;
-		ListView_GetItem(hListView, &item);
-		INode* pNode = (INode*)item.lParam;
-
-		if (chk) {
-		}
-		else {
-		}
-	}
-
 }

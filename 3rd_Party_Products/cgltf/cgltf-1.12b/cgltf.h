@@ -588,6 +588,20 @@ typedef struct cgltf_mesh_gpu_instancing {
 	cgltf_size attributes_count;
 } cgltf_mesh_gpu_instancing;
 
+// ***Hayashi***
+typedef struct cgltf_node_visibility
+{
+	cgltf_bool visible;
+} cgltf_node_visibility;
+typedef struct cgltf_node_hoverability
+{
+	cgltf_bool hoverable;
+} cgltf_node_hoverability;
+typedef struct cgltf_node_selectability
+{
+	cgltf_bool selectable;
+} cgltf_node_selectability;
+
 typedef struct cgltf_primitive {
 	cgltf_primitive_type type;
 	cgltf_accessor* indices;
@@ -697,7 +711,13 @@ struct cgltf_node {
 	cgltf_size extensions_count;
 	cgltf_extension* extensions;
 
-	cgltf_int asset_index; /**** Hayashi ****/
+	cgltf_int asset_index;					/**** Hayashi ****/
+	cgltf_bool has_node_visibility;			/**** Hayashi ****/
+	cgltf_bool has_node_hoverability;		/**** Hayashi ****/
+	cgltf_bool has_node_selectability;		/**** Hayashi ****/
+	cgltf_node_visibility visibility;		/**** Hayashi ****/
+	cgltf_node_hoverability hoverabilty;	/**** Hayashi ****/
+	cgltf_node_selectability selectability; /**** Hayashi ****/
 };
 
 typedef struct cgltf_scene {
@@ -4290,6 +4310,108 @@ static int cgltf_parse_json_image(cgltf_options* options, jsmntok_t const* token
 	return i;
 }
 
+// ***Hayashi***
+static int cgltf_parse_json_node_visibility(cgltf_options* options, jsmntok_t const* tokens, int i, const uint8_t* json_chunk, cgltf_node_visibility* out_visibility)
+{
+	CGLTF_CHECK_TOKTYPE(tokens[i], JSMN_OBJECT);
+	int size = tokens[i].size;
+	++i;
+
+	// Default
+	out_visibility->visible = true;
+
+	for (int j = 0; j < size; ++j)
+	{
+		CGLTF_CHECK_KEY(tokens[i]);
+
+		if (cgltf_json_strcmp(tokens + i, json_chunk, "visible") == 0)
+		{
+			++i;
+			out_visibility->visible = cgltf_json_to_bool(tokens + i, json_chunk);
+			++i;
+		}
+		else
+		{
+			i = cgltf_skip_json(tokens, i + 1);
+		}
+
+		if (i < 0)
+		{
+			return i;
+		}
+	}
+
+	return i;
+}
+// ***Hayashi***
+static int cgltf_parse_json_node_hoverability(cgltf_options* options, jsmntok_t const* tokens, int i, const uint8_t* json_chunk, cgltf_node_hoverability* out_hoverability)
+{
+	CGLTF_CHECK_TOKTYPE(tokens[i], JSMN_OBJECT);
+	int size = tokens[i].size;
+	++i;
+
+	// Default
+	out_hoverability->hoverable = true;
+
+	for (int j = 0; j < size; ++j)
+	{
+		CGLTF_CHECK_KEY(tokens[i]);
+
+		if (cgltf_json_strcmp(tokens + i, json_chunk, "hoverable") == 0)
+		{
+			++i;
+			out_hoverability->hoverable = cgltf_json_to_bool(tokens + i, json_chunk);
+			++i;
+		}
+		else
+		{
+			i = cgltf_skip_json(tokens, i + 1);
+		}
+
+		if (i < 0)
+		{
+			return i;
+		}
+	}
+
+	return i;
+}
+// ***Hayashi***
+static int cgltf_parse_json_node_selectability(cgltf_options* options, jsmntok_t const* tokens, int i, const uint8_t* json_chunk, cgltf_node_selectability* out_selectability)
+{
+	CGLTF_CHECK_TOKTYPE(tokens[i], JSMN_OBJECT);
+	int size = tokens[i].size;
+	++i;
+
+	// Default
+	out_selectability->selectable = true;
+
+	for (int j = 0; j < size; ++j)
+	{
+		CGLTF_CHECK_KEY(tokens[i]);
+
+		if (cgltf_json_strcmp(tokens + i, json_chunk, "selectable") == 0)
+		{
+			++i;
+			out_selectability->selectable = cgltf_json_to_bool(tokens + i, json_chunk);
+			++i;
+		}
+		else
+		{
+			i = cgltf_skip_json(tokens, i + 1);
+		}
+
+		if (i < 0)
+		{
+			return i;
+		}
+	}
+
+	return i;
+}
+
+
+
 static int cgltf_parse_json_sampler(cgltf_options* options, jsmntok_t const* tokens, int i, const uint8_t* json_chunk, cgltf_sampler* out_sampler)
 {
 	(void)options;
@@ -5620,6 +5742,21 @@ static int cgltf_parse_json_node(cgltf_options* options, jsmntok_t const* tokens
 				{
 					out_node->has_mesh_gpu_instancing = 1;
 					i = cgltf_parse_json_mesh_gpu_instancing(options, tokens, i + 1, json_chunk, &out_node->mesh_gpu_instancing);
+				}
+				else if (cgltf_json_strcmp(tokens + i, json_chunk, "KHR_node_visibility") == 0)	// ***Hayashi***
+				{
+					out_node->has_node_visibility = 1;
+					i = cgltf_parse_json_node_visibility(options, tokens, i + 1, json_chunk, &out_node->visibility);
+				}
+				else if (cgltf_json_strcmp(tokens + i, json_chunk, "KHR_node_hoverability") == 0)	// ***Hayashi***
+				{
+					out_node->has_node_hoverability = 1;
+					i = cgltf_parse_json_node_hoverability(options, tokens, i + 1, json_chunk, &out_node->hoverabilty);
+				}
+				else if (cgltf_json_strcmp(tokens + i, json_chunk, "KHR_node_selectability") == 0)	// ***Hayashi***
+				{
+					out_node->has_node_selectability = 1;
+					i = cgltf_parse_json_node_selectability(options, tokens, i + 1, json_chunk, &out_node->selectability);
 				}
 				else
 				{
