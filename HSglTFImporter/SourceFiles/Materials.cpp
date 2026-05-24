@@ -820,7 +820,7 @@ Point2 ApplyGltfTextureTransform(Texmap* pBmpTex, const cgltf_texture_view* text
 	// Transform not found or disabled
 	if (!textview->has_transform) return offset;
 
-	// glTF transform情報
+	// glTF transform information
 	float sclU = textview->transform.scale[0];
 	float sclV = textview->transform.scale[1];
 	float rot = textview->transform.rotation;
@@ -849,7 +849,7 @@ Point2 ApplyGltfTextureTransform(Texmap* pBmpTex, const cgltf_texture_view* text
 	pUVGen->SetVOffs(offset.y, t);
 	pUVGen->SetUScl(sclU, t);
 	pUVGen->SetVScl(sclV, t);
-	pUVGen->SetWAng(rot, t); // 3ds MaxのWAngはラジアン単位でOK
+	pUVGen->SetWAng(rot, t); // expects radians
 
 	if (pBmpTex->ClassID() == bmptexClassID) {
 		((BitmapTex*)pBmpTex)->ReloadBitmapAndUpdate();
@@ -976,30 +976,30 @@ Point2 glTFImporter_Core::SetTextureUVoffset(Texmap* pBmpTex, cgltf_texture_view
 					uvGen->SetMapChannel(mapCh);
 				}
 
-				// 1. タイリング（スケール）の設定
+				// 1. Setting the tiling (scale)
 				uvGen->SetUScl(scaleU, t);
 				uvGen->SetVScl(scaleV, t);
 
-				// 2. 回転の設定
-				// glTFは原点(0,0)中心の反時計回り。
-				// MaxのWAngも同様だが、座標系が上下反転しているため、
-				// 回転方向や中心の補正が必要な場合があります。
+				// 2. Rotation Settings
+				// glTF rotates counterclockwise around the origin (0,0).
+				// Max's WAng is similar, but the coordinate system is inverted vertically, 
+				// so correction of the rotation direction and center may be necessary.
 				uvGen->SetWAng(rot, t);
 
-				// 3. オフセットの計算
-				// MaxのUVGenでは、Offset値は「タイリング後の1単位」として扱われるため
-				// 回転がない場合は以下の式が標準的です。
+				// 3. Offset Calculation
+				// In Max's UVGen, the Offset value is treated as "1 unit after tiling",
+				// so the following formula is standard when there is no rotation:
 				p2.x = offU;
-				// V方向：glTFの「上端からのオフセット」を、Maxの「下端からのオフセット」に変換
-				// さらにタイリング（高さ）分を考慮して、開始点を下端基準へ。
+				// V direction: Convert glTF's "offset from top edge" to Max's "offset from bottom edge"
+				// Further consider the tiling (height) and adjust the starting point to the bottom edge.
 				p2.y = 1.0f - scaleV - offV;
 				uvGen->SetUOffs(p2.x, t);
 				uvGen->SetVOffs(p2.y, t);
 
-				// 4. 重要：座標系の原点設定
-				// glTFの仕様に合わせるため、回転・スケールの中心を(0,0)にする必要がある場合、
-				// 以下のフラグを確認してください（必要に応じてコメント解除）
-				// uvGen->SetFlag(U_OFFSET, 0); 
+				// 4. Important: Setting the origin of the coordinate system
+				// If you need to set the rotation and scaling center to (0,0) to conform to the glTF specifications,
+				// Check the following flag (uncomment if necessary)
+				// uvGen->SetFlag(U_OFFSET, 0);
 			}
 		}
 	}
