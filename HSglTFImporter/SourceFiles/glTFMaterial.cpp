@@ -62,25 +62,8 @@ void glTFImporter_Core::CreateglTFMaterial(void)
 			pBmpTex = GetBitmapTexFromglTexture(metalRgh->base_color_texture.texture);
 			SetTextureUVoffset(pBmpTex, &metalRgh->base_color_texture);
 			pBlock0->SetValue(glTF_baseColorMap, m_time, pBmpTex);
-			//if(BaseColor.r== BaseColor.g == BaseColor.b == 0.0f)		//if (col[0] == col[1] == col[2] == 0.0f)col[2] = 0.00001f;
-			//	pBlock0->SetValue(glTF_baseColor, m_time, BaseColor);
 
 			if (mtl->alpha_mode == cgltf_alpha_mode_mask || mtl->alpha_mode == cgltf_alpha_mode_blend) {
-/*
-				BitmapTex* pAlphaBmp = NewDefaultBitmapTex();
-				pAlphaBmp->SetName(pBmpTex->GetName() + TSTR(_T("_Alpha")));
-				pAlphaBmp->GetUVGen()->SetCoordMapping(UVMAP_SCREEN_ENV);
-				pAlphaBmp->GetUVGen()->SetTextureTiling(U_WRAP | V_WRAP);
-				pAlphaBmp->GetUVGen()->InitSlotType(MAPSLOT_TEXTURE);
-				pAlphaBmp->SetMapName(pBmpTex->GetMapName());
-				pAlphaBmp->SetMtlFlag(MTL_TEX_DISPLAY_ENABLED, TRUE);
-				pAlphaBmp->SetAlphaAsMono(TRUE);
-				pAlphaBmp->SetAlphaAsRGB(FALSE);
-				((IParamBlock2*)pAlphaBmp->GetReference(1))->SetValue(10, 0, 1);
-				//pAlphaBmp->SetPremultAlpha(FALSE);
-				//pSmat->GetParamBlockByID(0)->SetValueByName(_T("rgbOutput"), 1, m_time);//Set AlphaOutput
-				//pBlock0->SetValue(glTF_alphaMap, m_time, pAlphaBmp);
-*/
 				Texmap* pAlphaTex = CreateAlphaFilterMap(pBmpTex);
 				pBlock0->SetValue(glTF_alphaMap, m_time, pAlphaTex);
 
@@ -96,12 +79,7 @@ void glTFImporter_Core::CreateglTFMaterial(void)
 			pBmpTex = GetBitmapTexFromglTexture(metalRgh->metallic_roughness_texture.texture);
 			CorrectBitmapGamma(pBmpTex, 1.0f);
 			SetTextureUVoffset(pBmpTex, &metalRgh->metallic_roughness_texture);
-			//Bitmap* pOriginalBmp = pBmpTex->GetBitmap(0);
-			//BitmapInfo bi = pOriginalBmp->GetBitmapInfo();
 			std::filesystem::path fname = pBmpTex->GetMapName();
-			//tstring orgFilePath = fname;
-			//std::filesystem::path fname = bi.Filename();
-			//tstring orgFilePath = tstring(m_fullpath.parent_path()) + tstring(_T("\\")) + tstring(fname);
 
 			tstring texFilePathR = tstring(m_WorkImageFolder) + tstring(fname.stem()) + tstring(_T("_R")) + tstring(fname.extension());
 			tstring texFilePathG = tstring(m_WorkImageFolder) + tstring(fname.stem()) + tstring(_T("_G")) + tstring(fname.extension());
