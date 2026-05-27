@@ -3,9 +3,11 @@
 **/Debug*/
 **/Release*/
 **/Releases*/
+**/bin/
+**/build/
 **/obj/
-**/ipch/
 **/x64/
+**/ipch/
 **/src/Generated/
 *.dli
 *.dle

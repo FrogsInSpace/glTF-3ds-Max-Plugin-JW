@@ -38,8 +38,8 @@
 		<VCToolsVersion></VCToolsVersion>
   </PropertyGroup>
   <PropertyGroup Label="SDK Paths">
-		<IntDir>$(ProjectDir)obj\$(Platform)\$(Configuration)\</IntDir>
-		<OutDir>$(ProjectDir)$(Platform)\$(Configuration)\</OutDir>
+		<IntDir>$(ProjectDir)build\$(Configuration)\</IntDir>
+		<OutDir>$(ProjectDir)bin\$(Configuration)\</OutDir>
 		<MaxSdkInc>$(MaxSDKPath)\include</MaxSdkInc>
 		<MaxSdkLib>$(MaxSDKPath)\lib\x64\Release</MaxSdkLib>
   </PropertyGroup>
