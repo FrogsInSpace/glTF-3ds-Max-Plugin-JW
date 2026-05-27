@@ -1,5 +1,7 @@
-@echo off
-setlocal enabledelayedexpansion
+@ECHO off
+SETLOCAL enabledelayedexpansion
+
+PUSHD "%~dp0"
 
 REM Check for Visual Studio x64 dev environment
 if /I NOT "%VSCMD_ARG_TGT_ARCH%"=="x64" (
@@ -32,11 +34,12 @@ for /L %%V in (2020,1,2027) do (
     )
 )
 
-
+popd
 exit /b
 
 :Failed
 	echo.
 	echo ERROR: failed to build !CONFIG!
 	echo.
+	popd
 	exit /b 1
