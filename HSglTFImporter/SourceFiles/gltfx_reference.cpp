@@ -130,24 +130,24 @@ BOOL CreateAssetTable(const TCHAR* filename, std::vector<AssetStr> &tbl)
 {
 	tbl.clear();
 
-	// ファイルストリームを開く
+	// Open File Stream
 	std::ifstream ifs(filename);
 	if (!ifs.is_open()) return FALSE;
 
-	// JSONパーサの準備
+	// JSON parser preparation
 	Json::CharReaderBuilder builder;
 	builder["collectComments"] = false;
 	Json::Value root;
 	std::string errs;
 
-	// ファイルをパース
+	// File parsing
 	if (!Json::parseFromStream(builder, ifs, &root, &errs)) return FALSE;
 
-	// "assets" 配列の取得と処理
+	// Retrieving and processing the "assets" array
 	const Json::Value& assets = root["assets"];
 	if (!assets.isArray()) return FALSE;
 
-	// 各 asset を処理
+	/// Process each asset
 	for (const auto& asset : assets) {
 		AssetStr a;
 		a.environment = -1;
@@ -221,7 +221,11 @@ INode* CreateAssetRec(cgltf_node* node, INode* pParent, float scale)
 		pRootNode->SetXRefParent(index, pNode);
 	}
 
+#ifdef MAX_RELEASE_R24
+	Matrix3 tm;
+#else
 	Matrix3 tm(1);
+#endif
 
 	if (node->has_matrix) {
 		float* mtx = node->matrix;

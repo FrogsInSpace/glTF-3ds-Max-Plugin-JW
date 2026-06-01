@@ -32,6 +32,7 @@
 #include <AssetManagement/iassetmanager.h>
 #include <AssetManagement/AssetUser.h>
 #include <winutil.h>
+#include <shellapi.h>
 
 BOOL exportSelected;
 
@@ -72,7 +73,7 @@ static BOOL HH_CubicSplineT;
 static BOOL Open_InstanceWithMtl;
 
 
-static TCHAR *pLicenseStr = _T(
+static const TCHAR *pLicenseStr = _T(
 "glTF/glb Exporter for 3dsmax Designed By Satoshi Hayashi\r\n \
 tiny-glTF2.0 is licensed under the MIT License.\r\n \
 Draco is licensed under the Apache 2.0.\r\n \
@@ -619,7 +620,7 @@ INT_PTR CALLBACK HSglTFExporterMainDlgProc(HWND hWnd, UINT message, WPARAM wPara
 		memset(&tabItem, 0, sizeof(TC_ITEM));
 
 		tabItem.mask = TCIF_TEXT;
-		tabItem.pszText = _T("Main Settings");
+		tabItem.pszText = const_cast<TCHAR*>(_T("Main Settings"));
 		tabItem.cchTextMax = 16;
 		TabCtrl_InsertItem(::GetDlgItem(hWnd, IDC_TAB1), 0, &tabItem);
 		hExportWnd = ::CreateDialogParam(hInstance, MAKEINTRESOURCE(IDD_EXPORT_DIALOG), hWnd, HSglTFExporterOptionsDlgProc, (LPARAM)NULL);

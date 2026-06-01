@@ -385,7 +385,7 @@ struct InteractivityStruct {
 
 
 //==========================================================
-// 頂点属性情報
+// Vertex attribute information
 //==========================================================
 struct VertexProp {
 	int faceID = 0;
@@ -399,7 +399,7 @@ struct VertexProp {
 };
 
 //==========================================================
-// 頂点属性フラグ
+// Vertex attribute flags
 //==========================================================
 struct vertPropFlag {
 	BOOL VColorUsed = FALSE;

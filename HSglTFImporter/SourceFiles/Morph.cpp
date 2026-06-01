@@ -58,7 +58,7 @@ void glTFImporter_Core::GetWeightAnimKeyFrameList(cgltf_animation_sampler *sampl
 	WeightKeyList.clear();
 	std::vector<float> weightTab;
 	if (sampler->interpolation == cgltf_interpolation_type_cubic_spline) {
-		// CubicSplineは未実装
+		//CubicSpline is not yet implemented.
 	}
 	else {
 		std::vector<float>::iterator p = AnimationList.begin();
@@ -147,7 +147,7 @@ void glTFImporter_Core::SetMorph(void)
 				cgltf_primitive *pr = &mesh->primitives[j];
 				cgltf_morph_target *target = &pr->targets[i];
 				cgltf_draco_mesh_compression *mc = NULL;
-				// TragetはDracoにならない？
+				// Will Target not be Draco?
 				if (pr->has_draco_mesh_compression) {
 					//mc = &pr->draco_mesh_compression;
 				}
@@ -170,7 +170,7 @@ void glTFImporter_Core::SetMorph(void)
 				}
 				VertOffset += static_cast<int>(VertNum);
 
-				// 頂点法線の設定
+				// Setting vertex normals
 				std::vector<float> NormalList;
 				if (mc) {
 					DracoDecodeProc(mc->buffer_view, NormalList, DracoDecodeType::NORMAL);
@@ -228,7 +228,7 @@ void glTFImporter_Core::SetMorph(void)
 			ExecuteMAXScriptScript(ComStr);
 #endif;
 		}
-		// ターゲットオブジェクトの法線を設定する
+		// Set the normal vector of the target object
 		{
 			pOrgMesh->SpecifyNormals();
 			MeshNormalSpec* pBaseNrmSpec = pOrgMesh->GetSpecifiedNormals();

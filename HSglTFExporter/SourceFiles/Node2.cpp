@@ -46,8 +46,10 @@ int GetVertNum(Mesh *pMesh, std::vector<int> &faceIDTable)
 /*
 std::map<int, int> sameVertMap;
 std::vector<int> diffVertMap;
-// 同じ頂点とみなされる頂点のマップを作る
-// なじ頂点=同一座標で同一法線をもつ
+
+// Create a map of vertices that are considered the same vertex
+// Vertices are considered the same if their coordinates and normal vectors are equal
+
 void testFunc(Mesh *pMesh, std::vector<int> faceIDTabl, MeshNormalSpec* pNrmSpec)
 {
 	sameVertMap.clear();
@@ -84,8 +86,8 @@ std::vector<VertexProp> VertPropTable;
 std::map<int, int> vertPropMap;
 
 //==========================================================
-// 各頂点の属性情報テーブルのインデックスを返す。
-// 同じ属性情報があったらそのインデクスを返す
+// Returns the index of the first matching VertexProp entry in the Attribute Information Table
+// If there is no matching entry, one is added to the and of the table and its index returned
 //==========================================================
 int SetVertPropMap(VertexProp &str)
 {
@@ -106,9 +108,9 @@ int SetVertPropMap(VertexProp &str)
 }
 
 //==========================================================
-// 各頂点の属性情報テーブルを作る
-// VertPropTable 属性付き頂点テーブル
-// vertPropMap 面の構成頂点がどのVertPropTableをもつかのマッピングテーブル
+// Create an Attribute Information Table for each vertex
+// VertPropTable: Vertex table with attributes
+// vertPropMap: Mapping table indicating which VertPropTable each vertex in a face belongs to
 //==========================================================
 void BuildVertexPropTable(Mesh *pMesh, std::vector<int> &faceIDTabl, MeshNormalSpec* pNrmSpec, const vertPropFlag &flag)
 {

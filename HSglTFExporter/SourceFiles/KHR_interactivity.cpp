@@ -144,7 +144,7 @@ void InitTypeTable(void)
 }
 
 //======================================================================
-// 使用しているtypeテーブルの生成
+// Create the type table
 //======================================================================
 int SetTypeTable(socketDataType type)
 {
@@ -159,7 +159,7 @@ int SetTypeTable(socketDataType type)
 }
 
 //======================================================================
-// typeテーブルをtinygltf::Value::Arrayにして返す
+// Fill types as tinygltf::Value::Array
 //======================================================================
 void SetTypesTable(tinygltf::Value::Array& types)
 {
@@ -186,24 +186,24 @@ void SetTypesTable(tinygltf::Value::Array& types)
 }
 
 //======================================================================
-// Operationを登録する。すでにある場合はインデクスを返す
+// Register an Operation, or return the index if already existing.
 //=====================================================================
 int SetDeclarationTable(const std::string &op)
 {
 	auto it = std::find(declarationTable.begin(), declarationTable.end(), op);
 
-	// すでに存在する場合、そのインデックスを返す
+	// return index of existing declaration
 	if (it != declarationTable.end()) {
 		return (int)std::distance(declarationTable.begin(), it);
 	}
 
-	// 存在しない場合、新しく追加し、そのインデックスを返す
+	// add new declaration to the end and return its index
 	declarationTable.push_back(op);
 	return (int)(declarationTable.size() - 1);
 }
 
 //======================================================================
-// ノードのindexを返す(プロパティのindexでなく、出力順位のindex)
+// return pNode's index in the nodeNodeTbl or -1 if not found
 //======================================================================
 int GetNodeIndex(INode *pNode)
 {
@@ -217,7 +217,7 @@ int GetNodeIndex(INode *pNode)
 }
 
 //======================================================================
-// 指定インデックスを持つノードを返す
+// Return the Node at a given index
 //======================================================================
 INode *GetIndexedNode(int index)
 {
@@ -231,7 +231,7 @@ INode *GetIndexedNode(int index)
 }
 
 //======================================================================
-// 指定ノードの指定ソケットに接続する親側ノードを返す
+// Returns the parent node connecting to the socket specified by socketIdx of the Node specified by nodeIdx.
 //======================================================================
 INode *GetParentNode(int nodeIdx, int socketIdx, tstring &socketName)
 {
@@ -265,7 +265,8 @@ INode *GetParentNode(int nodeIdx, int socketIdx, tstring &socketName)
 }
 
 //======================================================================
-// 指定ノードの指定ソケットに接続する子側ノードを返す(対象のソケット名も返す)
+// Returns the child node that connects to the specified socket of the specified node 
+// lso returns the name of the target socket
 //======================================================================
 INode *GetChildNode(INode *pNode, int socketIdx, int subIdx, TSTR &name)
 {
@@ -288,7 +289,7 @@ INode *GetChildNode(INode *pNode, int socketIdx, int subIdx, TSTR &name)
 }
 
 //======================================================================
-// 文字列より数字配列
+// Numeric arrays are better than strings.
 // "0,0,0" -> [0,0,0]
 //======================================================================
 void SetValueArray(tstring &str, socketDataType type, tinygltf::Value::Array &ary)
@@ -393,7 +394,7 @@ void glTFExporter_Core::CreateDeclarationExtensionInfo(INode *pNode, const std::
 }
 
 //======================================================================
-// ノードの生成
+// Generate nodes array
 //======================================================================
 void glTFExporter_Core::SetNodeTable(INode *pNode, tinygltf::Value::Array& nodes)
 {
@@ -692,7 +693,7 @@ BOOL CheckIfExtension(const std::string &op, nodeInfo &info)
 }
 
 //======================================================================
-// Declarationsノードの生成
+// Generate declarations array
 //======================================================================
 void glTFExporter_Core::SetDeclarationsTypesTable(tinygltf::Value::Array& declarations, std::vector<std::string>&interactiveExtensionList)
 {
@@ -729,7 +730,7 @@ void glTFExporter_Core::SetDeclarationsTypesTable(tinygltf::Value::Array& declar
 }
 
 //======================================================================
-// Variableノードの生成
+// Generate variables array
 //======================================================================
 void glTFExporter_Core::SetVariableTable(INode *pNode, tinygltf::Value::Array& variables)
 {
@@ -766,7 +767,7 @@ void glTFExporter_Core::SetVariableTable(INode *pNode, tinygltf::Value::Array& v
 }
 
 //======================================================================
-// Eventノードの生成
+// Generate events array
 //======================================================================
 void glTFExporter_Core::SetEventTable(INode *pNode, tinygltf::Value::Array& events)
 {
@@ -942,8 +943,8 @@ void glTFExporter_Core::GetInteractivityNodeList(std::vector<std::string>& inter
 
 
 //======================================================================
-// DWORDで表記されるnodeIndexよりノードドリストインデックス)int変換
-// val：_nodeIndexを渡してintに変える
+// Convert nodeIndex (represented as DWORD) to an int
+// val: _nodeIndex as DWORD string 
 //======================================================================
 int glTFExporter_Core::ConvertNodeIndexToInt(TSTR& val)
 {

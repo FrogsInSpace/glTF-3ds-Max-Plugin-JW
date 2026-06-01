@@ -231,7 +231,7 @@ void glTFImporter_Core::GetClr4AnimKeyFrameList(cgltf_animation_sampler* sampler
 	AnimKeyInfo keyInfo;
 	PosKeyList.clear();
 	if (sampler->interpolation == cgltf_interpolation_type_cubic_spline) {
-		// CubicSpline[InTan/OutTan]は未実装
+		// CubicSpline[InTan/OutTan] - not yet implemented
 		std::vector<float>::iterator p = AnimationList.begin();
 		for (auto key : KeyFrames) {
 			float ix = *(p + 0);
@@ -282,7 +282,7 @@ void glTFImporter_Core::GetFloatAnimKeyFrameList(cgltf_animation_sampler* sample
 	AnimKeyInfo keyInfo;
 	FloatKeyList.clear();
 	if (sampler->interpolation == cgltf_interpolation_type_cubic_spline) {
-		// CubicSpline[InTan/OutTan]は未実装
+		// CubicSpline[InTan/OutTan] - not yet implemented
 		std::vector<float>::iterator p = AnimationList.begin();
 		for (auto key : KeyFrames) {
 			float i = *(p + 0);
@@ -321,7 +321,7 @@ void glTFImporter_Core::GetPoint2AnimKeyFrameList(cgltf_animation_sampler* sampl
 	AnimKeyInfo keyInfo;
 	Point2KeyList.clear();
 	if (sampler->interpolation == cgltf_interpolation_type_cubic_spline) {
-		// CubicSpline[InTan/OutTan]は未実装
+		// CubicSpline[InTan/OutTan] - not yet implemented
 		std::vector<float>::iterator p = AnimationList.begin();
 		for (auto key : KeyFrames) {
 			float ix = *(p + 0);
@@ -1973,7 +1973,7 @@ void glTFImporter_Core::GetSclAnimKeyFrameList(cgltf_animation_sampler *sampler,
 	AnimKeyInfo keyInfo;
 	SclKeyList.clear();
 	if (sampler->interpolation == cgltf_interpolation_type_cubic_spline) {
-		// CubicSpline[InTan/OutTan]は未実装
+		// CubicSpline[InTan/OutTan] - not yet implemented
 		std::vector<float>::iterator p = AnimationList.begin();
 		for (auto key : KeyFrames) {
 			float ix = *(p + 0);
@@ -2047,7 +2047,12 @@ void glTFImporter_Core::SetAnimationRec(INode *pNode, int animIdx)
 			SetAnimImportStatus(1);
 		}
 	}
+#ifdef MAX_RELEASE_R24
+	Matrix3 mtx;
+#else
 	Matrix3 mtx(1);
+#endif 
+
 	if (pNode->GetParentNode()->IsRootNode())
 		mtx = YupTM;
 

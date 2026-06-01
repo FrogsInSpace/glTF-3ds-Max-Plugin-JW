@@ -1,4 +1,3 @@
-LIBRARY HSglTFExporter.dle
 EXPORTS
    LibDescription       @1       PRIVATE
    LibNumberClasses     @2       PRIVATE

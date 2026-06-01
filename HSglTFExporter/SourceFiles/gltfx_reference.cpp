@@ -26,7 +26,7 @@ std::vector<tstring> AssetTable;
 std::map<INode*, UINT> nodeIndexMap;
 
 //======================================================================
-// 山椒シーンファイルテーブル(AssetTable)を作成
+// Create a scene file table (AssetTable).
 //======================================================================
 int CreateAssetTable(const tstring& filename)
 {
@@ -58,9 +58,8 @@ int CreateAssetTable(const tstring& filename)
 }
 
 //======================================================================
-// 指定ノードを含む階層内にnodeIndexMapリスト内のノードが含まれるか
-// 含まれる場合にtrueを返すが、指定ノード自体がリスト内にある場合は
-// assetIdxにインデクスを渡す
+// Recursively searches for pNode in nodeIndexMap, also traversing child nodes
+// Returns true If pNode is found, and sets assetIdx to the index valku stored in the map 
 //======================================================================
 BOOL findNodeRec(INode* pNode, int &assetIdx)
 {
@@ -82,7 +81,7 @@ BOOL findNodeRec(INode* pNode, int &assetIdx)
 }
 
 //======================================================================
-// ノードツリーを構築
+// Construct a node tree
 //======================================================================
 int CreateNodeTreeRec(tinygltf::Model &model, INode* pParentNode)
 {

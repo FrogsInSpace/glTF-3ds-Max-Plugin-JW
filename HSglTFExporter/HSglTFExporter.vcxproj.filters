@@ -10,38 +10,56 @@
     <ClCompile Include="SourceFiles\CustomAttribute.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="SourceFiles\HSglTFExpoter.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="SourceFiles\ImageBuffer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="SourceFiles\Materials.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="SourceFiles\MimeTypes.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="SourceFiles\Morph.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="SourceFiles\Node.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="SourceFiles\DllEntry.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="SourceFiles\DracoEncode.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="SourceFiles\EXT_mesh_gpu_instancing.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SourceFiles\HSglTFExpoter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SourceFiles\Materials.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SourceFiles\MergeBitmap.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SourceFiles\Morph.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SourceFiles\KHR_animation_pointer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SourceFiles\MimeTypes.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SourceFiles\KHR_collision_shapes.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SourceFiles\ImageBuffer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SourceFiles\Node.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="SourceFiles\Skin.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SourceFiles\Shape.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="SourceFiles\SceneExtension.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="SourceFiles\Shape.cpp">
+    <ClCompile Include="SourceFiles\WebpEncoder.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SourceFiles\ArnoldMaterial.cpp">
+      <Filter>Source Files\Materials</Filter>
     </ClCompile>
     <ClCompile Include="SourceFiles\glTFMaterial.cpp">
       <Filter>Source Files\Materials</Filter>
@@ -49,50 +67,32 @@
     <ClCompile Include="SourceFiles\PBRMaterial.cpp">
       <Filter>Source Files\Materials</Filter>
     </ClCompile>
-    <ClCompile Include="SourceFiles\ScanlineMaterial.cpp">
-      <Filter>Source Files\Materials</Filter>
-    </ClCompile>
-    <ClCompile Include="SourceFiles\USDMaterial.cpp">
+    <ClCompile Include="SourceFiles\PhysicalMaterial.cpp">
       <Filter>Source Files\Materials</Filter>
     </ClCompile>
     <ClCompile Include="SourceFiles\PBRSpecGlossMaterial.cpp">
       <Filter>Source Files\Materials</Filter>
     </ClCompile>
-    <ClCompile Include="SourceFiles\PhysicalMaterial.cpp">
+    <ClCompile Include="SourceFiles\ScanlineMaterial.cpp">
       <Filter>Source Files\Materials</Filter>
     </ClCompile>
     <ClCompile Include="SourceFiles\VRayMaterial.cpp">
       <Filter>Source Files\Materials</Filter>
     </ClCompile>
+    <ClCompile Include="SourceFiles\USDMaterial.cpp">
+      <Filter>Source Files\Materials</Filter>
+    </ClCompile>
     <ClCompile Include="SourceFiles\CoronaMaterial.cpp">
       <Filter>Source Files\Materials</Filter>
     </ClCompile>
-    <ClCompile Include="SourceFiles\KHR_animation_pointer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="SourceFiles\MergeBitmap.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="SourceFiles\EXT_mesh_gpu_instancing.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="SourceFiles\ArnoldMaterial.cpp">
+    <ClCompile Include="SourceFiles\OpenPBRMaterial.cpp">
       <Filter>Source Files\Materials</Filter>
-    </ClCompile>
-    <ClCompile Include="SourceFiles\WebpEncoder.cpp">
-      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="SourceFiles\KHR_interactivity.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="SourceFiles\KHR_collision_shapes.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="SourceFiles\Node2.cpp">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="SourceFiles\OpenPBRMaterial.cpp">
-      <Filter>Source Files\Materials</Filter>
     </ClCompile>
     <ClCompile Include="SourceFiles\PostProcess.cpp">
       <Filter>Source Files</Filter>
@@ -105,38 +105,39 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Include\HSglTFExporter.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Include\define.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header</Filter>
     </ClInclude>
+    <ClInclude Include="Include\HSglTFExporter.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Resource\resource.h" />
     <ClInclude Include="Resource\resource.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Source Files">
-      <UniqueIdentifier>{86f785c1-2156-474a-8a01-81262ba05c56}</UniqueIdentifier>
+      <UniqueIdentifier>{f6795881-49b0-41a8-a71f-92784846d1bc}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files">
-      <UniqueIdentifier>{c31e9602-eaea-491c-af2f-e1e40ad8f128}</UniqueIdentifier>
+    <Filter Include="Header">
+      <UniqueIdentifier>{daa1dc7d-2bd1-45c3-bbe4-7ff892d9acb9}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\Materials">
-      <UniqueIdentifier>{b6c51f95-b3c8-47f9-afe1-d9699d156fe9}</UniqueIdentifier>
+      <UniqueIdentifier>{ac53b0ec-1932-4910-98cf-b13fabba99b8}</UniqueIdentifier>
     </Filter>
     <Filter Include="Resource">
-      <UniqueIdentifier>{7c248ac1-f2fc-4b2e-8b8d-21a18e8fd5c3}</UniqueIdentifier>
+      <UniqueIdentifier>{9ec93d4d-60b2-4daf-a985-ee90ca1992d7}</UniqueIdentifier>
     </Filter>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="HSglTFExporter.def">
-      <Filter>Source Files</Filter>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource\HSglTFExporter.rc">
       <Filter>Resource</Filter>
     </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="SourceFiles\HSglTFExporter.def">
+      <Filter>Source Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

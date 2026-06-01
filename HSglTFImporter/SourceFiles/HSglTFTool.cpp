@@ -72,7 +72,7 @@ public:
 static HSglTFTool theHSglTFToolt;
 
 //===================================================
-// クラス記述子
+// Class descriptor
 //===================================================
 class HSglTFToolClassDesc:public ClassDesc2 {
 public:
@@ -561,12 +561,12 @@ static LRESULT CALLBACK NodeIndexDlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPA
 					HWND hListView = GetDlgItem(hWnd, IDC_NODEINDEX_LIST);
 					NMLISTVIEW* pnmv = (NMLISTVIEW*)lParam;
 
-					static bool ascending = true;  // クリックごとに昇順/降順切替
+					static bool ascending = true;  // Toggle ascending/descending order with each click
 					SortParam param = { hListView, pnmv->iSubItem, ascending };
 
 					ListView_SortItems(hListView, CompareFunc, (LPARAM)&param);
 
-					ascending = !ascending; // 次回は逆順
+					ascending = !ascending; // Next time, we'll do it in reverse order.
 				}
 				break;
 			}
@@ -674,18 +674,18 @@ void NodeIndexDlgInit(HWND hWnd)
 	LV_COLUMN lColumn;
 	lColumn.mask = LVCF_FMT | LVCF_SUBITEM | LVCF_WIDTH | LVCF_TEXT; //| LVCF_DEFAULTWIDTH;
 	lColumn.fmt = LVCFMT_RIGHT;
-	lColumn.pszText = _T("Name");
+	lColumn.pszText = const_cast<TCHAR*>(_T("Name"));
 	lColumn.cx = 90;
 	lColumn.iSubItem = 0;
 	ListView_InsertColumn(hListView, 0, &lColumn);
-	lColumn.pszText = _T("Sel");
+	lColumn.pszText = const_cast<TCHAR*>(_T("Sel"));
 	lColumn.cx = 35;
 	lColumn.iSubItem = 1;
 	ListView_InsertColumn(hListView, 1, &lColumn);
-	lColumn.pszText = _T("Hov");
+	lColumn.pszText = const_cast<TCHAR*>(_T("Hov"));
 	lColumn.cx = 35;
 	lColumn.iSubItem = 2;
-	ListView_InsertColumn(hListView, 2, &lColumn);	lColumn.pszText = _T("Vis");
+	ListView_InsertColumn(hListView, 2, &lColumn);	lColumn.pszText = const_cast<TCHAR*>(_T("Vis"));
 	lColumn.cx = 35;
 	lColumn.iSubItem = 3;
 	ListView_InsertColumn(hListView, 3, &lColumn);

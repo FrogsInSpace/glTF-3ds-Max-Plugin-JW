@@ -118,13 +118,13 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <None Include="HSglTFImporter.def">
-      <Filter>Source Files</Filter>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
     <ResourceCompile Include="Resource\HSglTFImporter.rc">
       <Filter>Resource</Filter>
     </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="SourceFiles\HSglTFImporter.def">
+      <Filter>Source Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

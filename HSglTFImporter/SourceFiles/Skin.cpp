@@ -84,7 +84,11 @@ void glTFImporter_Core::SetSkin(cgltf_node *node)
 
 	cgltf_accessor *acc = skin->inverse_bind_matrices;
 	if (acc) {
+#ifdef MAX_RELEASE_R24
+		Matrix3 ParentTM;
+#else
 		Matrix3 ParentTM(1);
+#endif 
 		if (!pNode->GetParentNode()->IsRootNode()) {
 //			ParentTM = (pNode->GetParentTM(m_time));
 		}

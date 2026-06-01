@@ -1,0 +1,76 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.37111.16
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "HSglTFExporter", "HSglTFExporter\HSglTFExporter.vcxproj", "{97D49973-99A4-41B9-B601-8E129D18F026}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "HSglTFImporter", "HSglTFImporter\HSglTFImporter.vcxproj", "{4DCC8EB2-9C05-48F9-B619-34A40F7D84C1}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Hybrid-Max2025|x64 = Hybrid-Max2025|x64
+		Hybrid-Max2026|x64 = Hybrid-Max2026|x64
+		Hybrid-Max2027|x64 = Hybrid-Max2027|x64
+		Release-Max2020|x64 = Release-Max2020|x64
+		Release-Max2021|x64 = Release-Max2021|x64
+		Release-Max2022|x64 = Release-Max2022|x64
+		Release-Max2023|x64 = Release-Max2023|x64
+		Release-Max2024|x64 = Release-Max2024|x64
+		Release-Max2025|x64 = Release-Max2025|x64
+		Release-Max2026|x64 = Release-Max2026|x64
+		Release-Max2027|x64 = Release-Max2027|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{97D49973-99A4-41B9-B601-8E129D18F026}.Hybrid-Max2025|x64.ActiveCfg = Hybrid-Max2025|x64
+		{97D49973-99A4-41B9-B601-8E129D18F026}.Hybrid-Max2025|x64.Build.0 = Hybrid-Max2025|x64
+		{97D49973-99A4-41B9-B601-8E129D18F026}.Hybrid-Max2026|x64.ActiveCfg = Hybrid-Max2026|x64
+		{97D49973-99A4-41B9-B601-8E129D18F026}.Hybrid-Max2026|x64.Build.0 = Hybrid-Max2026|x64
+		{97D49973-99A4-41B9-B601-8E129D18F026}.Hybrid-Max2027|x64.ActiveCfg = Hybrid-Max2027|x64
+		{97D49973-99A4-41B9-B601-8E129D18F026}.Hybrid-Max2027|x64.Build.0 = Hybrid-Max2027|x64
+		{97D49973-99A4-41B9-B601-8E129D18F026}.Release-Max2020|x64.ActiveCfg = Release-Max2020|x64
+		{97D49973-99A4-41B9-B601-8E129D18F026}.Release-Max2020|x64.Build.0 = Release-Max2020|x64
+		{97D49973-99A4-41B9-B601-8E129D18F026}.Release-Max2021|x64.ActiveCfg = Release-Max2021|x64
+		{97D49973-99A4-41B9-B601-8E129D18F026}.Release-Max2021|x64.Build.0 = Release-Max2021|x64
+		{97D49973-99A4-41B9-B601-8E129D18F026}.Release-Max2022|x64.ActiveCfg = Release-Max2022|x64
+		{97D49973-99A4-41B9-B601-8E129D18F026}.Release-Max2022|x64.Build.0 = Release-Max2022|x64
+		{97D49973-99A4-41B9-B601-8E129D18F026}.Release-Max2023|x64.ActiveCfg = Release-Max2023|x64
+		{97D49973-99A4-41B9-B601-8E129D18F026}.Release-Max2023|x64.Build.0 = Release-Max2023|x64
+		{97D49973-99A4-41B9-B601-8E129D18F026}.Release-Max2024|x64.ActiveCfg = Release-Max2024|x64
+		{97D49973-99A4-41B9-B601-8E129D18F026}.Release-Max2024|x64.Build.0 = Release-Max2024|x64
+		{97D49973-99A4-41B9-B601-8E129D18F026}.Release-Max2025|x64.ActiveCfg = Release-Max2025|x64
+		{97D49973-99A4-41B9-B601-8E129D18F026}.Release-Max2025|x64.Build.0 = Release-Max2025|x64
+		{97D49973-99A4-41B9-B601-8E129D18F026}.Release-Max2026|x64.ActiveCfg = Release-Max2026|x64
+		{97D49973-99A4-41B9-B601-8E129D18F026}.Release-Max2026|x64.Build.0 = Release-Max2026|x64
+		{97D49973-99A4-41B9-B601-8E129D18F026}.Release-Max2027|x64.ActiveCfg = Release-Max2027|x64
+		{97D49973-99A4-41B9-B601-8E129D18F026}.Release-Max2027|x64.Build.0 = Release-Max2027|x64
+		{4DCC8EB2-9C05-48F9-B619-34A40F7D84C1}.Hybrid-Max2025|x64.ActiveCfg = Hybrid-Max2025|x64
+		{4DCC8EB2-9C05-48F9-B619-34A40F7D84C1}.Hybrid-Max2025|x64.Build.0 = Hybrid-Max2025|x64
+		{4DCC8EB2-9C05-48F9-B619-34A40F7D84C1}.Hybrid-Max2026|x64.ActiveCfg = Hybrid-Max2026|x64
+		{4DCC8EB2-9C05-48F9-B619-34A40F7D84C1}.Hybrid-Max2026|x64.Build.0 = Hybrid-Max2026|x64
+		{4DCC8EB2-9C05-48F9-B619-34A40F7D84C1}.Hybrid-Max2027|x64.ActiveCfg = Hybrid-Max2027|x64
+		{4DCC8EB2-9C05-48F9-B619-34A40F7D84C1}.Hybrid-Max2027|x64.Build.0 = Hybrid-Max2027|x64
+		{4DCC8EB2-9C05-48F9-B619-34A40F7D84C1}.Release-Max2020|x64.ActiveCfg = Release-Max2020|x64
+		{4DCC8EB2-9C05-48F9-B619-34A40F7D84C1}.Release-Max2020|x64.Build.0 = Release-Max2020|x64
+		{4DCC8EB2-9C05-48F9-B619-34A40F7D84C1}.Release-Max2021|x64.ActiveCfg = Release-Max2021|x64
+		{4DCC8EB2-9C05-48F9-B619-34A40F7D84C1}.Release-Max2021|x64.Build.0 = Release-Max2021|x64
+		{4DCC8EB2-9C05-48F9-B619-34A40F7D84C1}.Release-Max2022|x64.ActiveCfg = Release-Max2022|x64
+		{4DCC8EB2-9C05-48F9-B619-34A40F7D84C1}.Release-Max2022|x64.Build.0 = Release-Max2022|x64
+		{4DCC8EB2-9C05-48F9-B619-34A40F7D84C1}.Release-Max2023|x64.ActiveCfg = Release-Max2023|x64
+		{4DCC8EB2-9C05-48F9-B619-34A40F7D84C1}.Release-Max2023|x64.Build.0 = Release-Max2023|x64
+		{4DCC8EB2-9C05-48F9-B619-34A40F7D84C1}.Release-Max2024|x64.ActiveCfg = Release-Max2024|x64
+		{4DCC8EB2-9C05-48F9-B619-34A40F7D84C1}.Release-Max2024|x64.Build.0 = Release-Max2024|x64
+		{4DCC8EB2-9C05-48F9-B619-34A40F7D84C1}.Release-Max2025|x64.ActiveCfg = Release-Max2025|x64
+		{4DCC8EB2-9C05-48F9-B619-34A40F7D84C1}.Release-Max2025|x64.Build.0 = Release-Max2025|x64
+		{4DCC8EB2-9C05-48F9-B619-34A40F7D84C1}.Release-Max2026|x64.ActiveCfg = Release-Max2026|x64
+		{4DCC8EB2-9C05-48F9-B619-34A40F7D84C1}.Release-Max2026|x64.Build.0 = Release-Max2026|x64
+		{4DCC8EB2-9C05-48F9-B619-34A40F7D84C1}.Release-Max2027|x64.ActiveCfg = Release-Max2027|x64
+		{4DCC8EB2-9C05-48F9-B619-34A40F7D84C1}.Release-Max2027|x64.Build.0 = Release-Max2027|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {075BC0AB-C184-4130-8246-D042B935EED6}
+	EndGlobalSection
+EndGlobal
