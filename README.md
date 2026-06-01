@@ -77,18 +77,20 @@ To build all release configurations at once, either use Visual Studio's "Batch B
 
 ### 🔧 Adding New 3ds Max Versions
 
-To keep project files clean, the recommended way to add new 3ds Max build targets is by manually editing the files below. Find the blocks related to the latest version and duplicate them, updating the year accordingly (e.g., `Max2027` → `Max2028`).
+To keep project files clean, the recommended way to add new 3ds Max build targets is by manually editing the files below. Find the blocks related to the latest version and duplicate them, updating the year accordingly.
+
+The example below adds the build configuration for 3ds Max 2027 by cloning and editing the entries for the 3ds Max 2026 configuration.
 
 ---
 
 - **Solution File (`HSglTF.sln`)**
-  Duplicate all lines containing `Max2027` and change the target to `Max2028` in the new lines.
+  Duplicate all lines containing `Max2026` and change the target to `Max2027` in the new lines.
 
 - **Project Files (`HSglTFImporter.vcxproj`, `HSglTFExporter.vcxproj`)**
-  Duplicate the XML `<ProjectConfiguration>` elements containing `Max2027`. Update the year to `Max2028` for both the **Release** and **Hybrid** configurations.
+  Duplicate the XML `<ProjectConfiguration>` elements containing `Max2026`. Update the year to `Max2027` for both the **Release** and **Hybrid** configurations.
 
 - **Property Sheets (`MaxSDKSetup.props`)**
-  Duplicate the XML lines/property groups containing `Max2027` and update them to `Max2028`.
+  Duplicate the XML lines/property groups containing `Max2026` and update them to `Max2027`.
 
 ---
 
