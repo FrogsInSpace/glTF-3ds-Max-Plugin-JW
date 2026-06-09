@@ -147,7 +147,7 @@ void SetDracoMorphTargetPositionTable(Modifier* pMod, int chID, const std::vecto
 //========================================================================
 // Generate morph target section of the primitive
 //========================================================================
-void glTFExporter_Core::CreateDracoMorphPrimiteve(tinygltf::Primitive& primitive, Modifier* pMorphMod, std::vector<VertexProp>& VertPropTable)
+void glTFExporter_Core::CreateDracoMorphPrimitive(tinygltf::Primitive& primitive, Modifier* pMorphMod, std::vector<VertexProp>& VertPropTable)
 {
 	primitive.targets.clear();
 	int cnt = GetMorphTargetNum(pMorphMod);
@@ -1025,7 +1025,7 @@ void glTFExporter_Core::CreateDracoMeshProp(tinygltf::Primitive &primitive, Mesh
 	if (pMorphMod) {
 		s_pDracoMesh = &dracoMesh;
 		s_pBaseMesh = pMesh;
-		CreateDracoMorphPrimiteve(primitive, pMorphMod, VertPropTable);
+		CreateDracoMorphPrimitive(primitive, pMorphMod, VertPropTable);
 	}
 	s_buffer.Clear();
 }
