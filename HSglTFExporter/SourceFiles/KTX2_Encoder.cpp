@@ -87,6 +87,9 @@ BOOL glTFExporter_Core::KTX2Encode(Texmap* pTex, KTX2TextureStruct& toKTX)
 
     BitmapInfo bi = pBmp->GetBitmapInfo();
 
+    if(bi.Width() <= 0 || bi.Height() <= 0)
+        return FALSE;
+
 #if MAX_RELEASE > 26000
 	tstring retname = GetCOREInterface()->GetDir(APP_SYSTEM_IMAGE_DIR).data();
 #else
@@ -95,8 +98,8 @@ BOOL glTFExporter_Core::KTX2Encode(Texmap* pTex, KTX2TextureStruct& toKTX)
 	retname += _T("\\") + tstring(std::filesystem::path(bi.Filename()).stem().c_str()) + _T(".ktx2");
     toKTX.originalPathStr = retname;
 
-    int width = bi.Width();
-    int height = bi.Height();
+    size_t width = bi.Width();
+    size_t height = bi.Height();
 
     ktxTexture2* texture;
     std::vector<uint8_t> rgbaData(width * height * 4, 0);
