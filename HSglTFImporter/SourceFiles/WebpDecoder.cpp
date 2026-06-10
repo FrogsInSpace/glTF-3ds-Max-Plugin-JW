@@ -63,6 +63,8 @@ BOOL glTFImporter_Core::WebpDecode(const tstring &fname, tstring &retname)
 
     int ret = WebPGetInfo(data.data(), data.size(), &width, &height);
 
+    if (!ret) return FALSE;
+
     uint8_t *buf = WebPDecodeRGBA(data.data(), data.size(), &width, &height);
     if (!buf) return FALSE;
 
