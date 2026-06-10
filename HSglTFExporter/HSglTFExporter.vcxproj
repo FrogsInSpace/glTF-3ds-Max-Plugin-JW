@@ -169,7 +169,7 @@
     </Link>
     <PostBuildEvent>
       <Command>echo F | xcopy /Y /Q "$(TargetPath)" "$(SolutionDir)Packages\3ds Max $(MaxSDKRelease)\Plugins\$(ProjectName)$(TargetExt)"</Command>
-	</PostBuildEvent>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="SourceFiles\Animation.cpp" />
@@ -182,7 +182,7 @@
     <ClCompile Include="SourceFiles\EXT_mesh_gpu_instancing.cpp" />
     <ClCompile Include="SourceFiles\glTFMaterial.cpp" />
     <ClCompile Include="SourceFiles\gltfx_reference.cpp" />
-    <ClCompile Include="SourceFiles\HSglTFExpoter.cpp" />
+    <ClCompile Include="SourceFiles\HSglTFExporter.cpp" />
     <ClCompile Include="SourceFiles\ImageBuffer.cpp" />
     <ClCompile Include="SourceFiles\KHR_animation_pointer.cpp" />
     <ClCompile Include="SourceFiles\KHR_collision_shapes.cpp" />
