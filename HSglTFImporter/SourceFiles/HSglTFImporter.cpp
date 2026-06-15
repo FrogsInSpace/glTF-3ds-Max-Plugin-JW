@@ -122,6 +122,7 @@ Pencil+® is registered trademarks of P SOFTHOUSE Co., Ltd..\r\n \
 	OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.\r\n"
 );
 
+
 static glTFImporter_Core theImporterCore;
 
 BOOL LaunchScript(tstring &script);
@@ -297,7 +298,7 @@ public:
 	}
 	void SetDebugModeFn(int i) {
 		TSTR profle;
-		profle.printf(_T("%s\\%s"), GetCOREInterface()->GetDir(APP_PLUGCFG_DIR), _T("HSglTFImpoter.ini"));
+		profle.printf(_T("%s\\%s"), GetCOREInterface()->GetDir(APP_PLUGCFG_DIR), _T("HSglTFImporter.ini"));
 		if(i)
 			MaxSDK::Util::WritePrivateProfileString(_T("ImpSettings"), _T("DebugMode"), _T("1"), profle);
 		else
@@ -631,7 +632,7 @@ const TCHAR *HSglTFImporter::LongDesc()
 	
 const TCHAR *HSglTFImporter::ShortDesc() 
 {			
-	return _T("GL Transmissoin Format 2.0 (HSglTFImporter)");
+	return _T("GL Transmission Format 2.0 (HSglTFImporter)");
 }
 
 const TCHAR *HSglTFImporter::AuthorName()
@@ -696,7 +697,7 @@ const TCHAR *HSglTF2Importer::LongDesc()
 
 const TCHAR *HSglTF2Importer::ShortDesc()
 {
-	return _T("GL Transmissoin Format 2.0");
+	return _T("GL Transmission Format 2.0");
 }
 
 const TCHAR *HSglTF2Importer::AuthorName()
@@ -769,7 +770,7 @@ BOOL glTFImporter_Core::ImportPreProcess(const TCHAR* filename, BOOL suppressPro
 
 
 	TSTR profle;
-	profle.printf(_T("%s\\%s"), GetCOREInterface()->GetDir(APP_PLUGCFG_DIR), _T("HSglTFImpoter.ini"));
+	profle.printf(_T("%s\\%s"), GetCOREInterface()->GetDir(APP_PLUGCFG_DIR), _T("HSglTFImporter.ini"));
 
 	HH_DebugMode = MaxSDK::Util::GetPrivateProfileInt(_T("ImpSettings"), _T("DebugMode"), 0, profle);
 

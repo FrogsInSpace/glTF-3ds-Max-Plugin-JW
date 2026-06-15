@@ -252,7 +252,7 @@ const TCHAR* HSglTF2Exporter::LongDesc()
 
 const TCHAR* HSglTF2Exporter::ShortDesc()
 {
-	return _T("GL Transmissoin Format 2.0");
+	return _T("GL Transmission Format 2.0");
 }
 
 const TCHAR* HSglTF2Exporter::AuthorName()
@@ -721,7 +721,7 @@ const TCHAR *HSglTFExporter::LongDesc()
 	
 const TCHAR *HSglTFExporter::ShortDesc()
 {			
-	return _T("GL Transmissoin Format 2.0 (HSglTFExporter)");
+	return _T("GL Transmission Format 2.0 (HSglTFExporter)");
 }
 
 const TCHAR *HSglTFExporter::AuthorName()
