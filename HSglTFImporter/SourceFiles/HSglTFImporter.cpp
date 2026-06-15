@@ -942,9 +942,9 @@ BOOL glTFImporter_Core::ImportPreProcess(const TCHAR* filename, BOOL suppressPro
 		if (HH_ColorManagement) {
 			pColMgr->SetColorPipelineMode(MaxSDK::ColorManagement::ColorPipelineMode::kOCIO_CUSTOM);
 			MaxSDK::ColorManagement::IModeSettings* pModeSetting = pColMgr->Settings();
-			TSTR profle;
-			profle.printf(_T("%sColorManagement\\ocio_configs\\glTF_PBR_Neutral_Tone_Mapper\\%s"), GetCOREInterface()->GetDir(APP_MAX_SYS_ROOT_DIR), _T("glTF_PBR_Neutral_Tone_Mapper.ocio"));
-			auto ret = pModeSetting->SetOCIOConfigFilePath(profle);
+			TSTR oicoConfigFile;
+			oicoConfigFile.printf(_T("%sColorManagement\\ocio_configs\\glTF_PBR_Neutral_Tone_Mapper\\%s"), GetCOREInterface()->GetDir(APP_MAX_SYS_ROOT_DIR), _T("glTF_PBR_Neutral_Tone_Mapper.ocio"));
+			auto ret = pModeSetting->SetOCIOConfigFilePath(oicoConfigFile);
 		}
 	}
 #endif
