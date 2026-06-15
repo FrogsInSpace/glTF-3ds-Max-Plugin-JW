@@ -88,6 +88,8 @@ void DracoDecodeProc(cgltf_buffer_view *bufferView, std::vector<float> &tbl, Dra
 	cgltf_buffer *data = bufferView->buffer;
 	if (!data || !data->data) return;
 	if (bufferView->offset >= data->size) return;
+	// Ensure buffer view fits inside the buffer
+	if(bufferView->offset + bufferView->size > data->size) return;
 
 	draco::Decoder decoder;
 	draco::DecoderBuffer buffer;

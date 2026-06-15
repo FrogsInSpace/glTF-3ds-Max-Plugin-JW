@@ -618,11 +618,16 @@ UINT glTFExporter_Core::IsUVAnimated(Texmap* pSrcTex)
 	}
 	if (pTex->ClassID() == ColorCorrectTexID) {
 		pTex = pTex->GetParamBlock(0)->GetTexmap(1);
+		if(!pTex) return ret;
 	}
 	if (pTex->ClassID() == RGBMultiTexID) {
-		pTex = pTex->GetParamBlock(0)->GetTexmap(2);
-		if(!pTex)
-			pTex = pTex->GetParamBlock(0)->GetTexmap(3);
+		Texmap *pTex2 = pTex->GetParamBlock(0)->GetTexmap(2);
+		if(pTex2)
+			pTex = pTex2;
+		else
+			pTex = pSrcTex->GetParamBlock(0)->GetTexmap(3);
+		
+		if(!pTex) return ret;
 	}
 
 	StdUVGen* pUVGen = NULL;
