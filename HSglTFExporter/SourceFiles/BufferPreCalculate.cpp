@@ -1,3 +1,4 @@
+// TODO: This file appears to be redundant and not used anywhere and may be removable ?
 
 #include "HSglTFExporter.h"
 
@@ -93,11 +94,13 @@ void glTFExporter_Core::CalcRec(INode *pNode)
 	}
 
 	Object *pObj = pNode->GetObjectRef();
-	if (pObj->SuperClassID() == CAMERA_CLASS_ID) {
-		m_CameraNum++;
-	}
-	else if (pObj->SuperClassID() == LIGHT_CLASS_ID) {
-		m_LightNum++;
+	if( pObj ) {
+		if (pObj->SuperClassID() == CAMERA_CLASS_ID) {
+			m_CameraNum++;
+		}
+		else if (pObj->SuperClassID() == LIGHT_CLASS_ID) {
+			m_LightNum++;
+		}
 	}
 
 	Tab<TimeValue> PosFrameList;
