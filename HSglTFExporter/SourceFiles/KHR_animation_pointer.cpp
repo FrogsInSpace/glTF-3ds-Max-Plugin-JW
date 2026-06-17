@@ -496,7 +496,7 @@ void glTFExporter_Core::CreateAnimationPointer(void)
 			if (pBlock->GetInt(1)) {
 				pC = pBlock->GetControllerByIndex(2);
 				if (CreateClearcoatFactorAnimation(pC, m.second))	m_AnimationPointer_Used = TRUE;
-	;
+
 				pC = pBlock->GetControllerByID(4);
 				if (CreateClearcoatRoughnessAnimation(pC, m.second)) m_AnimationPointer_Used = TRUE;
 
@@ -512,8 +512,10 @@ void glTFExporter_Core::CreateAnimationPointer(void)
 		if (pBlock) {
 			if (pBlock->GetInt(1)) {
 				pC = pBlock->GetControllerByIndex(2);
-				if (CreateClearcoatFactorAnimation(pC, m.second))	m_AnimationPointer_Used = TRUE;
-				;
+				
+				// TODO: verify that this is indeed correct ( CreateClearcoatFactorAnimation ? ) 
+				if (CreateClearcoatFactorAnimation(pC, m.second)) m_AnimationPointer_Used = TRUE;
+	
 				pC = pBlock->GetControllerByID(2);
 				if (CreateSpecularFactorAnimation(pC, m.second)) m_AnimationPointer_Used = TRUE;
 
@@ -521,6 +523,8 @@ void glTFExporter_Core::CreateAnimationPointer(void)
 				if (CreateSpecularColorAnimation(pC, m.second)) m_AnimationPointer_Used = TRUE;
 
 				Texmap* pTex = pBlock->GetTexmap(3);
+
+				// TODO: verify that this is indeed correct ( see above )
 				CreateUVAnimation(pTex, m.second, TargetTex::ClearcoatMap);
 				pTex = pBlock->GetTexmap(3);
 				CreateUVAnimation(pTex, m.second, TargetTex::SpecularMap);
@@ -874,6 +878,9 @@ BOOL glTFExporter_Core::CreateUVAnimation(Texmap *pSrcTex, UINT mtlIdx, TargetTe
 
 		m_TexTransform_Used = TRUE;
 	}
+
+	if(pOfsU2C) pOfsU2C->DeleteThis();
+	if(pOfsV2C) pOfsV2C->DeleteThis();
 
 	return (KeyFrameList1.size() > 0);
 }
