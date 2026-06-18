@@ -33,6 +33,7 @@ size_t WriteCallback(void* contents, size_t size, size_t nmemb, std::string* out
 }
 
 int proc() {
+    // TODO: The code below increases the risk of accidentally committing a real authentication key to the GitHub repository.
     // Authentication key (replace YOUR_AUTH_KEY with your appropriate key)
     std::string authKey = "YOUR_AUTH_KEY";
 

@@ -199,6 +199,7 @@ void DracoDecodeProc(cgltf_buffer_view *bufferView, std::vector<float> &tbl, Dra
 			}
 
 			if (type == DracoDecodeType::WEIGHTS) {
+				// TODO: Replace hardcoded GENERIC attribute indices (0/1) with a lookup based on the glTF Draco extension attribute mapping (if available).
 				auto attr = pMesh->GetNamedAttribute(draco::GeometryAttribute::GENERIC, 1);
 				if (!attr) return;
 				if (attr->is_mapping_identity()) {
@@ -225,6 +226,7 @@ void DracoDecodeProc(cgltf_buffer_view *bufferView, std::vector<float> &tbl, Dra
 			}
 
 			if (type == DracoDecodeType::JOINTS) {
+				// TODO: Replace hardcoded GENERIC attribute indices (0/1) with a lookup based on the glTF Draco extension attribute mapping (if available).
 				auto attr = pMesh->GetNamedAttribute(draco::GeometryAttribute::GENERIC, 0);
 				if (!attr) return;
 				if (attr->is_mapping_identity()) {

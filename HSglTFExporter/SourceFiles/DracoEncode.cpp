@@ -1008,7 +1008,9 @@ void glTFExporter_Core::CreateDracoMeshProp(tinygltf::Primitive &primitive, Mesh
 	primitive.extensions.insert(std::make_pair("KHR_draco_mesh_compression", tinygltf::Value(ary)));
 
 	if (pMorphMod) {
-		s_pDracoMesh = &dracoMesh;
+		/// TODO: static global s_pDracoMesh stores address of local variable dracoMesh.
+		/// This becomes invalid after the function returns (dangling pointer).
+		s_pDracoMesh = &dracoMesh; 
 		s_pBaseMesh = pMesh;
 		CreateDracoMorphPrimitive(primitive, pMorphMod, VertPropTable);
 	}
