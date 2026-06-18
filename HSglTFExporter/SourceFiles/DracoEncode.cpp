@@ -127,7 +127,12 @@ void SetDracoMorphTargetPositionTable(Modifier* pMod, int chID, const std::vecto
 		GetDracoMeshIndexList2(list2Table, dracoPos, basevertTable);
 
 		for (int i = 0; i < vIDMapTable.size(); i++) {
-			int idx = list2Table[vIDMapTable[i]];
+			int mapIdx = vIDMapTable[i];
+			
+			/// TODO: how to deal with invalid/outof-bounds index ?
+			assert(mapIdx >= 0 && mapIdx < list2Table.size());
+
+			int idx = list2Table[mapIdx];
 			mapTable.push_back(idx);
 		}
 	}
@@ -156,6 +161,11 @@ void glTFExporter_Core::CreateDracoMorphPrimitive(tinygltf::Primitive& primitive
 		std::vector<Point3> targetPtTbl;
 
 		SetDracoMorphTargetPositionTable(pMorphMod, i, VertPropTable, targetPtTbl);
+
+		/// TODO: needs to be validated: 
+		/// added empty morph target check to avoid null/dangling access later in processing
+		if (targetPtTbl.empty()) 
+			continue; 
 
 		//----------- Morph TargetPosition
 		{
@@ -720,6 +730,15 @@ int CreateWeightDracoBuffer(draco::Mesh &dracoMesh, Mesh *pMesh, std::map<int, s
 //========================================================================
 void glTFExporter_Core::CreateDracoMeshProp(tinygltf::Primitive &primitive, Mesh *pMesh, MeshNormalSpec *pNrmSpec, std::vector<int> &faceIDTable, std::vector<VertexProp>& VertPropTable, std::map<int, int>& vertPropMap, vertPropFlag& flag, Mtl *pMtl, ISkinContextData *pSkinMC, Modifier *pMorphMod, const Matrix3 &OffsetTM)
 {
+
+	DbgAssert(!faceIDTable.empty());
+	DbgAssert(!VertPropTable.empty());
+
+	/// TODO: needs to be validated: 
+	/// added empty checks to avoid null/dangling access later in processing
+	if(faceIDTable.empty() || VertPropTable.empty())
+		 return;
+
 	draco::Mesh dracoMesh;
 	tinygltf::Value::Object dracoAttr;
 
