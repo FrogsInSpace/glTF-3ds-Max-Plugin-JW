@@ -19,10 +19,6 @@
 
 #pragma once
 
-//#pragma warning( disable : 4267 )
-#pragma warning( disable : 4828 )
-
-
 #include "3dsmaxsdk_preinclude.h"
 #include "Max.h"
 #include "resource.h"
