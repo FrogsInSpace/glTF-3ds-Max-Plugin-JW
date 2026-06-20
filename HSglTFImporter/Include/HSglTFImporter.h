@@ -349,7 +349,7 @@ public:
 	INode* CreateMaxNode(cgltf_node *node, INode* pParent);
 	INode* CreateCamera(cgltf_node *node);
 	INode* CreateLight(cgltf_node *node);
-	void AttacheNodeExtentions(INode* pNode, cgltf_node* node);
+	void AttacheNodeExtensions(INode* pNode, cgltf_node* node);
 
 	BOOL FindAnimationChannels(cgltf_node *node, cgltf_animation *animation, std::vector<size_t> &ChannelList);
 	BOOL FindMtlAnimationChannels(cgltf_material* mtl, cgltf_animation* animation, std::vector<size_t>& ChannelList);

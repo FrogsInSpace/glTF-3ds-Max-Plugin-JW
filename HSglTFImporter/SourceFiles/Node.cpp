@@ -774,7 +774,7 @@ INode* glTFImporter_Core::CreateMaxNode(cgltf_node* node, INode* pParent)
 		}
 	}
 
-	AttacheNodeExtentions(pNode, node);
+	AttacheNodeExtensions(pNode, node);
 
 	if (ViewVertColor) {
 		pNode->SetCVertMode(TRUE);
