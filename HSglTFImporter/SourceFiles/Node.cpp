@@ -835,51 +835,51 @@ void glTFImporter_Core::CreateNodeInfosRec(cgltf_node *node, INode *targetParent
 	}
 
 	INode *pNewObject = NULL;
-	if (node->camera) {
+	TSTR baseName;
+
+	if(node->camera) {
+		baseName = _T("Camera");
 		pNewObject = CreateCamera(node);
-		if (_tcslen(pNewObject->GetName()) == 0 && m_AvoidDupName) {
-			TSTR name = _T("Camera");
-			GetCOREInterface()->MakeNameUnique(name);
-			pNewObject->SetName(name);
-		}
+		
+		if (!pNewObject) return;
 	}
-	else if (node->light) {
+	else if(node->light) {
+		baseName = _T("Light");
 		pNewObject = CreateLight(node);
-		if (_tcslen(pNewObject->GetName()) == 0 && m_AvoidDupName) {
-			TSTR name = _T("Light");
-			GetCOREInterface()->MakeNameUnique(name);
-			pNewObject->SetName(name);
-		}
+		
+		if (!pNewObject) return;
 	}
 	else {
+		baseName = _T("Object");
 		pNewObject = CreateMaxNode(node, targetParent);
+		
 		if (!pNewObject) return;
-		if (_tcslen(pNewObject->GetName()) == 0 && m_AvoidDupName) {
-			TSTR name = _T("Object");
-			GetCOREInterface()->MakeNameUnique(name);
-			pNewObject->SetName(name);
-		}
-		if (!pNewObject->GetMtl()&& pNewObject->GetObjectRef()->SuperClassID()== GEOMOBJECT_CLASS_ID) {
+		
+		if (!pNewObject->GetMtl() && pNewObject->GetObjectRef()->SuperClassID()== GEOMOBJECT_CLASS_ID) {
 			pNewObject->SetWireColor(RGB(128,128,128));
-		}
-
-		cgltf_size size;
-		cgltf_result ret = cgltf_copy_extras_json(m_glTF_data, &node->extras, NULL, &size);
-		if (size > 0) {
-			std::vector<custAttrParam> attrTbl;
-			CreateParamTableFromExtras(node->extras, size, attrTbl);
-			//AttacheCustAttr(pNewObject->GetObjectRef(), attrTbl);
-			if (m_ExtraToUserProp)
-				SetUserPropParam(pNewObject, attrTbl);
-			if(m_ExtraToCustAttr)
-				AttacheCustAttr(pNewObject, attrTbl);
 		}
 	}
 
 	if (m_AvoidDupName) {
-		TSTR n = pNewObject->GetName();
-		GetCOREInterface()->MakeNameUnique(n);
-		pNewObject->SetName(n);
+		TSTR name = pNewObject->GetName();
+		if(_tcslen(name) == 0) {
+			name = baseName;
+		}
+		GetCOREInterface()->MakeNameUnique(name);
+		pNewObject->SetName(name);
+	}
+
+	// featch and attach extras as Custom Attributes/User Props
+	cgltf_size size;
+	cgltf_result ret = cgltf_copy_extras_json(m_glTF_data, &node->extras, NULL, &size);
+	if (size > 0) {
+		std::vector<custAttrParam> attrTbl;
+		CreateParamTableFromExtras(node->extras, size, attrTbl);
+		//AttacheCustAttr(pNewObject->GetObjectRef(), attrTbl);
+		if (m_ExtraToUserProp)
+			SetUserPropParam(pNewObject, attrTbl);
+		if(m_ExtraToCustAttr)
+			AttacheCustAttr(pNewObject, attrTbl);
 	}
 
 	m_NodeMap.insert(std::make_pair(node, pNewObject));
@@ -1007,9 +1007,9 @@ void glTFImporter_Core::CreateNodeInfosRec(cgltf_node *node, INode *targetParent
 }
 
 //======================================================================
-// Attache Extention params 
+// Attach Extention params 
 //======================================================================
-void glTFImporter_Core::AttacheNodeExtentions(INode* pNode, cgltf_node* node)
+void glTFImporter_Core::AttacheNodeExtensions(INode* pNode, cgltf_node* node)
 {
 	if (!pNode || !node) return;
 
