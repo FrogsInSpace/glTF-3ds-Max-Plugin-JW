@@ -155,7 +155,7 @@ void glTFImporter_Core::SetMorph(void)
 				//cgltf_attribute_type att_type;
 				std::vector<float> VertIdList;
 				if (mc) {
-					DracoDecodeProc(mc->buffer_view, VertIdList, DracoDecodeType::POSITION);
+					DracoDecodeProc(mc->buffer_view, pr, VertIdList, DracoDecodeType::POSITION);
 				}
 				else {
 					GetDataList(VertIdList, findTargetAttrAccesor(target, "POSITION"));
@@ -173,7 +173,7 @@ void glTFImporter_Core::SetMorph(void)
 				// Setting vertex normals
 				std::vector<float> NormalList;
 				if (mc) {
-					DracoDecodeProc(mc->buffer_view, NormalList, DracoDecodeType::NORMAL);
+					DracoDecodeProc(mc->buffer_view, pr, NormalList, DracoDecodeType::NORMAL);
 				}
 				else {
 					GetDataList(NormalList, findTargetAttrAccesor(target, "NORMAL"));

@@ -51,7 +51,7 @@ void glTFImporter_Core::SetSkin(cgltf_node *node)
 		}
 		std::vector<float> wList;
 		if (mc) {
-			DracoDecodeProc(mc->buffer_view, wList, DracoDecodeType::WEIGHTS);
+			DracoDecodeProc(mc->buffer_view, pr, wList, DracoDecodeType::WEIGHTS);
 		}
 		else {
 			GetDataList(wList, findAttrAccesor(pr, "WEIGHTS_0"));
@@ -66,7 +66,7 @@ void glTFImporter_Core::SetSkin(cgltf_node *node)
 		//}
 		std::vector<float> bList;
 		if (mc) {
-			DracoDecodeProc(mc->buffer_view, bList, DracoDecodeType::JOINTS);
+			DracoDecodeProc(mc->buffer_view, pr, bList, DracoDecodeType::JOINTS);
 		}
 		else {
 			GetDataList(bList, findAttrAccesor(pr, "JOINTS_0"));

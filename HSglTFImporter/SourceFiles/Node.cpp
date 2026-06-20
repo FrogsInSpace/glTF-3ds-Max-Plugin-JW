@@ -262,7 +262,7 @@ INode* glTFImporter_Core::CreateMaxNode(cgltf_node* node, INode* pParent)
 		float scale_v = 1.0f;
 		float offset_u = 0.0f;
 		float offset_v = 0.0f;
-		if (m_Quantization) {
+		if (m_Quantization && pr->material) {
 			if (pr->material->has_pbr_metallic_roughness) {
 				if (pr->material->pbr_metallic_roughness.base_color_texture.has_transform) {
 					scale_u = pr->material->pbr_metallic_roughness.base_color_texture.transform.scale[0];
@@ -294,7 +294,7 @@ INode* glTFImporter_Core::CreateMaxNode(cgltf_node* node, INode* pParent)
 		// Set vertex
 		std::vector<float> VertIdList;
 		if (mc) {
-			DracoDecodeProc(mc->buffer_view, VertIdList, DracoDecodeType::POSITION);
+			DracoDecodeProc(mc->buffer_view, pr, VertIdList, DracoDecodeType::POSITION);
 		}
 		else {
 			GetDataList(VertIdList, findAttrAccesor(pr, "POSITION"));
@@ -482,7 +482,7 @@ INode* glTFImporter_Core::CreateMaxNode(cgltf_node* node, INode* pParent)
 		// Set the Vertex nodr
 		std::vector<float> NormalList;
 		if (mc) {
-			DracoDecodeProc(mc->buffer_view, NormalList, DracoDecodeType::NORMAL);
+			DracoDecodeProc(mc->buffer_view, pr, NormalList, DracoDecodeType::NORMAL);
 		}
 		else {
 			GetDataList(NormalList, findAttrAccesor(pr, "NORMAL"));
@@ -505,7 +505,7 @@ INode* glTFImporter_Core::CreateMaxNode(cgltf_node* node, INode* pParent)
 		cgltf_type val_type= cgltf_type_vec4;
 		float vcScale = 255.0f;
 		if (mc) {
-			DracoDecodeProc(mc->buffer_view, vClrList, DracoDecodeType::COLOR);
+			DracoDecodeProc(mc->buffer_view, pr, vClrList, DracoDecodeType::COLOR);
 			cgltf_accessor* acc = findAttrAccesor(pr, "COLOR_0");
 			if (acc) {
 				if (acc->component_type == cgltf_component_type::cgltf_component_type_r_32f) vcScale = 1.0f;
@@ -555,7 +555,7 @@ INode* glTFImporter_Core::CreateMaxNode(cgltf_node* node, INode* pParent)
 		//Set UV1
 		std::vector<float> texCoord1List;
 		if (mc) {
-			DracoDecodeProc(mc->buffer_view, texCoord1List, DracoDecodeType::TEX_COORD);
+			DracoDecodeProc(mc->buffer_view, pr, texCoord1List, DracoDecodeType::TEX_COORD);
 		}
 		else {
 			cgltf_accessor* acc = findAttrAccesor(pr, "TEXCOORD_0");

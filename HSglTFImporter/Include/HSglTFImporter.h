@@ -297,7 +297,7 @@ extern Texmap* CreateAlphaChOSLNode(AColor col);
 extern Texmap* CreateColorMultiplyOSLNode(Texmap* pTex, Color col);
 
 extern void GetDracoMeshIndexList(cgltf_buffer_view* bufferView, std::vector<float> &tbl);
-extern void DracoDecodeProc(cgltf_buffer_view* bufferView, std::vector<float> &tbl, DracoDecodeType type);
+extern void DracoDecodeProc(cgltf_buffer_view* bufferView, cgltf_primitive* primitive, std::vector<float> &tbl, DracoDecodeType type);
 
 extern void OpenProgreessDlg(cgltf_data* m_glTF_data);
 extern void CloseProgreessDlg(void);

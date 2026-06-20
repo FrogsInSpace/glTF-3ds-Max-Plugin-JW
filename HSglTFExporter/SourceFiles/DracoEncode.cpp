@@ -130,7 +130,11 @@ void SetDracoMorphTargetPositionTable(Modifier* pMod, int chID, const std::vecto
 			int mapIdx = vIDMapTable[i];
 			
 			/// TODO: how to deal with invalid/outof-bounds index ?
-			assert(mapIdx >= 0 && mapIdx < list2Table.size());
+			//assert(mapIdx >= 0 && mapIdx < list2Table.size());
+			if (mapIdx < 0 || mapIdx >= static_cast<int>(list2Table.size())) {
+				DbgAssert(!"Invalid morph target mapping index");
+				continue;
+			}
 
 			int idx = list2Table[mapIdx];
 			mapTable.push_back(idx);
@@ -164,8 +168,11 @@ void glTFExporter_Core::CreateDracoMorphPrimitive(tinygltf::Primitive& primitive
 
 		/// TODO: needs to be validated: 
 		/// added empty morph target check to avoid null/dangling access later in processing
-		if (targetPtTbl.empty()) 
-			continue; 
+		//if (targetPtTbl.empty()) continue;
+		if (targetPtTbl.empty() || targetPtTbl.size() != VertPropTable.size()) {
+			DbgAssert(!"Morph target position table size mismatch or empty.");
+			continue;
+		}
 
 		//----------- Morph TargetPosition
 		{
@@ -1032,6 +1039,9 @@ void glTFExporter_Core::CreateDracoMeshProp(tinygltf::Primitive &primitive, Mesh
 		s_pDracoMesh = &dracoMesh; 
 		s_pBaseMesh = pMesh;
 		CreateDracoMorphPrimitive(primitive, pMorphMod, VertPropTable);
+
+		s_pDracoMesh = nullptr;
+		s_pBaseMesh = nullptr;
 	}
 	s_buffer.Clear();
 }

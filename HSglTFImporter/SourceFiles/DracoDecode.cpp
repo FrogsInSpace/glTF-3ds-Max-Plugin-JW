@@ -81,7 +81,7 @@ void GetDracoMeshIndexList(cgltf_buffer_view* bufferView, std::vector<float> &tb
 //=======================================================================
 //
 //=======================================================================
-void DracoDecodeProc(cgltf_buffer_view *bufferView, std::vector<float> &tbl, DracoDecodeType type)
+void DracoDecodeProc(cgltf_buffer_view *bufferView, cgltf_primitive* primitive, std::vector<float> &tbl, DracoDecodeType type)
 {
 	tbl.clear();
 
@@ -200,7 +200,17 @@ void DracoDecodeProc(cgltf_buffer_view *bufferView, std::vector<float> &tbl, Dra
 
 			if (type == DracoDecodeType::WEIGHTS) {
 				// TODO: Replace hardcoded GENERIC attribute indices (0/1) with a lookup based on the glTF Draco extension attribute mapping (if available).
-				auto attr = pMesh->GetNamedAttribute(draco::GeometryAttribute::GENERIC, 1);
+				int attributeId = 1;
+				if (primitive && primitive->has_draco_mesh_compression) {
+					for (cgltf_size i = 0; i < primitive->draco_mesh_compression.attributes_count; ++i) {
+						// cgltf_attribute 構造体なので .name と .index を使用します
+						if (strcmp(primitive->draco_mesh_compression.attributes[i].name, "WEIGHTS_0") == 0) {
+							attributeId = (int)primitive->draco_mesh_compression.attributes[i].index;
+							break;
+						}
+					}
+				}
+				auto attr = pMesh->GetNamedAttribute(draco::GeometryAttribute::GENERIC, attributeId);
 				if (!attr) return;
 				if (attr->is_mapping_identity()) {
 					for (draco::AttributeValueIndex i(0); i < attr->size(); ++i) {
@@ -227,7 +237,16 @@ void DracoDecodeProc(cgltf_buffer_view *bufferView, std::vector<float> &tbl, Dra
 
 			if (type == DracoDecodeType::JOINTS) {
 				// TODO: Replace hardcoded GENERIC attribute indices (0/1) with a lookup based on the glTF Draco extension attribute mapping (if available).
-				auto attr = pMesh->GetNamedAttribute(draco::GeometryAttribute::GENERIC, 0);
+				int attributeId = 0;
+				if (primitive && primitive->has_draco_mesh_compression) {
+					for (cgltf_size i = 0; i < primitive->draco_mesh_compression.attributes_count; ++i) {
+						if (strcmp(primitive->draco_mesh_compression.attributes[i].name, "JOINTS_0") == 0) {
+							attributeId = (int)primitive->draco_mesh_compression.attributes[i].index;
+							break;
+						}
+					}
+				}
+				auto attr = pMesh->GetNamedAttribute(draco::GeometryAttribute::GENERIC, attributeId);
 				if (!attr) return;
 				if (attr->is_mapping_identity()) {
 					for (draco::AttributeValueIndex i(0); i < attr->size(); ++i) {
