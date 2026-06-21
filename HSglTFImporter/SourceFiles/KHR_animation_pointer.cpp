@@ -93,14 +93,14 @@ void glTFImporter_Core::SetAnimationPointer(int animID)
 	if (!animation) return;
 
 
-	struct ofsetCtrl {
+	struct offsetCtrl {
 		Control* pUC;
 		Control* pVC;
 	};
-	std::map<Mtl*, ofsetCtrl> ofsetBaseColorTexList;
-	std::map<Mtl*, ofsetCtrl> ofsetEmissiveTexList;
-	ofsetBaseColorTexList.clear();
-	ofsetEmissiveTexList.clear();
+	std::map<Mtl*, offsetCtrl> offsetBaseColorTexList;
+	std::map<Mtl*, offsetCtrl> offsetEmissiveTexList;
+	offsetBaseColorTexList.clear();
+	offsetEmissiveTexList.clear();
 
 	size_t ChannelCnt = animation->channels_count;
 	for (size_t i = 0; i < ChannelCnt; i++) {
@@ -258,10 +258,10 @@ void glTFImporter_Core::SetAnimationPointer(int animID)
 								std::map<TimeValue, AnimKeyInfo> FloatZKeyList;
 								SplitPoint3ChannelList(Point2KeyList, FloatXKeyList, FloatYKeyList, FloatZKeyList);
 
-								ofsetCtrl oc;
+								offsetCtrl oc;
 								oc.pUC = CreateFloatController(FloatXKeyList);
 								oc.pVC = CreateFloatController(FloatYKeyList);
-								ofsetBaseColorTexList.insert(std::make_pair(pMtl, oc));
+								offsetBaseColorTexList.insert(std::make_pair(pMtl, oc));
 								//SetUVOffsetController(pMtl, pUC, pVC, sampler->interpolation, 0);
 							}
 							else if (retPath[5] == "rotation") {
@@ -343,10 +343,10 @@ void glTFImporter_Core::SetAnimationPointer(int animID)
 									std::map<TimeValue, AnimKeyInfo> FloatZKeyList;
 									SplitPoint3ChannelList(Point2KeyList, FloatXKeyList, FloatYKeyList, FloatZKeyList);
 
-									ofsetCtrl oc;
+									offsetCtrl oc;
 									oc.pUC = CreateFloatController(FloatXKeyList);
 									oc.pVC = CreateFloatController(FloatYKeyList);
-									ofsetBaseColorTexList.insert(std::make_pair(pMtl, oc));
+									offsetBaseColorTexList.insert(std::make_pair(pMtl, oc));
 									//SetUVOffsetController(pMtl, pUC, pVC, sampler->interpolation, 0);
 								}
 							}
@@ -381,10 +381,10 @@ void glTFImporter_Core::SetAnimationPointer(int animID)
 							std::map<TimeValue, AnimKeyInfo> FloatZKeyList;
 							SplitPoint3ChannelList(Point2KeyList, FloatXKeyList, FloatYKeyList, FloatZKeyList);
 
-							ofsetCtrl oc;
+							offsetCtrl oc;
 							oc.pUC = CreateFloatController(FloatXKeyList);
 							oc.pVC = CreateFloatController(FloatYKeyList);
-							ofsetEmissiveTexList.insert(std::make_pair(pMtl, oc));
+							offsetEmissiveTexList.insert(std::make_pair(pMtl, oc));
 							//SetUVOffsetController(pMtl, pUC, pVC, sampler->interpolation, 0);
 						}
 					}
@@ -435,10 +435,10 @@ void glTFImporter_Core::SetAnimationPointer(int animID)
 										std::map<TimeValue, AnimKeyInfo> FloatZKeyList;
 										SplitPoint3ChannelList(Point2KeyList, FloatXKeyList, FloatYKeyList, FloatZKeyList);
 
-										ofsetCtrl oc;
+										offsetCtrl oc;
 										oc.pUC = CreateFloatController(FloatXKeyList);
 										oc.pVC = CreateFloatController(FloatYKeyList);
-										ofsetBaseColorTexList.insert(std::make_pair(pMtl, oc));
+										offsetBaseColorTexList.insert(std::make_pair(pMtl, oc));
 										//SetUVOffsetController(pMtl, pUC, pVC, sampler->interpolation, 0);
 									}
 									else if (retPath[7] == "rotation") {
@@ -560,10 +560,10 @@ void glTFImporter_Core::SetAnimationPointer(int animID)
 									std::map<TimeValue, AnimKeyInfo> FloatZKeyList;
 									SplitPoint3ChannelList(Point2KeyList, FloatXKeyList, FloatYKeyList, FloatZKeyList);
 
-									ofsetCtrl oc;
+									offsetCtrl oc;
 									oc.pUC = CreateFloatController(FloatXKeyList);
 									oc.pVC = CreateFloatController(FloatYKeyList);
-									ofsetBaseColorTexList.insert(std::make_pair(pMtl, oc));
+									offsetBaseColorTexList.insert(std::make_pair(pMtl, oc));
 									//SetUVOffsetController(pMtl, pUC, pVC, sampler->interpolation, 0);
 									}
 									else if (retPath[7] == "rotation") {
@@ -821,10 +821,10 @@ void glTFImporter_Core::SetAnimationPointer(int animID)
 
 	}
 
-	for (auto om : ofsetBaseColorTexList) {
+	for (auto om : offsetBaseColorTexList) {
 		SetUVOffsetController(om.first, om.second.pUC, om.second.pVC, cgltf_interpolation_type_linear, 0, TargetTex::BaseColorMap);
 	}
-	for (auto om : ofsetEmissiveTexList) {
+	for (auto om : offsetEmissiveTexList) {
 		SetUVOffsetController(om.first, om.second.pUC, om.second.pVC, cgltf_interpolation_type_linear, 0, TargetTex::EmissiveMap);
 	}
 }

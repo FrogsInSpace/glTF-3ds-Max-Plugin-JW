@@ -148,7 +148,7 @@ inline const MCHAR* GetCustomAttrName(CustAttrib* p)
 #define PHYSICALMATERIAL_CLASS_ID Class_ID(0x3d6b1cec, 0xdeadc001)
 #endif
 
-#define UV_ANIMATE_OFSET	0x1
+#define UV_ANIMATE_OFFSET	0x1
 #define UV_ANIMATE_SCALE	0x2
 #define UV_ANIMATE_ROTATE	0x4
 

@@ -59,7 +59,7 @@ public:
 
 	void DoTest(HWND hWnd);
 	void SetNodeAttr(HWND hWnd);
-	void SetNodeExtentionValue(HWND hWnd);
+	void SetNodeExtensionValue(HWND hWnd);
 	//void RemoveNodeAttr(HWND hWnd);
 	void NodeIndexDlg(HWND hWnd);
 	void RemoveAttr(HWND hWnd);
@@ -99,21 +99,21 @@ ClassDesc2* GetHSglTFToolDesc()
 //======================================================================
 //======================================================================
 enum {
-	fnIdAttacheExtensionAttrFn,
+	fnIdAttachExtensionAttrFn,
 };
 class HSglTFToolActions : public FPStaticInterface {
 public:
-	virtual BOOL AttacheExtensionAttrFn(ReferenceTarget*, TSTR) = 0;
+	virtual BOOL AttachExtensionAttrFn(ReferenceTarget*, TSTR) = 0;
 };
 class HSglTFToolActionsIMP : public HSglTFToolActions {
 public:
 	DECLARE_DESCRIPTOR(HSglTFToolActionsIMP)
 
 	BEGIN_FUNCTION_MAP
-	FN_2(fnIdAttacheExtensionAttrFn, TYPE_BOOL, AttacheExtensionAttrFn, TYPE_REFTARG, TYPE_STRING);
+	FN_2(fnIdAttachExtensionAttrFn, TYPE_BOOL, AttachExtensionAttrFn, TYPE_REFTARG, TYPE_STRING);
 	END_FUNCTION_MAP
 
-	BOOL AttacheExtensionAttrFn(ReferenceTarget* pRef, TSTR str) {
+	BOOL AttachExtensionAttrFn(ReferenceTarget* pRef, TSTR str) {
 		if (str== _T("KHR_materials_anisotropy")) {
 			SetAttributes((Mtl*)pRef, KHR_MATERIALS_ANISOTROPY, TRUE);
 		}
@@ -305,10 +305,10 @@ void SetAttributes(Mtl* pSmat, ULONG flag, BOOL enableFlag)
 	diffTrans.diffuseTransmissionTexture = texView;
 
 	if (pSmat->ClassID() == StandardMtlID) {
-		app.AttacheAlphaModeCustAttr(pSmat, 0);
+		app.AttachAlphaModeCustAttr(pSmat, 0);
 	}
 	else if (pSmat->ClassID() == PBRMetalMtlID) {
-		app.AttacheAlphaModeCustAttr(pSmat, 0);
+		app.AttachAlphaModeCustAttr(pSmat, 0);
 		if (flag & KHR_MATERIALS_IOR)					app.CreateIORAttr(pSmat, &ior, enableFlag);
 		if (flag & KHR_MATERIALS_DIFFUSE_TRANSMISSION)	app.CreateTransmissionAttr(pSmat, &transmission, enableFlag);
 		if (flag & KHR_MATERIALS_VOLUME)				app.CreateVolumeAttr(pSmat, &volume, enableFlag);
@@ -325,7 +325,7 @@ void SetAttributes(Mtl* pSmat, ULONG flag, BOOL enableFlag)
 	else if (pSmat->ClassID() == PBRSpecGlossMtlID) {
 	}
 	else if (pSmat->ClassID() == PHYSICALMATERIAL_CLASS_ID) {
-		app.AttacheAlphaModeCustAttr(pSmat, 0);
+		app.AttachAlphaModeCustAttr(pSmat, 0);
 		if(flag & KHR_MATERIALS_VOLUME)					app.CreateVolumeAttr(pSmat, &volume, enableFlag);
 		if (flag & KHR_MATERIALS_UNLIT)					app.CreateUnlitAttr(pSmat, enableFlag);
 		if (flag & KHR_MATERIALS_SPECULAR)				app.CreateSpecularAttr(pSmat, &specular, enableFlag);
@@ -343,7 +343,7 @@ void SetAttributes(Mtl* pSmat, ULONG flag, BOOL enableFlag)
 	else  if (pSmat->ClassID() == USDMaterialID) {
 	}
 	else  if (pSmat->ClassID() == Arnold_StandardSufaceID) {
-		app.AttacheAlphaModeCustAttr(pSmat, 0);
+		app.AttachAlphaModeCustAttr(pSmat, 0);
 		if (flag & KHR_MATERIALS_DIFFUSE_TRANSMISSION) app.CreateDiffuseTransmissionAttr(pSmat, &diffTrans, enableFlag);
 	}
 	else  if (pSmat->ClassID() == VRayMaterialID) {
@@ -389,7 +389,7 @@ void HSglTFTool::DoTest(HWND hWnd)
 
 //===================================================
 //===================================================
-void RemoveNodeAttributes(INode *pNode,  const tstring &ExtentionName)
+void RemoveNodeAttributes(INode *pNode,  const tstring &ExtensionName)
 {
 	if (!pNode) return;
 	ICustAttribContainer* pContainer = pNode->GetObjectRef()->GetCustAttribContainer();
@@ -397,7 +397,7 @@ void RemoveNodeAttributes(INode *pNode,  const tstring &ExtentionName)
 
 	glTFImporter_Core app;
 	IParamBlock2 *pBlock = NULL;
-	int idx = app.GetCustAttrPBlock(pNode->GetObjectRef(), ExtentionName, pBlock);
+	int idx = app.GetCustAttrPBlock(pNode->GetObjectRef(), ExtensionName, pBlock);
 	if (idx >= 0) {
 		pContainer->RemoveCustAttrib(idx);
 	}
@@ -541,7 +541,7 @@ static LRESULT CALLBACK NodeIndexDlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPA
 			theHSglTFToolt.SetNodeAttr(hWnd);
 			break;
 		case IDC_SETVAL_BUTTON:
-			theHSglTFToolt.SetNodeExtentionValue(hWnd);
+			theHSglTFToolt.SetNodeExtensionValue(hWnd);
 			break;
 
 		case IDOK:
@@ -771,7 +771,7 @@ void HSglTFTool::SetNodeAttr(HWND hWnd)
 
 //=============================================================================
 //=============================================================================
-void HSglTFTool::SetNodeExtentionValue(HWND hWnd)
+void HSglTFTool::SetNodeExtensionValue(HWND hWnd)
 {
 	HWND hListView = GetDlgItem(hWnd, IDC_NODEINDEX_LIST);
 

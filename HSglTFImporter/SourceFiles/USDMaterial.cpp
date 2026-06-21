@@ -296,7 +296,7 @@ void glTFImporter_Core::CreateUSDMaterial(void)
 
 		bool doubleSided = mtl->double_sided;
 
-		AttacheAlphaModeCustAttr(pSmat, mtl->alpha_mode);
+		AttachAlphaModeCustAttr(pSmat, mtl->alpha_mode);
 
 		CreateTransmissionAttr(pSmat, &mtl->transmission, mtl->has_transmission);
 		CreateVolumeAttr(pSmat, &mtl->volume, mtl->has_volume);

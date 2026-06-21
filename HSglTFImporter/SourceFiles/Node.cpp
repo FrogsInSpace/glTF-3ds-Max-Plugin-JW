@@ -774,7 +774,7 @@ INode* glTFImporter_Core::CreateMaxNode(cgltf_node* node, INode* pParent)
 		}
 	}
 
-	AttacheNodeExtensions(pNode, node);
+	AttachNodeExtensions(pNode, node);
 
 	if (ViewVertColor) {
 		pNode->SetCVertMode(TRUE);
@@ -875,11 +875,11 @@ void glTFImporter_Core::CreateNodeInfosRec(cgltf_node *node, INode *targetParent
 	if (size > 0) {
 		std::vector<custAttrParam> attrTbl;
 		CreateParamTableFromExtras(node->extras, size, attrTbl);
-		//AttacheCustAttr(pNewObject->GetObjectRef(), attrTbl);
+		//AttachCustAttr(pNewObject->GetObjectRef(), attrTbl);
 		if (m_ExtraToUserProp)
 			SetUserPropParam(pNewObject, attrTbl);
 		if(m_ExtraToCustAttr)
-			AttacheCustAttr(pNewObject, attrTbl);
+			AttachCustAttr(pNewObject, attrTbl);
 	}
 
 	m_NodeMap.insert(std::make_pair(node, pNewObject));
@@ -1007,9 +1007,9 @@ void glTFImporter_Core::CreateNodeInfosRec(cgltf_node *node, INode *targetParent
 }
 
 //======================================================================
-// Attach Extention params 
+// Attach Extension params 
 //======================================================================
-void glTFImporter_Core::AttacheNodeExtensions(INode* pNode, cgltf_node* node)
+void glTFImporter_Core::AttachNodeExtensions(INode* pNode, cgltf_node* node)
 {
 	if (!pNode || !node) return;
 

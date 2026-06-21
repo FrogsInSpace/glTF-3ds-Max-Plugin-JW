@@ -405,7 +405,7 @@ Texmap* CreateUberBitmapOSLNode(const TSTR& fname)
 
 //======================================================================
 //======================================================================
-Texmap* CreateSpecGloddFilterOSLNode(Texmap* pTex1, Texmap* pTex2)
+Texmap* CreateSpecGlossFilterOSLNode(Texmap* pTex1, Texmap* pTex2)
 {
 	Texmap* pOSLMap = (Texmap*)GetCOREInterface()->CreateInstance(TEXMAP_CLASS_ID, OSLTex_CLASS_ID);
 	IParamBlock2* pPBlock0 = pOSLMap->GetParamBlock(0);

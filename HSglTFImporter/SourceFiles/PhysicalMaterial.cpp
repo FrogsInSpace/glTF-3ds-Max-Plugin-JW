@@ -462,7 +462,7 @@ void glTFImporter_Core::CreatePhysicalMaterial(void)
 				pBmpTex = GetBitmapTexFromglTexture(spglTexInfo->texture);
 				SetTextureUVoffset(pBmpTex, spglTexInfo);
 				CorrectBitmapGamma(pBmpTex, 1.0f);
-				Texmap* pTex = CreateSpecGloddFilterOSLNode(pBmpTex1, pBmpTex);
+				Texmap* pTex = CreateSpecGlossFilterOSLNode(pBmpTex1, pBmpTex);
 				pBlock0->SetValue(fm_base_color_map, m_time, pTex);
 				int aaa = pBmpTex->GetAlphaSource();
 				if (pBmpTex->GetAlphaSource() == ALPHA_FILE) {
@@ -502,7 +502,7 @@ void glTFImporter_Core::CreatePhysicalMaterial(void)
 		//bool doubleSided = mtl->double_sided;
 
 
-		AttacheAlphaModeCustAttr(pSmat, mtl->alpha_mode);
+		AttachAlphaModeCustAttr(pSmat, mtl->alpha_mode);
 
 		CreateVolumeAttr(pSmat, &mtl->volume, mtl->has_volume);
 

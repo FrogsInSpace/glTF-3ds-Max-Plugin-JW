@@ -645,9 +645,9 @@ UINT glTFExporter_Core::IsUVAnimated(Texmap* pSrcTex)
 
 	IParamBlock* pBlock = GetParamBlock(pUVGen, 0);
 	Control* pOffsetUC = pBlock->GetController(0);
-	if (pOffsetUC) if (pOffsetUC->IsAnimated()) ret |= UV_ANIMATE_OFSET;
+	if (pOffsetUC) if (pOffsetUC->IsAnimated()) ret |= UV_ANIMATE_OFFSET;
 	Control* pOffsetVC = pBlock->GetController(1);
-	if (pOffsetVC) if (pOffsetVC->IsAnimated()) ret |= UV_ANIMATE_OFSET;
+	if (pOffsetVC) if (pOffsetVC->IsAnimated()) ret |= UV_ANIMATE_OFFSET;
 	Control* pScaleUC = pBlock->GetController(2);
 	if (pScaleUC) if (pScaleUC->IsAnimated()) ret |= UV_ANIMATE_SCALE;
 	Control* pScaleVC = pBlock->GetController(3);
@@ -792,8 +792,8 @@ BOOL glTFExporter_Core::CreateUVAnimation(Texmap *pSrcTex, UINT mtlIdx, TargetTe
 	Control* pOfsU2C = (Control*)GetCOREInterface()->CreateInstance(CTRL_FLOAT_CLASS_ID, Class_ID(0x2007, 0x0));
 	Control* pOfsV2C = (Control*)GetCOREInterface()->CreateInstance(CTRL_FLOAT_CLASS_ID, Class_ID(0x2007, 0x0));
 	for (auto t : KeyFrameList1) {
-		float ofsetU = pUVGen->GetUOffs(t);
-		float ofsetV = pUVGen->GetVOffs(t);
+		float offsetU = pUVGen->GetUOffs(t);
+		float offsetV = pUVGen->GetVOffs(t);
 		float sclU = pUVGen->GetUScl(t);
 		float sclV = pUVGen->GetVScl(t);
 		float rot = pUVGen->GetWAng(t);
@@ -805,25 +805,25 @@ BOOL glTFExporter_Core::CreateUVAnimation(Texmap *pSrcTex, UINT mtlIdx, TargetTe
 
 		if (sclU >= 1.0f) {
 			localoffsetU += (1.0f - (1.0f / sclU)) / 2.0f;
-			ofsetU += localoffsetU;
-			ofsetU *= -1.0f;
+			offsetU += localoffsetU;
+			offsetU *= -1.0f;
 		}
 		else {
 			localoffsetU += (1.0f - sclU) / 2.0f;
-			ofsetU = localoffsetU - ofsetU * sclU;
+			offsetU = localoffsetU - offsetU * sclU;
 		}
 
 		if (sclV >= 1.0f) {
 			localoffsetV += (1.0f - (1.0f / sclV)) / 2.0f;
-			ofsetV -= localoffsetV;
+			offsetV -= localoffsetV;
 		}
 		else {
 			localoffsetV += (1.0f - sclV) / 2.0f;
-			ofsetV = localoffsetV + ofsetV * sclV;
+			offsetV = localoffsetV + offsetV * sclV;
 		}
 
-		pOfsU2C->SetValue(t, &ofsetU);
-		pOfsV2C->SetValue(t, &ofsetV);
+		pOfsU2C->SetValue(t, &offsetU);
+		pOfsV2C->SetValue(t, &offsetV);
 	}
 
 	AnimateOff();

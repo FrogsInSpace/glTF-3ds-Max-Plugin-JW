@@ -203,7 +203,7 @@ void DracoDecodeProc(cgltf_buffer_view *bufferView, cgltf_primitive* primitive, 
 				int attributeId = 1;
 				if (primitive && primitive->has_draco_mesh_compression) {
 					for (cgltf_size i = 0; i < primitive->draco_mesh_compression.attributes_count; ++i) {
-						// cgltf_attribute 構造体なので .name と .index を使用します
+						// Since it is a cgltf_attribute structure, use .name and .index
 						if (strcmp(primitive->draco_mesh_compression.attributes[i].name, "WEIGHTS_0") == 0) {
 							attributeId = (int)primitive->draco_mesh_compression.attributes[i].index;
 							break;

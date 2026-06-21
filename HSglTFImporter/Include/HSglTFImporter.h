@@ -292,7 +292,7 @@ extern Texmap* CreateFlipNormalOSLNode(Texmap* pTex, BOOL FlipGreen, BOOL FlipRe
 extern Texmap *CreateMetalRoughOccOSLNode(Texmap *pTex, float value);
 extern Texmap* CreateBitmapLookupOSLNode(const TSTR& fname);
 extern Texmap* CreateUberBitmapOSLNode(const TSTR& fname);
-extern Texmap* CreateSpecGloddFilterOSLNode(Texmap* pTex1, Texmap* pTex2);
+extern Texmap* CreateSpecGlossFilterOSLNode(Texmap* pTex1, Texmap* pTex2);
 extern Texmap* CreateAlphaChOSLNode(AColor col);
 extern Texmap* CreateColorMultiplyOSLNode(Texmap* pTex, Color col);
 
@@ -349,7 +349,7 @@ public:
 	INode* CreateMaxNode(cgltf_node *node, INode* pParent);
 	INode* CreateCamera(cgltf_node *node);
 	INode* CreateLight(cgltf_node *node);
-	void AttacheNodeExtensions(INode* pNode, cgltf_node* node);
+	void AttachNodeExtensions(INode* pNode, cgltf_node* node);
 
 	BOOL FindAnimationChannels(cgltf_node *node, cgltf_animation *animation, std::vector<size_t> &ChannelList);
 	BOOL FindMtlAnimationChannels(cgltf_material* mtl, cgltf_animation* animation, std::vector<size_t>& ChannelList);
@@ -459,8 +459,8 @@ public:
 
 	void CreateParamTableFromExtras(cgltf_extras& extras, cgltf_size size, std::vector<custAttrParam>& attrTbl, BOOL FileAttFlae = TRUE);
 	void CreateTargetListFromExtras(cgltf_extras& extras, cgltf_size size, std::vector<tstring>& tbl);
-	Class_ID AttacheCustAttr(Animatable* pAnim, std::vector<custAttrParam>& attrTbl, tstring name=_T(""));
-	void AttacheAlphaModeCustAttr(Mtl* pMtl, int alphamode);
+	Class_ID AttachCustAttr(Animatable* pAnim, std::vector<custAttrParam>& attrTbl, tstring name=_T(""));
+	void AttachAlphaModeCustAttr(Mtl* pMtl, int alphamode);
 	void SetUserPropParam(INode *pNode, std::vector<custAttrParam>& attrTbl);
 
 	void CreateUnlitAttr(Mtl* pMtl, BOOL unlit);
@@ -487,7 +487,7 @@ public:
 	int GetCustAttrPBlock(ReferenceTarget* pRef, const tstring& AttName, IParamBlock2* &pBlock);
 
 	void SetSceneProperties(void);
-	void AttacheSceneProp(std::vector<custAttrParam>& attrTbl);
+	void AttachSceneProp(std::vector<custAttrParam>& attrTbl);
 	void SetSceneInfos(void);
 	void CreateRigidTable(INode *pNode, char *data);
 	void SetRigidModefiers(void);

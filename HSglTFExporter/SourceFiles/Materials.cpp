@@ -502,8 +502,8 @@ BOOL glTFExporter_Core::CreateTextureTransformBlock(tinygltf::ExtensionMap& exte
 {
 	if (!pTex) return FALSE;
 
-	float ofsetU = 0.0f;
-	float ofsetV = 0.0f;
+	float offsetU = 0.0f;
+	float offsetV = 0.0f;
 	float sclU = 1.0f;
 	float sclV = 1.0f;
 	float rot = 0.0f;
@@ -512,8 +512,8 @@ BOOL glTFExporter_Core::CreateTextureTransformBlock(tinygltf::ExtensionMap& exte
 #if TRUE
 	StdUVGen* pUVGen = GetUVGen(pTex);
 	if(pUVGen){
-		ofsetU = pUVGen->GetUOffs(m_time);
-		ofsetV = pUVGen->GetVOffs(m_time);
+		offsetU = pUVGen->GetUOffs(m_time);
+		offsetV = pUVGen->GetVOffs(m_time);
 		sclU = pUVGen->GetUScl(m_time);
 		sclV = pUVGen->GetVScl(m_time);
 		rot = pUVGen->GetWAng(m_time);
@@ -522,34 +522,34 @@ BOOL glTFExporter_Core::CreateTextureTransformBlock(tinygltf::ExtensionMap& exte
 	float localoffsetU = -0.5f * cos(rot) + 0.5f * sin(rot) + 0.5f;
 	float localoffsetV = -0.5f * sin(rot) - 0.5f * cos(rot) + 0.5f;
 
-	if (rot == 0.0f && ofsetU==0.0f && sclU > 1.0f) {
+	if (rot == 0.0f && offsetU==0.0f && sclU > 1.0f) {
 		localoffsetU = (sclU - 1.0f) / 2.0f;
-		ofsetU += localoffsetU;
+		offsetU += localoffsetU;
 	}
 	else {
 		if (sclU >= 1.0f) {
 			localoffsetU += (1.0f - (1.0f / sclU)) / 2.0f;
-			ofsetU += localoffsetU;
+			offsetU += localoffsetU;
 		}
 		else {
 			localoffsetU += (1.0f - sclU) / 2.0f;
-			ofsetU = localoffsetU - ofsetU * sclU;
-			ofsetU *= -1.0f;
+			offsetU = localoffsetU - offsetU * sclU;
+			offsetU *= -1.0f;
 		}
 	}
 
-	if (rot == 0.0f && ofsetV == 0.0f && sclV > 1.0f) {
+	if (rot == 0.0f && offsetV == 0.0f && sclV > 1.0f) {
 		localoffsetV = (sclV - 1.0f) / 2.0f;
-		ofsetV += localoffsetV;
+		offsetV += localoffsetV;
 	}
 	else {
 		if (sclV >= 1.0f) {
 			localoffsetV += (1.0f - (1.0f / sclV)) / 2.0f;
-			ofsetV -= localoffsetV;
+			offsetV -= localoffsetV;
 		}
 		else {
 			localoffsetV += (1.0f - sclV) / 2.0f;
-			ofsetV = localoffsetV + ofsetV * sclV;
+			offsetV = localoffsetV + offsetV * sclV;
 		}
 	}
 #else
@@ -608,8 +608,8 @@ BOOL glTFExporter_Core::CreateTextureTransformBlock(tinygltf::ExtensionMap& exte
 		offset = origin * t;
 	}
 
-	ofsetU = std::fmod(offset.x, 1);
-	ofsetV = std::fmod((1.0 - offset.y), 1);
+	offsetU = std::fmod(offset.x, 1);
+	offsetV = std::fmod((1.0 - offset.y), 1);
 	sclU = scale.x;
 	sclV = scale.y;
 	rot = rotationEuler.z;
@@ -617,11 +617,11 @@ BOOL glTFExporter_Core::CreateTextureTransformBlock(tinygltf::ExtensionMap& exte
 #endif
 
 	tinygltf::Value::Object obj;
-	if (ofsetU != 0.0f || ofsetV != 0.0f || (force & UV_ANIMATE_OFSET)) {
-		tinygltf::Value::Array ofset;
-		ofset.push_back(tinygltf::Value(truncateDecimal(-ofsetU)));
-		ofset.push_back(tinygltf::Value(truncateDecimal(ofsetV)));
-		obj.insert(std::make_pair("offset", tinygltf::Value(ofset)));
+	if (offsetU != 0.0f || offsetV != 0.0f || (force & UV_ANIMATE_OFFSET)) {
+		tinygltf::Value::Array offset;
+		offset.push_back(tinygltf::Value(truncateDecimal(-offsetU)));
+		offset.push_back(tinygltf::Value(truncateDecimal(offsetV)));
+		obj.insert(std::make_pair("offset", tinygltf::Value(offset)));
 	}
 	if (sclU != 1.0f || sclV != 1.0f || (force & UV_ANIMATE_SCALE)) {
 		tinygltf::Value::Array scl;
@@ -652,8 +652,8 @@ BOOL glTFExporter_Core::CreateTextureTransformBlock(tinygltf::ExtensionMap& exte
 //======================================================================
 BOOL glTFExporter_Core::CreateTextureTransformBlockEx(tinygltf::Value::Object& object, Texmap* pTex, BOOL extent)
 {
-	float ofsetU = 0.0f;
-	float ofsetV = 0.0f;
+	float offsetU = 0.0f;
+	float offsetV = 0.0f;
 	float sclU = 1.0f;
 	float sclV = 1.0f;
 	float rot = 0.0f;
@@ -662,19 +662,19 @@ BOOL glTFExporter_Core::CreateTextureTransformBlockEx(tinygltf::Value::Object& o
 
 	StdUVGen* pUVGen = GetUVGen(pTex);
 	if (pUVGen) {
-		ofsetU = pUVGen->GetUOffs(m_time);
-		ofsetV = pUVGen->GetVOffs(m_time);
+		offsetU = pUVGen->GetUOffs(m_time);
+		offsetV = pUVGen->GetVOffs(m_time);
 		sclU = pUVGen->GetUScl(m_time);
 		sclV = pUVGen->GetVScl(m_time);
 		rot = pUVGen->GetWAng(m_time);
 	}
 
 	tinygltf::Value::Object obj;
-	if (ofsetU != 0.0f || ofsetV != 0.0f || (force & UV_ANIMATE_OFSET)) {
-		tinygltf::Value::Array ofset;
-		ofset.push_back(tinygltf::Value(-ofsetU));
-		ofset.push_back(tinygltf::Value(ofsetV));
-		obj.insert(std::make_pair("offset", tinygltf::Value(ofset)));
+	if (offsetU != 0.0f || offsetV != 0.0f || (force & UV_ANIMATE_OFFSET)) {
+		tinygltf::Value::Array offset;
+		offset.push_back(tinygltf::Value(-offsetU));
+		offset.push_back(tinygltf::Value(offsetV));
+		obj.insert(std::make_pair("offset", tinygltf::Value(offset)));
 	}
 	if (sclU != 1.0f || sclV != 1.0f || (force & UV_ANIMATE_SCALE)) {
 		tinygltf::Value::Array scl;

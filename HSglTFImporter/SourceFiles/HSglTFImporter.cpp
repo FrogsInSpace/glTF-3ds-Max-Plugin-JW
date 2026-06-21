@@ -1097,7 +1097,7 @@ BOOL glTFImporter_Core::ImportScene(void)
 		if (size > 0) {
 			std::vector<custAttrParam> attrTbl;
 			CreateParamTableFromExtras(m.first->extras, size, attrTbl);
-			AttacheCustAttr(m.second, attrTbl);
+			AttachCustAttr(m.second, attrTbl);
 		}
 	}
 
@@ -1169,7 +1169,7 @@ BOOL glTFImporter_Core::ImportScene(void)
 
 #endif
 
-	// Attache Skin
+	// Attach Skin
 	SetSkinImportStatus(0);
 	for (auto n : m_NodeMap) {
 		if (n.first->skin) {
@@ -1564,7 +1564,7 @@ BOOL glTFImporter_Core::GetDataList(std::vector<float>& retVal, cgltf_accessor* 
 }
 
 //======================================================================
-// Attache the modfier
+// Attach the modfier
 // =====================================================================
 Modifier *AddModifier(INode* pNode, const Class_ID &CID)
 {
@@ -1586,7 +1586,7 @@ Modifier *AddModifier(INode* pNode, const Class_ID &CID)
 	return pMod;
 }
 //======================================================================
-// Attache the modfier
+// Attach the modfier
 //======================================================================
 void AddModifier(INode* pNode, Modifier* pMod)
 {

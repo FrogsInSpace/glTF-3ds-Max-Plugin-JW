@@ -387,7 +387,7 @@ void glTFImporter_Core::SetUserPropParam(INode *pNode, std::vector<custAttrParam
 
 //======================================================================
 //======================================================================
-Class_ID glTFImporter_Core::AttacheCustAttr(Animatable* pAnim, std::vector<custAttrParam>& attrTbl, tstring AttrName)
+Class_ID glTFImporter_Core::AttachCustAttr(Animatable* pAnim, std::vector<custAttrParam>& attrTbl, tstring AttrName)
 {
 	Class_ID ret(0, 0);
 
@@ -535,7 +535,7 @@ void glTFImporter_Core::CreateUnlitAttr(Mtl* pMtl, BOOL unlit)
 	param.iParam = unlit;
 	attrTbl.push_back(param);
 
-	Class_ID retID = AttacheCustAttr(pMtl, attrTbl, _T("Unlit"));
+	Class_ID retID = AttachCustAttr(pMtl, attrTbl, _T("Unlit"));
 
 
 }
@@ -606,7 +606,7 @@ void glTFImporter_Core::CreateIridescenceAttr(Mtl *pMtl, cgltf_iridescence* irid
 	}
 
 
-	Class_ID retID = AttacheCustAttr(pMtl, attrTbl, _T("Iridescence"));
+	Class_ID retID = AttachCustAttr(pMtl, attrTbl, _T("Iridescence"));
 
 	ICustAttribContainer *pContainer = pMtl->GetCustAttribContainer();
 	if (!pContainer) return;
@@ -651,7 +651,7 @@ void glTFImporter_Core::CreateIORAttr(Mtl* pMtl, cgltf_ior* ior, BOOL enabled)
 	param.fmaxParam = 50.0f;
 	attrTbl.push_back(param);
 
-	Class_ID retID = AttacheCustAttr(pMtl, attrTbl, _T("IOR"));
+	Class_ID retID = AttachCustAttr(pMtl, attrTbl, _T("IOR"));
 /*
 	ICustAttribContainer* pContainer = pMtl->GetCustAttribContainer();
 	for (int i = 0; i < pContainer->GetNumCustAttribs(); i++) {
@@ -685,7 +685,7 @@ void glTFImporter_Core::CreateEmissiveStrengthAttr(Mtl* pMtl, cgltf_emissive_str
 	param.fmaxParam = 100.0f;
 	attrTbl.push_back(param);
 
-	Class_ID retID = AttacheCustAttr(pMtl, attrTbl, _T("EmissiveStrength"));
+	Class_ID retID = AttachCustAttr(pMtl, attrTbl, _T("EmissiveStrength"));
 }
 
 //======================================================================
@@ -733,7 +733,7 @@ void glTFImporter_Core::CreateVolumeAttr(Mtl* pMtl, cgltf_volume* volume, BOOL e
 		attrTbl.push_back(param);
 	}
 
-	Class_ID retID = AttacheCustAttr(pMtl, attrTbl, _T("Volume"));
+	Class_ID retID = AttachCustAttr(pMtl, attrTbl, _T("Volume"));
 	if (retID == Class_ID(0, 0)) return;
 
 	ICustAttribContainer* pContainer = pMtl->GetCustAttribContainer();
@@ -797,7 +797,7 @@ void glTFImporter_Core::CreateSheenAttr(Mtl* pMtl, cgltf_sheen* sheen, BOOL enab
 		attrTbl.push_back(param);
 	}
 
-	Class_ID retID = AttacheCustAttr(pMtl, attrTbl, _T("Sheen"));
+	Class_ID retID = AttachCustAttr(pMtl, attrTbl, _T("Sheen"));
 
 	ICustAttribContainer* pContainer = pMtl->GetCustAttribContainer();
 	for (int i = 0; i < pContainer->GetNumCustAttribs(); i++) {
@@ -877,7 +877,7 @@ void glTFImporter_Core::CreateClearcoatAttr(Mtl* pMtl, cgltf_clearcoat* clearcoa
 		attrTbl.push_back(param);
 	}
 
-	Class_ID retID = AttacheCustAttr(pMtl, attrTbl, _T("Clearcoat"));
+	Class_ID retID = AttachCustAttr(pMtl, attrTbl, _T("Clearcoat"));
 
 	ICustAttribContainer* pContainer = pMtl->GetCustAttribContainer();
 	for (int i = 0; i < pContainer->GetNumCustAttribs(); i++) {
@@ -932,7 +932,7 @@ void glTFImporter_Core::CreateTransmissionAttr(Mtl* pMtl, cgltf_transmission* tr
 	}
 
 
-	Class_ID retID = AttacheCustAttr(pMtl, attrTbl, _T("Transmission"));
+	Class_ID retID = AttachCustAttr(pMtl, attrTbl, _T("Transmission"));
 
 	ICustAttribContainer* pContainer = pMtl->GetCustAttribContainer();
 	for (int i = 0; i < pContainer->GetNumCustAttribs(); i++) {
@@ -968,7 +968,7 @@ void glTFImporter_Core::CreateDispersionAttr(Mtl* pMtl, cgltf_dispersion* disper
 	param.fmaxParam = 100.0f;
 	attrTbl.push_back(param);
 
-	Class_ID retID = AttacheCustAttr(pMtl, attrTbl, _T("Dispersion"));
+	Class_ID retID = AttachCustAttr(pMtl, attrTbl, _T("Dispersion"));
 }
 
 //======================================================================
@@ -1012,7 +1012,7 @@ void glTFImporter_Core::CreateAnisotropyAttr(Mtl* pMtl, cgltf_anisotropy* anisot
 	}
 
 
-	Class_ID retID = AttacheCustAttr(pMtl, attrTbl, _T("Anisotropy"));
+	Class_ID retID = AttachCustAttr(pMtl, attrTbl, _T("Anisotropy"));
 
 	ICustAttribContainer* pContainer = pMtl->GetCustAttribContainer();
 	for (int i = 0; i < pContainer->GetNumCustAttribs(); i++) {
@@ -1075,7 +1075,7 @@ void glTFImporter_Core::CreateDiffuseTransmissionAttr(Mtl* pMtl, cgltf_diffuse_t
 		attrTbl.push_back(param);
 	}
 
-	Class_ID retID = AttacheCustAttr(pMtl, attrTbl, _T("DiffuseTransmission"));
+	Class_ID retID = AttachCustAttr(pMtl, attrTbl, _T("DiffuseTransmission"));
 
 	ICustAttribContainer* pContainer = pMtl->GetCustAttribContainer();
 	for (int i = 0; i < pContainer->GetNumCustAttribs(); i++) {
@@ -1141,7 +1141,7 @@ void glTFImporter_Core::CreateSpecularAttr(Mtl* pMtl, cgltf_specular* specular, 
 		attrTbl.push_back(param);
 	}
 
-	Class_ID retID = AttacheCustAttr(pMtl, attrTbl, _T("Specular"));
+	Class_ID retID = AttachCustAttr(pMtl, attrTbl, _T("Specular"));
 
 	ICustAttribContainer* pContainer = pMtl->GetCustAttribContainer();
 	for (int i = 0; i < pContainer->GetNumCustAttribs(); i++) {
@@ -1191,7 +1191,7 @@ void glTFImporter_Core::CreateWebpEncodingAttr(Texmap* pTex, const tstring &path
 	param.iParam = FALSE;
 	attrTbl.push_back(param);
 
-	Class_ID retID = AttacheCustAttr(pTex, attrTbl, _T("Webp Encode"));
+	Class_ID retID = AttachCustAttr(pTex, attrTbl, _T("Webp Encode"));
 }
 
 //======================================================================
@@ -1239,7 +1239,7 @@ void glTFImporter_Core::CreateKTX2EncodingAttr(Texmap* pTex, const tstring& path
 	param.iParam = FALSE;
 	attrTbl.push_back(param);
 
-	Class_ID retID = AttacheCustAttr(pTex, attrTbl, _T("KTX2 Encode"));
+	Class_ID retID = AttachCustAttr(pTex, attrTbl, _T("KTX2 Encode"));
 }
 
 
@@ -1261,7 +1261,7 @@ void glTFImporter_Core::CreateVRayExtAttr(Mtl* pMtl, const vrayExtStruct &vray, 
 	param.fmaxParam = 1.0f;
 	attrTbl.push_back(param);
 
-	Class_ID retID = AttacheCustAttr(pMtl, attrTbl, _T("VRay Extention"));
+	Class_ID retID = AttachCustAttr(pMtl, attrTbl, _T("VRay Extention"));
 
 	//ICustAttribContainer* pContainer = pMtl->GetCustAttribContainer();
 }
@@ -1281,7 +1281,7 @@ void glTFImporter_Core::CreateSelectabilityAttr(INode* pNode, const Selectabilit
 	param.iParam = str.selectable;
 	attrTbl.push_back(param);
 
-	Class_ID retID = AttacheCustAttr(pNode, attrTbl, _T("Selectability"));
+	Class_ID retID = AttachCustAttr(pNode, attrTbl, _T("Selectability"));
 }
 
 //======================================================================
@@ -1299,7 +1299,7 @@ void glTFImporter_Core::CreateHoverabilityAttr(INode* pNode, const HoverabilityS
 	param.iParam = str.hoverable;
 	attrTbl.push_back(param);
 
-	Class_ID retID = AttacheCustAttr(pNode, attrTbl, _T("Hoverability"));
+	Class_ID retID = AttachCustAttr(pNode, attrTbl, _T("Hoverability"));
 }
 
 //======================================================================
@@ -1317,7 +1317,7 @@ void glTFImporter_Core::CreateVisibilityAttr(INode* pNode, const VisibilityStruc
 	param.iParam = str.visible;
 	attrTbl.push_back(param);
 
-	Class_ID retID = AttacheCustAttr(pNode, attrTbl, _T("Visibility"));
+	Class_ID retID = AttachCustAttr(pNode, attrTbl, _T("Visibility"));
 }
 
 //======================================================================
@@ -1343,7 +1343,7 @@ DWORD glTFImporter_Core::CreateInteractivityAttr(ReferenceTarget* pRef, const In
 	param.inVisible = TRUE;
 	attrTbl.push_back(param);
 
-	Class_ID retID = AttacheCustAttr(pRef, attrTbl, _T("Interactivity"));
+	Class_ID retID = AttachCustAttr(pRef, attrTbl, _T("Interactivity"));
 	return str.id;
 }
 
@@ -1407,7 +1407,7 @@ BOOL glTFImporter_Core::RemoveInteractivityAttr(ReferenceTarget* pRef)
 
 //======================================================================
 //======================================================================
-void glTFImporter_Core::AttacheAlphaModeCustAttr(Mtl *pMtl, int alphamode)
+void glTFImporter_Core::AttachAlphaModeCustAttr(Mtl *pMtl, int alphamode)
 {
 	IParamBlock2 *pBlock = NULL;
 	if (GetCustAttrPBlock(pMtl, tstring(_T("AlphaMode")),pBlock)!=-1) return;
