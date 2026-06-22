@@ -20,7 +20,7 @@
 #include "HSglTFImporter.h"
 #include "jsmn.h"
 
-//#define USE_REFACTORED_CREATEPARAMTABLE
+#define USE_REFACTORED_CREATEPARAMTABLE
 
 bool isNumber(const char* str)
 {
