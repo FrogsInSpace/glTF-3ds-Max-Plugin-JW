@@ -371,7 +371,7 @@ void glTFExporter_Core::CreateAnimationPointer(void)
 			pC = pBlock->GetControllerByID(vr_reflection_metalness);
 			CreateMetalicFactorAnimation(pC, m.second);
 
-			IParamBlock2* pBlockEx = GetCustAttrPBlock(pMtl, tstring(_T("VRay Extention")));
+			IParamBlock2* pBlockEx = GetCustAttrPBlock(pMtl, tstring(_T("VRay Extension")));
 			if (pBlockEx) {
 				//pC = pBlock->GetControllerByID(vr_diffuse_roughness);
 				pC = pBlockEx->GetControllerByID(1);

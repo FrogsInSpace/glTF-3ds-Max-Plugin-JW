@@ -153,7 +153,7 @@ inline const MCHAR* GetCustomAttrName(CustAttrib* p)
 #define UV_ANIMATE_ROTATE	0x4
 
 #define InteractiveLayerName (_T("HSInteractiveGraphLayer"))
-#define InteractiveNodeName (_T("HSInetractiveGraphNode"))
+#define InteractiveNodeName (_T("HSInteractiveGraphNode"))
 
 enum class TargetTex {
 	BaseColorMap = 0,

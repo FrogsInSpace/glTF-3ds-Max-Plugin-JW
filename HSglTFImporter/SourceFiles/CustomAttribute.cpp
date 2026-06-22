@@ -1249,7 +1249,7 @@ void glTFImporter_Core::CreateKTX2EncodingAttr(Texmap* pTex, const tstring& path
 void glTFImporter_Core::CreateVRayExtAttr(Mtl* pMtl, const vrayExtStruct &vray, BOOL enabled)
 {
 	IParamBlock2 *pBlock = NULL;
-	if (GetCustAttrPBlock(pMtl, tstring(_T("VRay Extention")),pBlock)!=-1) return;
+	if (GetCustAttrPBlock(pMtl, tstring(_T("VRay Extension")),pBlock)!=-1) return;
 
 	std::vector<custAttrParam> attrTbl;
 	custAttrParam param;
@@ -1261,7 +1261,7 @@ void glTFImporter_Core::CreateVRayExtAttr(Mtl* pMtl, const vrayExtStruct &vray, 
 	param.fmaxParam = 1.0f;
 	attrTbl.push_back(param);
 
-	Class_ID retID = AttachCustAttr(pMtl, attrTbl, _T("VRay Extention"));
+	Class_ID retID = AttachCustAttr(pMtl, attrTbl, _T("VRay Extension"));
 
 	//ICustAttribContainer* pContainer = pMtl->GetCustAttribContainer();
 }

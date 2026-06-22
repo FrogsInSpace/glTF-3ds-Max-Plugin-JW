@@ -487,7 +487,7 @@ BOOL glTFExporter_Core::SetVRayExtParams(MtlBase* pMtl, vrayExtStruct& str)
 {
 	str.roughness = 1.0f;
 
-	IParamBlock2* pBlock = GetCustAttrPBlock(pMtl, tstring(_T("VRay Extention")));
+	IParamBlock2* pBlock = GetCustAttrPBlock(pMtl, tstring(_T("VRay Extension")));
 	if (!pBlock) return FALSE;
 
 	pBlock->GetValueByName(_T("PBR roughness"), m_time, str.roughness, FOREVER, 0);

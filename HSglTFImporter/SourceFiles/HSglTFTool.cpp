@@ -154,7 +154,7 @@ public:
 	}
 };
 static HSglTFToolActionsIMP HSglTFToolActionsFP(HSGLTFTOOL_INTERFACE_ID, _T("HSglTFTools"), 0, GetHSglTFToolDesc(), 0,
-	fnIdAttacheExtensionAttrFn, _T("AttacheExtensionAttr"), 0, TYPE_BOOL, 0, 2, _T("target"), 0, TYPE_REFTARG, _T("extension"), 0, TYPE_STRING,
+	fnIdAttachExtensionAttrFn, _T("AttachExtensionAttr"), 0, TYPE_BOOL, 0, 2, _T("target"), 0, TYPE_REFTARG, _T("extension"), 0, TYPE_STRING,
 	p_end
 );
 FPInterfaceDesc* HSglTFTool::GetDesc() { return &HSglTFToolActionsFP; }
