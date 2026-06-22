@@ -1097,6 +1097,8 @@ BOOL glTFImporter_Core::ImportScene(void)
 		if (size > 0) {
 			std::vector<custAttrParam> attrTbl;
 			CreateParamTableFromExtras(m.first->extras, size, attrTbl);
+
+			/// TODO: validate if this should check m_ExtraToCustAttr before
 			AttachCustAttr(m.second, attrTbl);
 		}
 	}

@@ -1,3 +1,5 @@
+/// TODO: source file is not used anywhere in the project and should be removed from the public repo
+
 #include "HSglTFImporter.h"
 
 #undef is_array
