@@ -91,7 +91,7 @@ void SetNormal(Mesh *pMesh, const std::vector<Point3> &VertNormalTable)
 
 //======================================================================
 //======================================================================
-cgltf_accessor* findAttrAccesor(cgltf_primitive *pr, const char *str)
+cgltf_accessor* findAttrAccessor(cgltf_primitive *pr, const char *str)
 {
 	cgltf_attribute *attr = pr->attributes;
 	for (int i = 0; i < pr->attributes_count; i++, attr++) {

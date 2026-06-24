@@ -277,7 +277,7 @@ extern void AddModifier(INode* pNode, Modifier* pMod);
 extern int FindModifier(INode* pNode, const Class_ID &CID, Modifier **pMod);
 //INode *CreateDummyNode(const TSTR &name);
 //Matrix3 Mtx4x4ToMatrix3(aiMatrix4x4 &m, float scale = 1.0f);
-cgltf_accessor* findAttrAccesor(cgltf_primitive *pr, const char *str);
+cgltf_accessor* findAttrAccessor(cgltf_primitive *pr, const char *str);
 
 extern Texmap *CreateColorMap(AColor &c);
 extern Texmap *CreateBaseColorMap(void);
