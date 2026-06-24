@@ -111,28 +111,6 @@ INode* glTFImporter_Core::CreateMaxNode(cgltf_node* node, INode* pParent)
 	//DebugPrint(StringToWString(name.C_Str()).c_str());
 	std::vector<Mtl*> mtlIdTable;
 
-	//size_t meshId;
-	//  If the node has no mesh data, create a dummy object
-	if (!node->mesh) {
-		DummyObject* pObj = (DummyObject*)GetCOREInterface()->CreateInstance(HELPER_CLASS_ID, Class_ID(DUMMY_CLASS_ID, 0));
-		pObj->SetBox(Box3(Point3(-10, -10, -10), Point3(10, 10, 10)));
-		INode* pNode = GetCOREInterface()->CreateObjectNode(pObj);
-		if (name.size() > 0) {
-			pNode->SetName(name.c_str());
-		}
-		else if (m_AvoidDupName) {
-			TSTR n = _T("Dummy");
-			GetCOREInterface()->MakeNameUnique(n);
-			pNode->SetName(n);
-		}
-		else {
-			pNode->SetName(name.c_str());
-		}
-
-		if (m_HideDummy) pNode->Hide(TRUE);
-		return pNode;
-	}
-
 	Mesh NewMesh;
 	BezierShape NewShape;
 	//NewMesh.setSmoothFlags(1);
@@ -849,6 +827,16 @@ void glTFImporter_Core::CreateNodeInfosRec(cgltf_node *node, INode *targetParent
 		
 		if (!pNewObject) return;
 	}
+	else if(!node->mesh) {
+		baseName = _T("Dummy");
+
+		DummyObject* pObj =  static_cast<DummyObject*>(GetCOREInterface()->CreateInstance(HELPER_CLASS_ID, Class_ID(DUMMY_CLASS_ID, 0)));
+		pObj->SetBox(Box3(Point3(-10, -10, -10), Point3(10, 10, 10)));
+		pNewObject = GetCOREInterface()->CreateObjectNode(pObj);
+
+		if (m_HideDummy) pNewObject->Hide(TRUE);
+	}
+
 	else {
 		baseName = _T("Object");
 		pNewObject = CreateMaxNode(node, targetParent);
