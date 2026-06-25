@@ -4,9 +4,9 @@
 
 This documentation for end users describes the glTF importer and exporter plug-ins for Autodesk 3ds Max, and is divided into three sections:
 
-1. **[glTF Importer](ImporterDocumentation)** explains the options for importing and formatting the scene for use in 3ds Max.
-1. **[glTF Editing](EditingDocumentation)** explains the tools within 3ds Max for editing and preparing glTF content.
-1. **[glTF Exporter](ExporterDocumentation)** explains the options for exporting the scene out from 3ds Max into glTF format. 
+1. **[glTF Importer](ImporterDocumentation.md)** explains the options for importing and formatting the scene for use in 3ds Max.
+1. **[glTF Editing](EditingDocumentation.md)** explains the tools within 3ds Max for editing and preparing glTF content.
+1. **[glTF Exporter](ExporterDocumentation.md)** explains the options for exporting the scene out from 3ds Max into glTF format. 
 
 ## glTF Extensions Supported
 | glTF Extension | Import | Export |
