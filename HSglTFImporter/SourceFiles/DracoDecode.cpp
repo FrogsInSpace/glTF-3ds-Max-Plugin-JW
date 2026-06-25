@@ -47,7 +47,7 @@
 //=======================================================================
 // Create vertex ID list from compressed buffer
 //=======================================================================
-void GetDracoMeshIndexList(cgltf_buffer_view* bufferView, std::vector<float> &tbl)
+void GetDracoMeshIndexList(cgltf_buffer_view* bufferView, std::vector<uint32_t> &tbl)
 {
 	tbl.clear();
 

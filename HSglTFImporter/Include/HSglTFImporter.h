@@ -147,6 +147,14 @@ inline const MCHAR* GetCustomAttrName(CustAttrib* p)
 #endif
 }
 
+inline std::vector<uint32_t> FloatToUInt32IndexBuffer(const std::vector<float>& in)
+{
+	std::vector<uint32_t> out(in.size());
+	for (size_t i = 0; i < in.size(); ++i)
+		out[i] = static_cast<uint32_t>(in[i]);
+	return out;
+}
+
 enum DracoDecodeType {
 	INVALID = -1,
 	POSITION = 0,
@@ -296,7 +304,7 @@ extern Texmap* CreateSpecGlossFilterOSLNode(Texmap* pTex1, Texmap* pTex2);
 extern Texmap* CreateAlphaChOSLNode(AColor col);
 extern Texmap* CreateColorMultiplyOSLNode(Texmap* pTex, Color col);
 
-extern void GetDracoMeshIndexList(cgltf_buffer_view* bufferView, std::vector<float> &tbl);
+extern void GetDracoMeshIndexList(cgltf_buffer_view* bufferView, std::vector<uint32_t> &tbl);
 extern void DracoDecodeProc(cgltf_buffer_view* bufferView, cgltf_primitive* primitive, std::vector<float> &tbl, DracoDecodeType type);
 
 extern void OpenProgreessDlg(cgltf_data* m_glTF_data);
