@@ -876,7 +876,7 @@ BOOL glTFExporter_Core::ExportPreProcess(const TCHAR* filename, BOOL suppressPro
 	s_TitleString = _T("HS glTF exporter for 3dsmax ") + tstring(HS_GLTF_EXPORTER_VER);
 
 	TSTR profle;
-	profle.printf(_T("%s\\%s"), GetCOREInterface()->GetDir(APP_PLUGCFG_DIR), _T("HSglTFImpoter.ini"));
+	profle.printf(_T("%s\\%s"), GetCOREInterface()->GetDir(APP_PLUGCFG_DIR), _T("HSglTFImporter.ini"));
 
 	int x = MaxSDK::Util::GetPrivateProfileInt(_T("ExpSettings"), _T("scale"), 39370, profle);
 	HH_scale = x / 1000.0f;

@@ -70,7 +70,7 @@ BOOL glTFImporter_Core::gltfx_reference(const TCHAR* filename)
 	s_Xaxis90 = Quat(sin(f), 0.0f, 0.0f, cos(f));
 
 	TSTR profle;
-	profle.printf(_T("%s\\%s"), GetCOREInterface()->GetDir(APP_PLUGCFG_DIR), _T("HSglTFImpoter.ini"));
+	profle.printf(_T("%s\\%s"), GetCOREInterface()->GetDir(APP_PLUGCFG_DIR), _T("HSglTFImporter.ini"));
 	MaxSDK::Util::WritePrivateProfileString(_T("ImpSettings"), _T("scale"), _T("1000"), profle);
 
 	HWND hDlg = ::CreateDialogParam(hInstance, MAKEINTRESOURCE(IDD_GLTFX_DLG), ::GetActiveWindow(), (DLGPROC)NULL, NULL);
