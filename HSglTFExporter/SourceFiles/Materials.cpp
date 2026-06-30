@@ -1768,6 +1768,7 @@ void glTFExporter_Core::CreateMaterialMapRec(MtlBase *pOrgMtl, BOOL VariantPart)
 			int num = ((Mtl*)pMtl)->NumSubMtls();
 			for (int i = 0; i < num; i++) {
 				Mtl *pSubMtl = ((Mtl*)pMtl)->GetSubMtl(i);
+				if(!pSubMtl) continue;
 				CreateMaterialMapRec(pSubMtl, TRUE);
 				mtlTbl.push_back(pSubMtl);
 			}
@@ -1834,6 +1835,8 @@ BOOL GetCutOffValue(Texmap *pCutOffTex, Texmap* &pRetTex, float &val)
 	IParamBlock2 *pPBlock1 = pCutOffTex->GetParamBlock(1);
 	pPBlock1->GetValue(0, 0, val, FOREVER);
 	pPBlock1->GetValue(4, 0, pRetTex, FOREVER);
+	
+	if (!pRetTex) return FALSE;
 	if (pRetTex->ClassID() == ColorCorrectTexID) {
 		pRetTex = pRetTex->GetParamBlock(0)->GetTexmap(1);
 	}
@@ -1857,6 +1860,7 @@ void GetUV(UVGen *pUVGen, float &px, float &py, float &sx, float &sy)
 	if (!pUVGen) return;
 
 	IParamBlock *pBlock = (IParamBlock*)pUVGen->SubAnim(0);
+	if (!pBlock) return;
 	pBlock->GetValue(0, 0, px, FOREVER);
 	pBlock->GetValue(1, 0, py, FOREVER);
 	pBlock->GetValue(2, 0, sx, FOREVER);
