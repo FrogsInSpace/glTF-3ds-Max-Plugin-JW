@@ -981,15 +981,19 @@ BOOL glTFExporter_Core::ExportPreProcess(const TCHAR* filename, BOOL suppressPro
 		_stprintf_s(buf, MAX_PATH, _T("%d"), HH_CubicSplineT);
 		MaxSDK::Util::WritePrivateProfileString(_T("ExpSettings"), _T("CubicSplineT"), buf, profle);
 	}
-	{
+
+	// only show messagebox if not suppressed
+	if(!suppressPrompts) {
+		{
 #define MESSAGE_STR _T("Negative transform(Mirrored Object) detected, meshes may not export correctly to glTF.\nThe use of the ResetXForm utility is highly recommended.")
-		INodeTab tbl;
-		GetMirroredNode(tbl);
-		if (tbl.Count() > 0) {
-			int ret = MessageBox(NULL, MESSAGE_STR, _T("WARNING:Mirrored Objexct detected"), MB_OKCANCEL | MB_ICONWARNING);
-			if (ret == IDCANCEL) {
-				if (!exportSelected) GetCOREInterface()->SelectNodeTab(tbl, TRUE);
-				return TRUE;
+			INodeTab tbl;
+			GetMirroredNode(tbl);
+			if(tbl.Count() > 0) {
+				int ret = MessageBox(NULL, MESSAGE_STR, _T("WARNING:Mirrored Objexct detected"), MB_OKCANCEL | MB_ICONWARNING);
+				if(ret == IDCANCEL) {
+					if(!exportSelected) GetCOREInterface()->SelectNodeTab(tbl, TRUE);
+					return TRUE;
+				}
 			}
 		}
 	}
