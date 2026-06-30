@@ -24,6 +24,8 @@
 
 #define CGLTF_IMPLEMENTATION
 
+//#define USE_REFACTORED_SETSPARSEDATA
+
 #include "HSglTFImporter.h"
 #include <IMaterialViewportShading.h>
 #include <shlwapi.h>
@@ -1331,8 +1333,160 @@ BOOL glTFImporter_Core::ImportScene(void)
 }
 
 //======================================================================
-// Create data list specified by the accesor
+// Create data list specified by the accessor
 // =====================================================================
+
+#ifdef USE_REFACTORED_SETSPARSEDATA
+
+//======================================================================
+// Gemini AI refactored version of the original SetSparseData ( see below )
+// Does not crash with Khronos meshopt samples like the original, but fails to import any meshdata
+// =====================================================================
+void glTFImporter_Core::SetSparseData(std::vector<float>& retVal, cgltf_accessor* acc)
+{
+	if (!acc) return;
+
+	cgltf_type type = acc->type;
+	size_t count = acc->count;
+	cgltf_component_type componentType = acc->component_type;
+	cgltf_buffer_view* bufferView = acc->buffer_view;
+
+	// 1. Explicitly track component byte size & validate enum definitions
+	size_t size = 0;
+	switch (componentType) {
+		case cgltf_component_type_r_8:   size = sizeof(char);           break;
+		case cgltf_component_type_r_8u:  size = sizeof(unsigned char);  break;
+		case cgltf_component_type_r_16:  size = sizeof(short);          break;
+		case cgltf_component_type_r_16u: size = sizeof(unsigned short); break;
+		case cgltf_component_type_r_32u: size = sizeof(unsigned int);   break;
+		case cgltf_component_type_r_32f: size = sizeof(float);          break;
+		default:
+			// Safety fallback: Unhandled or malicious component type enum
+			return;
+	}
+
+	// 2. Safely translate type dimensions and catch unhandled enums
+	size_t dataLen = 0;
+	switch (type) {
+		case cgltf_type_scalar: dataLen = 1;  break;
+		case cgltf_type_vec2:   dataLen = 2;  break;
+		case cgltf_type_vec3:   dataLen = 3;  break;
+		case cgltf_type_vec4:   dataLen = 4;  break;
+		case cgltf_type_mat2:   dataLen = 4;  break;
+		case cgltf_type_mat3:   dataLen = 9;  break;
+		case cgltf_type_mat4:   dataLen = 16; break;
+		default:
+			// Safety fallback: Unhandled or invalid structural dimension type
+			return;
+	}
+
+	// 3. Fallback tracking when no buffer backing is explicitly present
+	cgltf_buffer* buffer = nullptr;
+	if (bufferView) {
+		buffer = bufferView->buffer;
+	}
+	else {
+		// Prevent 64-bit multiplication overflows during allocation sizes
+		if (count > 0 && dataLen > (std::numeric_limits<size_t>::max() / count)) {
+			return; 
+		}
+
+		// Optimally allocate space directly on the vector to avoid re-allocation loops
+		size_t totalElements = count * dataLen;
+		try {
+			retVal.insert(retVal.end(), totalElements, 0.0f);
+		} catch (const std::bad_alloc&) {
+			// Guard against system out-of-memory states if count is exceptionally large
+			return;
+		}
+		return;
+	}
+
+	// Validate that the underlying buffer container is actually populated
+	if (!buffer || !buffer->data) {
+		return;
+	}
+
+	// 4. Calculate stride step safely and verify internal element fit
+	size_t bs = bufferView->stride;
+	size_t step = (bs > 0) ? bs : dataLen * size;
+
+	// Ensure our element data fits cleanly within the designated step/stride span
+	if (dataLen * size > step) {
+		return;
+	}
+
+	// 5. Defend against integer multiplication overflow before processing loop
+	if (count > 0 && step > (std::numeric_limits<size_t>::max() / count)) {
+		return;
+	}
+
+	// Calculate structural block placement and boundaries across 64-bit constraints
+	size_t baseOffset = bufferView->offset + acc->offset;
+	size_t totalRequiredBytes = baseOffset + (count * step);
+
+	// Final buffer boundary validation checking the file definition vs real memory size
+	if (totalRequiredBytes > buffer->size) {
+		return;
+	}
+
+	// Base pointer address mapping across the complete validated byte span
+	const char* const basePtr = static_cast<const char*>(buffer->data) + baseOffset;
+
+	for (size_t i = 0; i < count; i++) {
+		const char* const elementPtr = basePtr + (i * step);
+
+		for (size_t j = 0; j < dataLen; j++) {
+			const char* const componentPtr = elementPtr + (j * size);
+
+			switch (componentType) {
+				case cgltf_component_type_r_8: {
+					char v;
+					std::memcpy(&v, componentPtr, sizeof(v));
+					retVal.push_back(static_cast<float>(v));
+					break;
+				}
+				case cgltf_component_type_r_8u: {
+					unsigned char v;
+					std::memcpy(&v, componentPtr, sizeof(v));
+					retVal.push_back(static_cast<float>(v));
+					break;
+				}
+				case cgltf_component_type_r_16: {
+					short v;
+					std::memcpy(&v, componentPtr, sizeof(v));
+					retVal.push_back(static_cast<float>(v));
+					break;
+				}
+				case cgltf_component_type_r_16u: {
+					unsigned short v;
+					std::memcpy(&v, componentPtr, sizeof(v));
+					retVal.push_back(static_cast<float>(v));
+					break;
+				}
+				case cgltf_component_type_r_32u: {
+					unsigned int v;
+					std::memcpy(&v, componentPtr, sizeof(v));
+					retVal.push_back(static_cast<float>(v));
+					break;
+				}
+				case cgltf_component_type_r_32f: {
+					float v;
+					std::memcpy(&v, componentPtr, sizeof(v));
+					retVal.push_back(v);
+					break;
+				}
+			}
+		}
+	}
+}
+
+#else
+/// TODO: throws exception when importing Khronos gltf-meshopt samples
+/// !!! This function crashes at memcpy when importing Khronos meshopt samples 
+/// BrainStem\glTF-Meshopt\BrainStem.gltf
+/// glTF-Meshopt\DragonAttenuation.gltf
+
 void glTFImporter_Core::SetSparseData(std::vector<float>& retVal, cgltf_accessor* acc)
 {
 	if (!acc) return;
@@ -1432,7 +1586,7 @@ void glTFImporter_Core::SetSparseData(std::vector<float>& retVal, cgltf_accessor
 		}
 	}
 }
-
+#endif USE_REFACTORED_SETSPARSEDATA
 //======================================================================
 // Chane data size specified by the sparse
 //======================================================================
