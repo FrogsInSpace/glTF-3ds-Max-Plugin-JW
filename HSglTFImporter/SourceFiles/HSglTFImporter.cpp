@@ -1013,15 +1013,13 @@ BOOL glTFImporter_Core::ImportScene(void)
 
 	LogOutput(_T("Import:") + tstring(m_fullpath));
 
-#if 0
 	for (int i = 0; i < m_glTF_data->extensions_used_count; i++) {
-		if (!strcmp(m_glTF_data->extensions_used[i], "KHR_draco_mesh_compression")) {
-			MessageBox(GetCOREInterface()->GetMAXHWnd(), _T("Draco compression is not supported."), _T(""), MB_OK);
+		if (!strcmp(m_glTF_data->extensions_used[i], "EXT_meshopt_compression")) {
+			MessageBox(GetCOREInterface()->GetMAXHWnd(), _T("EXT_meshopt_compression is not supported."), _T("File Import Failed"), MB_OK | MB_ICONWARNING);
 			cgltf_free(m_glTF_data);
 			return FALSE;
 		}
 	}
-#endif
 
 	m_Quantization = FALSE;
 	if (m_glTF_data->extensions_used_count>0) {
