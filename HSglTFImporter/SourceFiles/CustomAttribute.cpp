@@ -513,9 +513,10 @@ Class_ID glTFImporter_Core::AttachCustAttr(Animatable* pAnim, std::vector<custAt
 #if 0
 	pAnim->AllocCustAttribContainer();
 	ICustAttribContainer* pContainer = pAnim->GetCustAttribContainer();
-
-	SimpleCustAttrib* ca = new SimpleCustAttrib();
-	pContainer->InsertCustAttrib(0, ca);
+	if(pContainer) {
+		SimpleCustAttrib* ca = new SimpleCustAttrib();
+		pContainer->InsertCustAttrib(0, ca);
+	}
 #endif
 	return ret;
 }
@@ -654,11 +655,14 @@ void glTFImporter_Core::CreateIORAttr(Mtl* pMtl, cgltf_ior* ior, BOOL enabled)
 	Class_ID retID = AttachCustAttr(pMtl, attrTbl, _T("IOR"));
 /*
 	ICustAttribContainer* pContainer = pMtl->GetCustAttribContainer();
-	for (int i = 0; i < pContainer->GetNumCustAttribs(); i++) {
-		CustAttrib* pAttr = pContainer->GetCustAttrib(i);
-		//TSTR nn = pAttr->GetName();
-		//if (pAttr->GetName() != TSTR(_T("Iridescence"))) continue;
-		if (pAttr->ClassID() != retID) continue;
+
+	if( pContainer ) {
+		for (int i = 0; i < pContainer->GetNumCustAttribs(); i++) {
+			CustAttrib* pAttr = pContainer->GetCustAttrib(i);
+			//TSTR nn = pAttr->GetName();
+			//if (pAttr->GetName() != TSTR(_T("Iridescence"))) continue;
+			if (pAttr->ClassID() != retID) continue;
+		}
 	}
 */
 }
@@ -737,13 +741,16 @@ void glTFImporter_Core::CreateVolumeAttr(Mtl* pMtl, cgltf_volume* volume, BOOL e
 	if (retID == Class_ID(0, 0)) return;
 
 	ICustAttribContainer* pContainer = pMtl->GetCustAttribContainer();
-	for (int i = 0; i < pContainer->GetNumCustAttribs(); i++) {
-		CustAttrib* pAttr = pContainer->GetCustAttrib(i);
-		if (pAttr->ClassID() != retID) continue;
+	if(pContainer) {
 
-		IParamBlock2* pParamBlk = pAttr->GetParamBlockByID(0);
-		if (pBmpTex1) {
-			pParamBlk->SetValueByName(_T("thicknessTexture"), pBmpTex1, 0);
+		for(int i = 0; i < pContainer->GetNumCustAttribs(); i++) {
+			CustAttrib* pAttr = pContainer->GetCustAttrib(i);
+			if(pAttr->ClassID() != retID) continue;
+
+			IParamBlock2* pParamBlk = pAttr->GetParamBlockByID(0);
+			if(pBmpTex1) {
+				pParamBlk->SetValueByName(_T("thicknessTexture"), pBmpTex1, 0);
+			}
 		}
 	}
 }
@@ -800,17 +807,19 @@ void glTFImporter_Core::CreateSheenAttr(Mtl* pMtl, cgltf_sheen* sheen, BOOL enab
 	Class_ID retID = AttachCustAttr(pMtl, attrTbl, _T("Sheen"));
 
 	ICustAttribContainer* pContainer = pMtl->GetCustAttribContainer();
-	for (int i = 0; i < pContainer->GetNumCustAttribs(); i++) {
-		CustAttrib* pAttr = pContainer->GetCustAttrib(i);
-		if (pAttr->ClassID() != retID) continue;
+	if(pContainer) {
+		for(int i = 0; i < pContainer->GetNumCustAttribs(); i++) {
+			CustAttrib* pAttr = pContainer->GetCustAttrib(i);
+			if(pAttr->ClassID() != retID) continue;
 
-//		pAttr->GetName();
-		IParamBlock2* pParamBlk = pAttr->GetParamBlockByID(0);
-		if (pBmpTex1) {
-			pParamBlk->SetValueByName(_T("sheenColorTexture"), pBmpTex1, 0);
-		}
-		if (pBmpTex2) {
-			pParamBlk->SetValueByName(_T("sheenRoughnessTexture"), pBmpTex2, 0);
+			//		pAttr->GetName();
+			IParamBlock2* pParamBlk = pAttr->GetParamBlockByID(0);
+			if(pBmpTex1) {
+				pParamBlk->SetValueByName(_T("sheenColorTexture"), pBmpTex1, 0);
+			}
+			if(pBmpTex2) {
+				pParamBlk->SetValueByName(_T("sheenRoughnessTexture"), pBmpTex2, 0);
+			}
 		}
 	}
 }
@@ -880,20 +889,22 @@ void glTFImporter_Core::CreateClearcoatAttr(Mtl* pMtl, cgltf_clearcoat* clearcoa
 	Class_ID retID = AttachCustAttr(pMtl, attrTbl, _T("Clearcoat"));
 
 	ICustAttribContainer* pContainer = pMtl->GetCustAttribContainer();
-	for (int i = 0; i < pContainer->GetNumCustAttribs(); i++) {
-		CustAttrib* pAttr = pContainer->GetCustAttrib(i);
-		if (pAttr->ClassID() != retID) continue;
+	if(pContainer) {
+		for(int i = 0; i < pContainer->GetNumCustAttribs(); i++) {
+			CustAttrib* pAttr = pContainer->GetCustAttrib(i);
+			if(pAttr->ClassID() != retID) continue;
 
-		//		pAttr->GetName();
-		IParamBlock2* pParamBlk = pAttr->GetParamBlockByID(0);
-		if (pBmpTex1) {
-			pParamBlk->SetValueByName(_T("clearcoatTexture"), pBmpTex1, 0);
-		}
-		if (pBmpTex2) {
-			pParamBlk->SetValueByName(_T("clearcoatRoughnessTexture"), pBmpTex2, 0);
-		}
-		if (pBmpTex3) {
-			pParamBlk->SetValueByName(_T("clearcoatNormalTexture"), pBmpTex3, 0);
+			//		pAttr->GetName();
+			IParamBlock2* pParamBlk = pAttr->GetParamBlockByID(0);
+			if(pBmpTex1) {
+				pParamBlk->SetValueByName(_T("clearcoatTexture"), pBmpTex1, 0);
+			}
+			if(pBmpTex2) {
+				pParamBlk->SetValueByName(_T("clearcoatRoughnessTexture"), pBmpTex2, 0);
+			}
+			if(pBmpTex3) {
+				pParamBlk->SetValueByName(_T("clearcoatNormalTexture"), pBmpTex3, 0);
+			}
 		}
 	}
 }
@@ -935,13 +946,15 @@ void glTFImporter_Core::CreateTransmissionAttr(Mtl* pMtl, cgltf_transmission* tr
 	Class_ID retID = AttachCustAttr(pMtl, attrTbl, _T("Transmission"));
 
 	ICustAttribContainer* pContainer = pMtl->GetCustAttribContainer();
-	for (int i = 0; i < pContainer->GetNumCustAttribs(); i++) {
-		CustAttrib* pAttr = pContainer->GetCustAttrib(i);
-		if (pAttr->ClassID() != retID) continue;
+	if(pContainer) {
+		for(int i = 0; i < pContainer->GetNumCustAttribs(); i++) {
+			CustAttrib* pAttr = pContainer->GetCustAttrib(i);
+			if(pAttr->ClassID() != retID) continue;
 
-		IParamBlock2* pParamBlk = pAttr->GetParamBlockByID(0);
-		if (pBmpTex1) {
-			pParamBlk->SetValueByName(_T("transmissionTexture"), pBmpTex1, 0);
+			IParamBlock2* pParamBlk = pAttr->GetParamBlockByID(0);
+			if(pBmpTex1) {
+				pParamBlk->SetValueByName(_T("transmissionTexture"), pBmpTex1, 0);
+			}
 		}
 	}
 }
@@ -1015,13 +1028,15 @@ void glTFImporter_Core::CreateAnisotropyAttr(Mtl* pMtl, cgltf_anisotropy* anisot
 	Class_ID retID = AttachCustAttr(pMtl, attrTbl, _T("Anisotropy"));
 
 	ICustAttribContainer* pContainer = pMtl->GetCustAttribContainer();
-	for (int i = 0; i < pContainer->GetNumCustAttribs(); i++) {
-		CustAttrib* pAttr = pContainer->GetCustAttrib(i);
-		if (pAttr->ClassID() != retID) continue;
+	if(pContainer) {
+		for(int i = 0; i < pContainer->GetNumCustAttribs(); i++) {
+			CustAttrib* pAttr = pContainer->GetCustAttrib(i);
+			if(pAttr->ClassID() != retID) continue;
 
-		IParamBlock2* pParamBlk = pAttr->GetParamBlockByID(0);
-		if (pBmpTex1) {
-			pParamBlk->SetValueByName(_T("anisotropyTexture"), pBmpTex1, 0);
+			IParamBlock2* pParamBlk = pAttr->GetParamBlockByID(0);
+			if(pBmpTex1) {
+				pParamBlk->SetValueByName(_T("anisotropyTexture"), pBmpTex1, 0);
+			}
 		}
 	}
 }
@@ -1055,7 +1070,7 @@ void glTFImporter_Core::CreateDiffuseTransmissionAttr(Mtl* pMtl, cgltf_diffuse_t
 
 	BitmapTex* pBmpTex1 = NULL;
 	cgltf_texture_view* texInfo1 = &diffuse_transmission->diffuseTransmissionColorTexture;
-	if (texInfo1->texture) {
+	if (texInfo1 && texInfo1->texture) {
 		pBmpTex1 = GetBitmapTexFromglTexture(texInfo1->texture);
 		SetTextureUVoffset(pBmpTex1, texInfo1);
 		param.name = std::string("diffuseTransmissionColorTexture");
@@ -1066,7 +1081,7 @@ void glTFImporter_Core::CreateDiffuseTransmissionAttr(Mtl* pMtl, cgltf_diffuse_t
 
 	BitmapTex* pBmpTex2 = NULL;
 	cgltf_texture_view* texInfo2 = &diffuse_transmission->diffuseTransmissionTexture;
-	if (texInfo2->texture) {
+	if (texInfo2 && texInfo2->texture) {
 		pBmpTex2 = GetBitmapTexFromglTexture(texInfo2->texture);
 		SetTextureUVoffset(pBmpTex2, texInfo2);
 		param.name = std::string("diffuseTransmissionTexture");
@@ -1078,16 +1093,18 @@ void glTFImporter_Core::CreateDiffuseTransmissionAttr(Mtl* pMtl, cgltf_diffuse_t
 	Class_ID retID = AttachCustAttr(pMtl, attrTbl, _T("DiffuseTransmission"));
 
 	ICustAttribContainer* pContainer = pMtl->GetCustAttribContainer();
-	for (int i = 0; i < pContainer->GetNumCustAttribs(); i++) {
-		CustAttrib* pAttr = pContainer->GetCustAttrib(i);
-		if (pAttr->ClassID() != retID) continue;
+	if(pContainer) {
+		for(int i = 0; i < pContainer->GetNumCustAttribs(); i++) {
+			CustAttrib* pAttr = pContainer->GetCustAttrib(i);
+			if(pAttr->ClassID() != retID) continue;
 
-		IParamBlock2* pParamBlk = pAttr->GetParamBlockByID(0);
-		if (pBmpTex1) {
-			pParamBlk->SetValueByName(_T("diffuseTransmissionColorTexture"), pBmpTex1, 0);
-		}
-		if (pBmpTex2) {
-			pParamBlk->SetValueByName(_T("diffuseTransmissionTexture"), pBmpTex2, 0);
+			IParamBlock2* pParamBlk = pAttr->GetParamBlockByID(0);
+			if(pBmpTex1) {
+				pParamBlk->SetValueByName(_T("diffuseTransmissionColorTexture"), pBmpTex1, 0);
+			}
+			if(pBmpTex2) {
+				pParamBlk->SetValueByName(_T("diffuseTransmissionTexture"), pBmpTex2, 0);
+			}
 		}
 	}
 }
@@ -1116,7 +1133,7 @@ void glTFImporter_Core::CreateSpecularAttr(Mtl* pMtl, cgltf_specular* specular, 
 
 	BitmapTex* pBmpTex1 = NULL;
 	cgltf_texture_view* texInfo1 = &specular->specular_texture;
-	if (texInfo1->texture) {
+	if (texInfo1 && texInfo1->texture) {
 		pBmpTex1 = GetBitmapTexFromglTexture(texInfo1->texture);
 		SetTextureUVoffset(pBmpTex1, texInfo1);
 		param.name = std::string("specularTexture");
@@ -1132,7 +1149,7 @@ void glTFImporter_Core::CreateSpecularAttr(Mtl* pMtl, cgltf_specular* specular, 
 
 	BitmapTex* pBmpTex2 = NULL;
 	cgltf_texture_view* texInfo2 = &specular->specular_color_texture;
-	if (texInfo2->texture) {
+	if (texInfo2 && texInfo2->texture) {
 		pBmpTex2 = GetBitmapTexFromglTexture(texInfo2->texture);
 		SetTextureUVoffset(pBmpTex2, texInfo2);
 		param.name = std::string("specularColorTexture");
@@ -1144,16 +1161,18 @@ void glTFImporter_Core::CreateSpecularAttr(Mtl* pMtl, cgltf_specular* specular, 
 	Class_ID retID = AttachCustAttr(pMtl, attrTbl, _T("Specular"));
 
 	ICustAttribContainer* pContainer = pMtl->GetCustAttribContainer();
-	for (int i = 0; i < pContainer->GetNumCustAttribs(); i++) {
-		CustAttrib* pAttr = pContainer->GetCustAttrib(i);
-		if (pAttr->ClassID() != retID) continue;
+	if(pContainer) {
+		for(int i = 0; i < pContainer->GetNumCustAttribs(); i++) {
+			CustAttrib* pAttr = pContainer->GetCustAttrib(i);
+			if(!pAttr || pAttr->ClassID() != retID) continue;
 
-		IParamBlock2* pParamBlk = pAttr->GetParamBlockByID(0);
-		if (pBmpTex1) {
-			pParamBlk->SetValueByName(_T("specularTexture"), pBmpTex1, 0);
-		}
-		if (pBmpTex2) {
-			pParamBlk->SetValueByName(_T("specularColorTexture"), pBmpTex2, 0);
+			IParamBlock2* pParamBlk = pAttr->GetParamBlockByID(0);
+			if(pBmpTex1) {
+				pParamBlk->SetValueByName(_T("specularTexture"), pBmpTex1, 0);
+			}
+			if(pBmpTex2) {
+				pParamBlk->SetValueByName(_T("specularColorTexture"), pBmpTex2, 0);
+			}
 		}
 	}
 }
