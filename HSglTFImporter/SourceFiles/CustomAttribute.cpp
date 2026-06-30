@@ -20,6 +20,8 @@
 #include "HSglTFImporter.h"
 #include "jsmn.h"
 
+#define USE_REFACTORED_CREATEPARAMTABLE
+
 bool isNumber(const char* str)
 {
 	for (const char* c = str;*c ; c++) {
@@ -56,37 +58,49 @@ int glTFImporter_Core::GetCustAttrPBlock(ReferenceTarget* pRef, const tstring& A
 	return -1;
 }
 
-//======================================================================
-//======================================================================
+
+#ifdef USE_REFACTORED_CREATEPARAMTABLE
+//==========================================================================
+// Gemini REFACTORED CreateParamTableFromExtras() with general safeguarding 
+//=========================================================================
 void glTFImporter_Core::CreateParamTableFromExtras(cgltf_extras &extras, cgltf_size size, std::vector<custAttrParam> &attrTbl, BOOL FileAttFlae)
 {
 	attrTbl.clear();
 
-	char* extras_buffer = new char[size];
-	cgltf_copy_extras_json(m_glTF_data, &extras, extras_buffer, &size);
+	if (size == 0) {
+		return;
+	}
+
+	// FIX 1: Use std::vector to guarantee automatic memory cleanup, eliminates memory leaks if exception is thrown later.
+	std::vector<char> extras_buffer(size);
+	cgltf_copy_extras_json(m_glTF_data, &extras, extras_buffer.data(), &size);
 
 	jsmn_parser p;
-	//const char* js = "{\"foo\": \"bar\", \"baz\": [1,true]}";
 	jsmn_init(&p);
-	size_t tokenNum = jsmn_parse(&p, extras_buffer, size, NULL, (size_t)0);
-	//size_t tokenNum = 10;
-	if (tokenNum <= 0) { delete[] extras_buffer; return; }
 
-	//jsmntok_t tokens[10] = { (jsmntype_t)0 };
-	jsmntok_t* tokens = new jsmntok_t[tokenNum];// { (jsmntype_t)0 };
+	// FIX 2: Capture as a standard signed 'int' to match signature and properly catch possible negative error codes.
+	int parsedTokens = jsmn_parse(&p, extras_buffer.data(), size, NULL, 0);
+	if (parsedTokens <= 0) 
+		return; 
+
+	size_t tokenNum = static_cast<size_t>(parsedTokens);
+	std::vector<jsmntok_t> tokens(tokenNum);
+
 	jsmn_init(&p);
-	jsmn_parse(&p, extras_buffer, size, tokens, static_cast<unsigned int>(tokenNum));
+	jsmn_parse(&p, extras_buffer.data(), size, tokens.data(), static_cast<unsigned int>(tokenNum));
 
 	BOOL TitleFlag = TRUE;
 	BOOL ParamFlag = FALSE;
-
+	const int BUFFER_SIZE = 10000;
 	custAttrParam param;
-	for (int i = 0; i < tokenNum; i++) {
-		char buf[10000];
+
+	for (size_t i = 0; i < tokenNum; i++) {
+		char buf[BUFFER_SIZE];
 		jsmntok_t tok = tokens[i];
+
 		if (tok.type == JSMN_STRING) {
-			memset(buf, 0, sizeof(buf));
-			strncpy_s(buf, sizeof(buf), extras_buffer + tok.start, tok.end - tok.start);
+			memset(buf, 0, BUFFER_SIZE);
+			strncpy_s(buf, BUFFER_SIZE, extras_buffer.data() + tok.start, std::clamp(tok.end - tok.start, 0, BUFFER_SIZE - 1));
 			if (TitleFlag) {
 				param.name = buf;
 				TitleFlag = FALSE;
@@ -109,8 +123,143 @@ void glTFImporter_Core::CreateParamTableFromExtras(cgltf_extras &extras, cgltf_s
 			}
 		}
 		else if (tok.type == JSMN_PRIMITIVE) {
-			memset(buf, 0, sizeof(buf));
-			strncpy_s(buf, sizeof(buf), extras_buffer + tok.start, tok.end - tok.start);
+			memset(buf, 0, BUFFER_SIZE);
+			strncpy_s(buf, BUFFER_SIZE, extras_buffer.data() + tok.start, std::clamp(tok.end - tok.start, 0, BUFFER_SIZE - 1));
+			if (strchr(buf, '.')) {
+				param.type = TYPE_FLOAT;
+				param.fParam = (float)atof(buf);
+				param.fminParam = -100000000.0f;
+				param.fmaxParam = 100000000.0f;
+			}
+			else {
+				param.type = TYPE_INT;
+				param.iParam = atoi(buf);
+				param.iminParam = -100000000;
+				param.imaxParam = 100000000;
+			}
+			TitleFlag = TRUE;
+			ParamFlag = FALSE;
+			attrTbl.push_back(param);
+		}
+
+		if (tok.type == JSMN_ARRAY) {
+			// FIX 3: Ensure there is at least one token following the array container
+			if (i + 1 >= tokenNum)
+				break;
+
+			i++; // Safely step past the JSMN_ARRAY token itself to reach the children
+
+			if (FileAttFlae) {
+				for (int xx = 0; xx < tok.size; xx++) {
+					// FIX 4: Strict heap out-of-bounds tracking inside the token consumer loop
+					if (i >= tokenNum) 
+						break;
+
+					jsmntok_t tk = tokens[i++];
+					memset(buf, 0, BUFFER_SIZE);
+					strncpy_s(buf, BUFFER_SIZE, extras_buffer.data() + tk.start, std::clamp(tk.end - tk.start, 0, BUFFER_SIZE - 1));
+
+					param.sParam = std::string(buf);
+					param.type = TYPE_STRING;
+					TitleFlag = TRUE;
+					ParamFlag = FALSE;
+					attrTbl.push_back(param);
+				}
+			}
+			else {
+				float val[4] = {0.0f};
+				int ss = tok.size > 4 ? 4 : tok.size;
+				for (int xx = 0; xx < ss; xx++) {
+					// FIX 4: Strict heap out-of-bounds tracking inside the token consumer loop
+					if (i >= tokenNum) 
+						break;
+
+					jsmntok_t tk = tokens[i++];
+					memset(buf, 0, BUFFER_SIZE);
+					strncpy_s(buf, BUFFER_SIZE, extras_buffer.data() + tk.start, std::clamp(tk.end - tk.start, 0, BUFFER_SIZE - 1));
+					val[xx] = (float)atof(buf);
+				}
+
+				// FIX 5: If a malicious or malformed file provides an RGBA array with > 4 items, 
+				// safely consume the remaining elements so they don't break the outer loop parser alignment.
+				if (tok.size > 4) {
+					int remaining = tok.size - 4;
+					for (int xx = 0; xx < remaining; xx++) {
+						if (i >= tokenNum) break;
+						i++;
+					}
+				}
+
+				param.type = TYPE_RGBA;
+				param.cParam = Color(val);
+				TitleFlag = TRUE;
+				ParamFlag = FALSE;
+				attrTbl.push_back(param);
+			}
+
+			// FIX 6: Offset the outer loop's mandatory 'i++'. Otherwise the token  immediately following the array is completely skipped.
+			i--; 
+		}
+	}
+}
+
+#else
+//=========================================================================
+// ORIGINAL CreateParamTableFromExtras() with added buffer bounds safeguarding 
+//=========================================================================
+void glTFImporter_Core::CreateParamTableFromExtras(cgltf_extras &extras, cgltf_size size, std::vector<custAttrParam> &attrTbl, BOOL FileAttFlae)
+{
+	attrTbl.clear();
+
+	char* extras_buffer = new char[size];
+	cgltf_copy_extras_json(m_glTF_data, &extras, extras_buffer, &size);
+
+	jsmn_parser p;
+	//const char* js = "{\"foo\": \"bar\", \"baz\": [1,true]}";
+	jsmn_init(&p);
+	size_t tokenNum = jsmn_parse(&p, extras_buffer, size, NULL, (size_t)0);
+	//size_t tokenNum = 10;
+	if (tokenNum <= 0) { delete[] extras_buffer; return; }
+
+	//jsmntok_t tokens[10] = { (jsmntype_t)0 };
+	jsmntok_t* tokens = new jsmntok_t[tokenNum];// { (jsmntype_t)0 };
+	jsmn_init(&p);
+	jsmn_parse(&p, extras_buffer, size, tokens, static_cast<unsigned int>(tokenNum));
+
+	BOOL TitleFlag = TRUE;
+	BOOL ParamFlag = FALSE;
+	const int BUFFER_SIZE = 10000;
+	custAttrParam param;
+	for (int i = 0; i < tokenNum; i++) {
+		char buf[BUFFER_SIZE];
+		jsmntok_t tok = tokens[i];
+		if (tok.type == JSMN_STRING) {
+			memset(buf, 0, BUFFER_SIZE);
+			strncpy_s(buf, BUFFER_SIZE, extras_buffer + tok.start,  std::clamp(tok.end - tok.start, 0, BUFFER_SIZE - 1));
+			if (TitleFlag) {
+				param.name = buf;
+				TitleFlag = FALSE;
+				ParamFlag = TRUE;
+			}
+			else if (ParamFlag) {
+				if (isNumber(buf)) {
+					param.type = TYPE_FLOAT;
+					param.fParam = (float)atof(buf);
+					param.fminParam = -100000000.0f;
+					param.fmaxParam = 100000000.0f;
+				}
+				else {
+					param.type = TYPE_STRING;
+					param.sParam = buf;
+				}
+				TitleFlag = TRUE;
+				ParamFlag = FALSE;
+				attrTbl.push_back(param);
+			}
+		}
+		else if (tok.type == JSMN_PRIMITIVE) {
+			memset(buf, 0, BUFFER_SIZE);
+			strncpy_s(buf, BUFFER_SIZE, extras_buffer + tok.start, std::clamp(tok.end - tok.start, 0, BUFFER_SIZE - 1));
 			if (strchr(buf, '.')) {
 				param.type = TYPE_FLOAT;
 				param.fParam = (float)atof(buf);
@@ -132,8 +281,8 @@ void glTFImporter_Core::CreateParamTableFromExtras(cgltf_extras &extras, cgltf_s
 				i++;
 				for (int xx = 0; xx < tok.size; xx++) {
 					jsmntok_t tk = tokens[i++];
-					memset(buf, 0, sizeof(buf));
-					strncpy_s(buf, sizeof(buf), extras_buffer + tk.start, tk.end - tk.start);
+					memset(buf, 0, BUFFER_SIZE);
+					strncpy_s(buf, BUFFER_SIZE, extras_buffer + tk.start, std::clamp(tk.end - tk.start, 0 , BUFFER_SIZE - 1) );
 					param.sParam = std::string(buf);
 					param.type = TYPE_STRING;
 					TitleFlag = TRUE;
@@ -149,8 +298,8 @@ void glTFImporter_Core::CreateParamTableFromExtras(cgltf_extras &extras, cgltf_s
 				int ss = tok.size > 4 ? 4 : tok.size;
 				for (int xx = 0; xx < ss; xx++) {
 					jsmntok_t tk = tokens[i++];
-					memset(buf, 0, sizeof(buf));
-					strncpy_s(buf, sizeof(buf), extras_buffer + tk.start, tk.end - tk.start);
+					memset(buf, 0, BUFFER_SIZE);
+					strncpy_s(buf,BUFFER_SIZE, extras_buffer + tk.start, std::clamp(tk.end - tk.start, 0 , BUFFER_SIZE - 1) );
 					val[xx] = (float)atof(buf);
 				}
 				param.type = TYPE_RGBA;
@@ -165,6 +314,8 @@ void glTFImporter_Core::CreateParamTableFromExtras(cgltf_extras &extras, cgltf_s
 	delete[] tokens;
 	delete[] extras_buffer;
 }
+#endif
+
 
 //======================================================================
 //======================================================================
@@ -236,7 +387,7 @@ void glTFImporter_Core::SetUserPropParam(INode *pNode, std::vector<custAttrParam
 
 //======================================================================
 //======================================================================
-Class_ID glTFImporter_Core::AttacheCustAttr(Animatable* pAnim, std::vector<custAttrParam>& attrTbl, tstring AttrName)
+Class_ID glTFImporter_Core::AttachCustAttr(Animatable* pAnim, std::vector<custAttrParam>& attrTbl, tstring AttrName)
 {
 	Class_ID ret(0, 0);
 
@@ -362,9 +513,10 @@ Class_ID glTFImporter_Core::AttacheCustAttr(Animatable* pAnim, std::vector<custA
 #if 0
 	pAnim->AllocCustAttribContainer();
 	ICustAttribContainer* pContainer = pAnim->GetCustAttribContainer();
-
-	SimpleCustAttrib* ca = new SimpleCustAttrib();
-	pContainer->InsertCustAttrib(0, ca);
+	if(pContainer) {
+		SimpleCustAttrib* ca = new SimpleCustAttrib();
+		pContainer->InsertCustAttrib(0, ca);
+	}
 #endif
 	return ret;
 }
@@ -384,7 +536,7 @@ void glTFImporter_Core::CreateUnlitAttr(Mtl* pMtl, BOOL unlit)
 	param.iParam = unlit;
 	attrTbl.push_back(param);
 
-	Class_ID retID = AttacheCustAttr(pMtl, attrTbl, _T("Unlit"));
+	Class_ID retID = AttachCustAttr(pMtl, attrTbl, _T("Unlit"));
 
 
 }
@@ -455,7 +607,7 @@ void glTFImporter_Core::CreateIridescenceAttr(Mtl *pMtl, cgltf_iridescence* irid
 	}
 
 
-	Class_ID retID = AttacheCustAttr(pMtl, attrTbl, _T("Iridescence"));
+	Class_ID retID = AttachCustAttr(pMtl, attrTbl, _T("Iridescence"));
 
 	ICustAttribContainer *pContainer = pMtl->GetCustAttribContainer();
 	if (!pContainer) return;
@@ -500,14 +652,17 @@ void glTFImporter_Core::CreateIORAttr(Mtl* pMtl, cgltf_ior* ior, BOOL enabled)
 	param.fmaxParam = 50.0f;
 	attrTbl.push_back(param);
 
-	Class_ID retID = AttacheCustAttr(pMtl, attrTbl, _T("IOR"));
+	Class_ID retID = AttachCustAttr(pMtl, attrTbl, _T("IOR"));
 /*
 	ICustAttribContainer* pContainer = pMtl->GetCustAttribContainer();
-	for (int i = 0; i < pContainer->GetNumCustAttribs(); i++) {
-		CustAttrib* pAttr = pContainer->GetCustAttrib(i);
-		//TSTR nn = pAttr->GetName();
-		//if (pAttr->GetName() != TSTR(_T("Iridescence"))) continue;
-		if (pAttr->ClassID() != retID) continue;
+
+	if( pContainer ) {
+		for (int i = 0; i < pContainer->GetNumCustAttribs(); i++) {
+			CustAttrib* pAttr = pContainer->GetCustAttrib(i);
+			//TSTR nn = pAttr->GetName();
+			//if (pAttr->GetName() != TSTR(_T("Iridescence"))) continue;
+			if (pAttr->ClassID() != retID) continue;
+		}
 	}
 */
 }
@@ -534,7 +689,7 @@ void glTFImporter_Core::CreateEmissiveStrengthAttr(Mtl* pMtl, cgltf_emissive_str
 	param.fmaxParam = 100.0f;
 	attrTbl.push_back(param);
 
-	Class_ID retID = AttacheCustAttr(pMtl, attrTbl, _T("EmissiveStrength"));
+	Class_ID retID = AttachCustAttr(pMtl, attrTbl, _T("EmissiveStrength"));
 }
 
 //======================================================================
@@ -582,17 +737,20 @@ void glTFImporter_Core::CreateVolumeAttr(Mtl* pMtl, cgltf_volume* volume, BOOL e
 		attrTbl.push_back(param);
 	}
 
-	Class_ID retID = AttacheCustAttr(pMtl, attrTbl, _T("Volume"));
+	Class_ID retID = AttachCustAttr(pMtl, attrTbl, _T("Volume"));
 	if (retID == Class_ID(0, 0)) return;
 
 	ICustAttribContainer* pContainer = pMtl->GetCustAttribContainer();
-	for (int i = 0; i < pContainer->GetNumCustAttribs(); i++) {
-		CustAttrib* pAttr = pContainer->GetCustAttrib(i);
-		if (pAttr->ClassID() != retID) continue;
+	if(pContainer) {
 
-		IParamBlock2* pParamBlk = pAttr->GetParamBlockByID(0);
-		if (pBmpTex1) {
-			pParamBlk->SetValueByName(_T("thicknessTexture"), pBmpTex1, 0);
+		for(int i = 0; i < pContainer->GetNumCustAttribs(); i++) {
+			CustAttrib* pAttr = pContainer->GetCustAttrib(i);
+			if(pAttr->ClassID() != retID) continue;
+
+			IParamBlock2* pParamBlk = pAttr->GetParamBlockByID(0);
+			if(pBmpTex1) {
+				pParamBlk->SetValueByName(_T("thicknessTexture"), pBmpTex1, 0);
+			}
 		}
 	}
 }
@@ -646,20 +804,22 @@ void glTFImporter_Core::CreateSheenAttr(Mtl* pMtl, cgltf_sheen* sheen, BOOL enab
 		attrTbl.push_back(param);
 	}
 
-	Class_ID retID = AttacheCustAttr(pMtl, attrTbl, _T("Sheen"));
+	Class_ID retID = AttachCustAttr(pMtl, attrTbl, _T("Sheen"));
 
 	ICustAttribContainer* pContainer = pMtl->GetCustAttribContainer();
-	for (int i = 0; i < pContainer->GetNumCustAttribs(); i++) {
-		CustAttrib* pAttr = pContainer->GetCustAttrib(i);
-		if (pAttr->ClassID() != retID) continue;
+	if(pContainer) {
+		for(int i = 0; i < pContainer->GetNumCustAttribs(); i++) {
+			CustAttrib* pAttr = pContainer->GetCustAttrib(i);
+			if(pAttr->ClassID() != retID) continue;
 
-//		pAttr->GetName();
-		IParamBlock2* pParamBlk = pAttr->GetParamBlockByID(0);
-		if (pBmpTex1) {
-			pParamBlk->SetValueByName(_T("sheenColorTexture"), pBmpTex1, 0);
-		}
-		if (pBmpTex2) {
-			pParamBlk->SetValueByName(_T("sheenRoughnessTexture"), pBmpTex2, 0);
+			//		pAttr->GetName();
+			IParamBlock2* pParamBlk = pAttr->GetParamBlockByID(0);
+			if(pBmpTex1) {
+				pParamBlk->SetValueByName(_T("sheenColorTexture"), pBmpTex1, 0);
+			}
+			if(pBmpTex2) {
+				pParamBlk->SetValueByName(_T("sheenRoughnessTexture"), pBmpTex2, 0);
+			}
 		}
 	}
 }
@@ -726,23 +886,25 @@ void glTFImporter_Core::CreateClearcoatAttr(Mtl* pMtl, cgltf_clearcoat* clearcoa
 		attrTbl.push_back(param);
 	}
 
-	Class_ID retID = AttacheCustAttr(pMtl, attrTbl, _T("Clearcoat"));
+	Class_ID retID = AttachCustAttr(pMtl, attrTbl, _T("Clearcoat"));
 
 	ICustAttribContainer* pContainer = pMtl->GetCustAttribContainer();
-	for (int i = 0; i < pContainer->GetNumCustAttribs(); i++) {
-		CustAttrib* pAttr = pContainer->GetCustAttrib(i);
-		if (pAttr->ClassID() != retID) continue;
+	if(pContainer) {
+		for(int i = 0; i < pContainer->GetNumCustAttribs(); i++) {
+			CustAttrib* pAttr = pContainer->GetCustAttrib(i);
+			if(pAttr->ClassID() != retID) continue;
 
-		//		pAttr->GetName();
-		IParamBlock2* pParamBlk = pAttr->GetParamBlockByID(0);
-		if (pBmpTex1) {
-			pParamBlk->SetValueByName(_T("clearcoatTexture"), pBmpTex1, 0);
-		}
-		if (pBmpTex2) {
-			pParamBlk->SetValueByName(_T("clearcoatRoughnessTexture"), pBmpTex2, 0);
-		}
-		if (pBmpTex3) {
-			pParamBlk->SetValueByName(_T("clearcoatNormalTexture"), pBmpTex3, 0);
+			//		pAttr->GetName();
+			IParamBlock2* pParamBlk = pAttr->GetParamBlockByID(0);
+			if(pBmpTex1) {
+				pParamBlk->SetValueByName(_T("clearcoatTexture"), pBmpTex1, 0);
+			}
+			if(pBmpTex2) {
+				pParamBlk->SetValueByName(_T("clearcoatRoughnessTexture"), pBmpTex2, 0);
+			}
+			if(pBmpTex3) {
+				pParamBlk->SetValueByName(_T("clearcoatNormalTexture"), pBmpTex3, 0);
+			}
 		}
 	}
 }
@@ -781,16 +943,18 @@ void glTFImporter_Core::CreateTransmissionAttr(Mtl* pMtl, cgltf_transmission* tr
 	}
 
 
-	Class_ID retID = AttacheCustAttr(pMtl, attrTbl, _T("Transmission"));
+	Class_ID retID = AttachCustAttr(pMtl, attrTbl, _T("Transmission"));
 
 	ICustAttribContainer* pContainer = pMtl->GetCustAttribContainer();
-	for (int i = 0; i < pContainer->GetNumCustAttribs(); i++) {
-		CustAttrib* pAttr = pContainer->GetCustAttrib(i);
-		if (pAttr->ClassID() != retID) continue;
+	if(pContainer) {
+		for(int i = 0; i < pContainer->GetNumCustAttribs(); i++) {
+			CustAttrib* pAttr = pContainer->GetCustAttrib(i);
+			if(pAttr->ClassID() != retID) continue;
 
-		IParamBlock2* pParamBlk = pAttr->GetParamBlockByID(0);
-		if (pBmpTex1) {
-			pParamBlk->SetValueByName(_T("transmissionTexture"), pBmpTex1, 0);
+			IParamBlock2* pParamBlk = pAttr->GetParamBlockByID(0);
+			if(pBmpTex1) {
+				pParamBlk->SetValueByName(_T("transmissionTexture"), pBmpTex1, 0);
+			}
 		}
 	}
 }
@@ -817,7 +981,7 @@ void glTFImporter_Core::CreateDispersionAttr(Mtl* pMtl, cgltf_dispersion* disper
 	param.fmaxParam = 100.0f;
 	attrTbl.push_back(param);
 
-	Class_ID retID = AttacheCustAttr(pMtl, attrTbl, _T("Dispersion"));
+	Class_ID retID = AttachCustAttr(pMtl, attrTbl, _T("Dispersion"));
 }
 
 //======================================================================
@@ -861,16 +1025,18 @@ void glTFImporter_Core::CreateAnisotropyAttr(Mtl* pMtl, cgltf_anisotropy* anisot
 	}
 
 
-	Class_ID retID = AttacheCustAttr(pMtl, attrTbl, _T("Anisotropy"));
+	Class_ID retID = AttachCustAttr(pMtl, attrTbl, _T("Anisotropy"));
 
 	ICustAttribContainer* pContainer = pMtl->GetCustAttribContainer();
-	for (int i = 0; i < pContainer->GetNumCustAttribs(); i++) {
-		CustAttrib* pAttr = pContainer->GetCustAttrib(i);
-		if (pAttr->ClassID() != retID) continue;
+	if(pContainer) {
+		for(int i = 0; i < pContainer->GetNumCustAttribs(); i++) {
+			CustAttrib* pAttr = pContainer->GetCustAttrib(i);
+			if(pAttr->ClassID() != retID) continue;
 
-		IParamBlock2* pParamBlk = pAttr->GetParamBlockByID(0);
-		if (pBmpTex1) {
-			pParamBlk->SetValueByName(_T("anisotropyTexture"), pBmpTex1, 0);
+			IParamBlock2* pParamBlk = pAttr->GetParamBlockByID(0);
+			if(pBmpTex1) {
+				pParamBlk->SetValueByName(_T("anisotropyTexture"), pBmpTex1, 0);
+			}
 		}
 	}
 }
@@ -904,7 +1070,7 @@ void glTFImporter_Core::CreateDiffuseTransmissionAttr(Mtl* pMtl, cgltf_diffuse_t
 
 	BitmapTex* pBmpTex1 = NULL;
 	cgltf_texture_view* texInfo1 = &diffuse_transmission->diffuseTransmissionColorTexture;
-	if (texInfo1->texture) {
+	if (texInfo1 && texInfo1->texture) {
 		pBmpTex1 = GetBitmapTexFromglTexture(texInfo1->texture);
 		SetTextureUVoffset(pBmpTex1, texInfo1);
 		param.name = std::string("diffuseTransmissionColorTexture");
@@ -915,7 +1081,7 @@ void glTFImporter_Core::CreateDiffuseTransmissionAttr(Mtl* pMtl, cgltf_diffuse_t
 
 	BitmapTex* pBmpTex2 = NULL;
 	cgltf_texture_view* texInfo2 = &diffuse_transmission->diffuseTransmissionTexture;
-	if (texInfo2->texture) {
+	if (texInfo2 && texInfo2->texture) {
 		pBmpTex2 = GetBitmapTexFromglTexture(texInfo2->texture);
 		SetTextureUVoffset(pBmpTex2, texInfo2);
 		param.name = std::string("diffuseTransmissionTexture");
@@ -924,19 +1090,21 @@ void glTFImporter_Core::CreateDiffuseTransmissionAttr(Mtl* pMtl, cgltf_diffuse_t
 		attrTbl.push_back(param);
 	}
 
-	Class_ID retID = AttacheCustAttr(pMtl, attrTbl, _T("DiffuseTransmission"));
+	Class_ID retID = AttachCustAttr(pMtl, attrTbl, _T("DiffuseTransmission"));
 
 	ICustAttribContainer* pContainer = pMtl->GetCustAttribContainer();
-	for (int i = 0; i < pContainer->GetNumCustAttribs(); i++) {
-		CustAttrib* pAttr = pContainer->GetCustAttrib(i);
-		if (pAttr->ClassID() != retID) continue;
+	if(pContainer) {
+		for(int i = 0; i < pContainer->GetNumCustAttribs(); i++) {
+			CustAttrib* pAttr = pContainer->GetCustAttrib(i);
+			if(pAttr->ClassID() != retID) continue;
 
-		IParamBlock2* pParamBlk = pAttr->GetParamBlockByID(0);
-		if (pBmpTex1) {
-			pParamBlk->SetValueByName(_T("diffuseTransmissionColorTexture"), pBmpTex1, 0);
-		}
-		if (pBmpTex2) {
-			pParamBlk->SetValueByName(_T("diffuseTransmissionTexture"), pBmpTex2, 0);
+			IParamBlock2* pParamBlk = pAttr->GetParamBlockByID(0);
+			if(pBmpTex1) {
+				pParamBlk->SetValueByName(_T("diffuseTransmissionColorTexture"), pBmpTex1, 0);
+			}
+			if(pBmpTex2) {
+				pParamBlk->SetValueByName(_T("diffuseTransmissionTexture"), pBmpTex2, 0);
+			}
 		}
 	}
 }
@@ -965,7 +1133,7 @@ void glTFImporter_Core::CreateSpecularAttr(Mtl* pMtl, cgltf_specular* specular, 
 
 	BitmapTex* pBmpTex1 = NULL;
 	cgltf_texture_view* texInfo1 = &specular->specular_texture;
-	if (texInfo1->texture) {
+	if (texInfo1 && texInfo1->texture) {
 		pBmpTex1 = GetBitmapTexFromglTexture(texInfo1->texture);
 		SetTextureUVoffset(pBmpTex1, texInfo1);
 		param.name = std::string("specularTexture");
@@ -981,7 +1149,7 @@ void glTFImporter_Core::CreateSpecularAttr(Mtl* pMtl, cgltf_specular* specular, 
 
 	BitmapTex* pBmpTex2 = NULL;
 	cgltf_texture_view* texInfo2 = &specular->specular_color_texture;
-	if (texInfo2->texture) {
+	if (texInfo2 && texInfo2->texture) {
 		pBmpTex2 = GetBitmapTexFromglTexture(texInfo2->texture);
 		SetTextureUVoffset(pBmpTex2, texInfo2);
 		param.name = std::string("specularColorTexture");
@@ -990,19 +1158,21 @@ void glTFImporter_Core::CreateSpecularAttr(Mtl* pMtl, cgltf_specular* specular, 
 		attrTbl.push_back(param);
 	}
 
-	Class_ID retID = AttacheCustAttr(pMtl, attrTbl, _T("Specular"));
+	Class_ID retID = AttachCustAttr(pMtl, attrTbl, _T("Specular"));
 
 	ICustAttribContainer* pContainer = pMtl->GetCustAttribContainer();
-	for (int i = 0; i < pContainer->GetNumCustAttribs(); i++) {
-		CustAttrib* pAttr = pContainer->GetCustAttrib(i);
-		if (pAttr->ClassID() != retID) continue;
+	if(pContainer) {
+		for(int i = 0; i < pContainer->GetNumCustAttribs(); i++) {
+			CustAttrib* pAttr = pContainer->GetCustAttrib(i);
+			if(!pAttr || pAttr->ClassID() != retID) continue;
 
-		IParamBlock2* pParamBlk = pAttr->GetParamBlockByID(0);
-		if (pBmpTex1) {
-			pParamBlk->SetValueByName(_T("specularTexture"), pBmpTex1, 0);
-		}
-		if (pBmpTex2) {
-			pParamBlk->SetValueByName(_T("specularColorTexture"), pBmpTex2, 0);
+			IParamBlock2* pParamBlk = pAttr->GetParamBlockByID(0);
+			if(pBmpTex1) {
+				pParamBlk->SetValueByName(_T("specularTexture"), pBmpTex1, 0);
+			}
+			if(pBmpTex2) {
+				pParamBlk->SetValueByName(_T("specularColorTexture"), pBmpTex2, 0);
+			}
 		}
 	}
 }
@@ -1040,7 +1210,7 @@ void glTFImporter_Core::CreateWebpEncodingAttr(Texmap* pTex, const tstring &path
 	param.iParam = FALSE;
 	attrTbl.push_back(param);
 
-	Class_ID retID = AttacheCustAttr(pTex, attrTbl, _T("Webp Encode"));
+	Class_ID retID = AttachCustAttr(pTex, attrTbl, _T("Webp Encode"));
 }
 
 //======================================================================
@@ -1088,7 +1258,7 @@ void glTFImporter_Core::CreateKTX2EncodingAttr(Texmap* pTex, const tstring& path
 	param.iParam = FALSE;
 	attrTbl.push_back(param);
 
-	Class_ID retID = AttacheCustAttr(pTex, attrTbl, _T("KTX2 Encode"));
+	Class_ID retID = AttachCustAttr(pTex, attrTbl, _T("KTX2 Encode"));
 }
 
 
@@ -1098,7 +1268,7 @@ void glTFImporter_Core::CreateKTX2EncodingAttr(Texmap* pTex, const tstring& path
 void glTFImporter_Core::CreateVRayExtAttr(Mtl* pMtl, const vrayExtStruct &vray, BOOL enabled)
 {
 	IParamBlock2 *pBlock = NULL;
-	if (GetCustAttrPBlock(pMtl, tstring(_T("VRay Extention")),pBlock)!=-1) return;
+	if (GetCustAttrPBlock(pMtl, tstring(_T("VRay Extension")),pBlock)!=-1) return;
 
 	std::vector<custAttrParam> attrTbl;
 	custAttrParam param;
@@ -1110,7 +1280,7 @@ void glTFImporter_Core::CreateVRayExtAttr(Mtl* pMtl, const vrayExtStruct &vray, 
 	param.fmaxParam = 1.0f;
 	attrTbl.push_back(param);
 
-	Class_ID retID = AttacheCustAttr(pMtl, attrTbl, _T("VRay Extention"));
+	Class_ID retID = AttachCustAttr(pMtl, attrTbl, _T("VRay Extension"));
 
 	//ICustAttribContainer* pContainer = pMtl->GetCustAttribContainer();
 }
@@ -1130,7 +1300,7 @@ void glTFImporter_Core::CreateSelectabilityAttr(INode* pNode, const Selectabilit
 	param.iParam = str.selectable;
 	attrTbl.push_back(param);
 
-	Class_ID retID = AttacheCustAttr(pNode, attrTbl, _T("Selectability"));
+	Class_ID retID = AttachCustAttr(pNode, attrTbl, _T("Selectability"));
 }
 
 //======================================================================
@@ -1148,7 +1318,7 @@ void glTFImporter_Core::CreateHoverabilityAttr(INode* pNode, const HoverabilityS
 	param.iParam = str.hoverable;
 	attrTbl.push_back(param);
 
-	Class_ID retID = AttacheCustAttr(pNode, attrTbl, _T("Hoverability"));
+	Class_ID retID = AttachCustAttr(pNode, attrTbl, _T("Hoverability"));
 }
 
 //======================================================================
@@ -1166,7 +1336,7 @@ void glTFImporter_Core::CreateVisibilityAttr(INode* pNode, const VisibilityStruc
 	param.iParam = str.visible;
 	attrTbl.push_back(param);
 
-	Class_ID retID = AttacheCustAttr(pNode, attrTbl, _T("Visibility"));
+	Class_ID retID = AttachCustAttr(pNode, attrTbl, _T("Visibility"));
 }
 
 //======================================================================
@@ -1192,7 +1362,7 @@ DWORD glTFImporter_Core::CreateInteractivityAttr(ReferenceTarget* pRef, const In
 	param.inVisible = TRUE;
 	attrTbl.push_back(param);
 
-	Class_ID retID = AttacheCustAttr(pRef, attrTbl, _T("Interactivity"));
+	Class_ID retID = AttachCustAttr(pRef, attrTbl, _T("Interactivity"));
 	return str.id;
 }
 
@@ -1256,7 +1426,7 @@ BOOL glTFImporter_Core::RemoveInteractivityAttr(ReferenceTarget* pRef)
 
 //======================================================================
 //======================================================================
-void glTFImporter_Core::AttacheAlphaModeCustAttr(Mtl *pMtl, int alphamode)
+void glTFImporter_Core::AttachAlphaModeCustAttr(Mtl *pMtl, int alphamode)
 {
 	IParamBlock2 *pBlock = NULL;
 	if (GetCustAttrPBlock(pMtl, tstring(_T("AlphaMode")),pBlock)!=-1) return;

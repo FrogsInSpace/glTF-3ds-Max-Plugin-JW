@@ -19,10 +19,6 @@
 
 #pragma once
 
-//#pragma warning( disable : 4267 )
-#pragma warning( disable : 4828 )
-
-
 #include "3dsmaxsdk_preinclude.h"
 #include "Max.h"
 #include "resource.h"
@@ -149,6 +145,14 @@ inline const MCHAR* GetCustomAttrName(CustAttrib* p)
 #else
 	return p->GetName();
 #endif
+}
+
+inline std::vector<uint32_t> FloatToUInt32IndexBuffer(const std::vector<float>& in)
+{
+	std::vector<uint32_t> out(in.size());
+	for (size_t i = 0; i < in.size(); ++i)
+		out[i] = static_cast<uint32_t>(in[i]);
+	return out;
 }
 
 enum DracoDecodeType {
@@ -281,7 +285,7 @@ extern void AddModifier(INode* pNode, Modifier* pMod);
 extern int FindModifier(INode* pNode, const Class_ID &CID, Modifier **pMod);
 //INode *CreateDummyNode(const TSTR &name);
 //Matrix3 Mtx4x4ToMatrix3(aiMatrix4x4 &m, float scale = 1.0f);
-cgltf_accessor* findAttrAccesor(cgltf_primitive *pr, const char *str);
+cgltf_accessor* findAttrAccessor(cgltf_primitive *pr, const char *str);
 
 extern Texmap *CreateColorMap(AColor &c);
 extern Texmap *CreateBaseColorMap(void);
@@ -296,12 +300,12 @@ extern Texmap* CreateFlipNormalOSLNode(Texmap* pTex, BOOL FlipGreen, BOOL FlipRe
 extern Texmap *CreateMetalRoughOccOSLNode(Texmap *pTex, float value);
 extern Texmap* CreateBitmapLookupOSLNode(const TSTR& fname);
 extern Texmap* CreateUberBitmapOSLNode(const TSTR& fname);
-extern Texmap* CreateSpecGloddFilterOSLNode(Texmap* pTex1, Texmap* pTex2);
+extern Texmap* CreateSpecGlossFilterOSLNode(Texmap* pTex1, Texmap* pTex2);
 extern Texmap* CreateAlphaChOSLNode(AColor col);
 extern Texmap* CreateColorMultiplyOSLNode(Texmap* pTex, Color col);
 
-extern void GetDracoMeshIndexList(cgltf_buffer_view* bufferView, std::vector<float> &tbl);
-extern void DracoDecodeProc(cgltf_buffer_view* bufferView, std::vector<float> &tbl, DracoDecodeType type);
+extern void GetDracoMeshIndexList(cgltf_buffer_view* bufferView, std::vector<uint32_t> &tbl);
+extern void DracoDecodeProc(cgltf_buffer_view* bufferView, cgltf_primitive* primitive, std::vector<float> &tbl, DracoDecodeType type);
 
 extern void OpenProgreessDlg(cgltf_data* m_glTF_data);
 extern void CloseProgreessDlg(void);
@@ -353,7 +357,7 @@ public:
 	INode* CreateMaxNode(cgltf_node *node, INode* pParent);
 	INode* CreateCamera(cgltf_node *node);
 	INode* CreateLight(cgltf_node *node);
-	void AttacheNodeExtentions(INode* pNode, cgltf_node* node);
+	void AttachNodeExtensions(INode* pNode, cgltf_node* node);
 
 	BOOL FindAnimationChannels(cgltf_node *node, cgltf_animation *animation, std::vector<size_t> &ChannelList);
 	BOOL FindMtlAnimationChannels(cgltf_material* mtl, cgltf_animation* animation, std::vector<size_t>& ChannelList);
@@ -463,8 +467,8 @@ public:
 
 	void CreateParamTableFromExtras(cgltf_extras& extras, cgltf_size size, std::vector<custAttrParam>& attrTbl, BOOL FileAttFlae = TRUE);
 	void CreateTargetListFromExtras(cgltf_extras& extras, cgltf_size size, std::vector<tstring>& tbl);
-	Class_ID AttacheCustAttr(Animatable* pAnim, std::vector<custAttrParam>& attrTbl, tstring name=_T(""));
-	void AttacheAlphaModeCustAttr(Mtl* pMtl, int alphamode);
+	Class_ID AttachCustAttr(Animatable* pAnim, std::vector<custAttrParam>& attrTbl, tstring name=_T(""));
+	void AttachAlphaModeCustAttr(Mtl* pMtl, int alphamode);
 	void SetUserPropParam(INode *pNode, std::vector<custAttrParam>& attrTbl);
 
 	void CreateUnlitAttr(Mtl* pMtl, BOOL unlit);
@@ -491,7 +495,7 @@ public:
 	int GetCustAttrPBlock(ReferenceTarget* pRef, const tstring& AttName, IParamBlock2* &pBlock);
 
 	void SetSceneProperties(void);
-	void AttacheSceneProp(std::vector<custAttrParam>& attrTbl);
+	void AttachSceneProp(std::vector<custAttrParam>& attrTbl);
 	void SetSceneInfos(void);
 	void CreateRigidTable(INode *pNode, char *data);
 	void SetRigidModefiers(void);

@@ -91,7 +91,7 @@ void SetNormal(Mesh *pMesh, const std::vector<Point3> &VertNormalTable)
 
 //======================================================================
 //======================================================================
-cgltf_accessor* findAttrAccesor(cgltf_primitive *pr, const char *str)
+cgltf_accessor* findAttrAccessor(cgltf_primitive *pr, const char *str)
 {
 	cgltf_attribute *attr = pr->attributes;
 	for (int i = 0; i < pr->attributes_count; i++, attr++) {
@@ -100,9 +100,41 @@ cgltf_accessor* findAttrAccesor(cgltf_primitive *pr, const char *str)
 	return NULL;
 }
 
-//======================================================================
+// Helpers to classify primitive types.
+enum class PrimCategory
+{
+	Unknown = 0,
+	Points,
+	Lines,
+	Triangles,
+};
+
+
+PrimCategory GetPrimCategory(int primType)
+{
+	switch (primType)
+	{
+		case cgltf_primitive_type_points:
+			return PrimCategory::Points;
+		case cgltf_primitive_type_triangles:
+		case cgltf_primitive_type_triangle_strip:
+		case cgltf_primitive_type_triangle_fan:
+			return PrimCategory::Triangles;
+
+		case cgltf_primitive_type_lines:
+		case cgltf_primitive_type_line_loop:
+		case cgltf_primitive_type_line_strip:
+			return PrimCategory::Lines;
+
+		default:
+			return PrimCategory::Unknown;
+	}
+}
+// end of helpers
+
+// ======================================================================
 // Create the actual node object
-//======================================================================
+// ======================================================================
 INode* glTFImporter_Core::CreateMaxNode(cgltf_node* node, INode* pParent)
 {
 	tstring name;
@@ -110,28 +142,6 @@ INode* glTFImporter_Core::CreateMaxNode(cgltf_node* node, INode* pParent)
 	if (pname) name = StringToWString(pname);
 	//DebugPrint(StringToWString(name.C_Str()).c_str());
 	std::vector<Mtl*> mtlIdTable;
-
-	//size_t meshId;
-	//  If the node has no mesh data, create a dummy object
-	if (!node->mesh) {
-		DummyObject* pObj = (DummyObject*)GetCOREInterface()->CreateInstance(HELPER_CLASS_ID, Class_ID(DUMMY_CLASS_ID, 0));
-		pObj->SetBox(Box3(Point3(-10, -10, -10), Point3(10, 10, 10)));
-		INode* pNode = GetCOREInterface()->CreateObjectNode(pObj);
-		if (name.size() > 0) {
-			pNode->SetName(name.c_str());
-		}
-		else if (m_AvoidDupName) {
-			TSTR n = _T("Dummy");
-			GetCOREInterface()->MakeNameUnique(n);
-			pNode->SetName(n);
-		}
-		else {
-			pNode->SetName(name.c_str());
-		}
-
-		if (m_HideDummy) pNode->Hide(TRUE);
-		return pNode;
-	}
 
 	Mesh NewMesh;
 	BezierShape NewShape;
@@ -158,7 +168,8 @@ INode* glTFImporter_Core::CreateMaxNode(cgltf_node* node, INode* pParent)
 	int vClrOffset = 0;
 	int NormalOffset = 0;
 	BOOL ViewVertColor = FALSE;
-	int ObjectType = 0;
+	
+	PrimCategory ObjectType = PrimCategory::Unknown;
 
 	std::vector<Point3> VertNormalTable;
 	VertNormalTable.clear();
@@ -178,11 +189,13 @@ INode* glTFImporter_Core::CreateMaxNode(cgltf_node* node, INode* pParent)
 	}
 
 	if (mesh->primitives_count > 0) {
-		cgltf_primitive* pr = &mesh->primitives[0];
-		ObjectType = pr->type;
-		if (pr->targets_count > 0)
+		cgltf_primitive* firstPrim = &mesh->primitives[0];
+		
+		ObjectType = GetPrimCategory(firstPrim->type);
+
+		if (firstPrim->targets_count > 0)
 			m_MorphTable.push_back(node);
-		if (pr->mappings_count > 0 && m_CompositeMtl) {
+		if (firstPrim->mappings_count > 0 && m_CompositeMtl) {
 			switch (GetMtlType()) {
 			case 0:
 				pCompositeMtl = (StdMat*)GetCOREInterface()->CreateInstance(MATERIAL_CLASS_ID, MaterialSwitcherClassID); ;
@@ -231,16 +244,16 @@ INode* glTFImporter_Core::CreateMaxNode(cgltf_node* node, INode* pParent)
 
 		// There is a possibility that primitives with maps and primitives without maps will be mixed together.
 		for (int i = 0; i < mesh->primitives_count; i++) {
-			cgltf_primitive* pr = &mesh->primitives[i];
+			cgltf_primitive* tmpPrim = &mesh->primitives[i];
 
-			if (findAttrAccesor(pr, "COLOR_0")) {
+			if (findAttrAccessor(tmpPrim, "COLOR_0")) {
 				NewMesh.setMapSupport(0, TRUE);
 				if (m_ViewVertexColor) ViewVertColor = TRUE;
 			}
 
 			int maxMap = 1;
-			if (findAttrAccesor(pr, "TEXCOORD_0")) maxMap = 2;
-			if (findAttrAccesor(pr, "TEXCOORD_1")) maxMap = 3;
+			if (findAttrAccessor(tmpPrim, "TEXCOORD_0")) maxMap = 2;
+			if (findAttrAccessor(tmpPrim, "TEXCOORD_1")) maxMap = 3;
 			NewMesh.setNumMaps(maxMap, FALSE);
 			if (maxMap == 2) {
 				NewMesh.setMapSupport(1, TRUE);
@@ -262,7 +275,7 @@ INode* glTFImporter_Core::CreateMaxNode(cgltf_node* node, INode* pParent)
 		float scale_v = 1.0f;
 		float offset_u = 0.0f;
 		float offset_v = 0.0f;
-		if (m_Quantization) {
+		if (m_Quantization && pr->material) {
 			if (pr->material->has_pbr_metallic_roughness) {
 				if (pr->material->pbr_metallic_roughness.base_color_texture.has_transform) {
 					scale_u = pr->material->pbr_metallic_roughness.base_color_texture.transform.scale[0];
@@ -291,62 +304,68 @@ INode* glTFImporter_Core::CreateMaxNode(cgltf_node* node, INode* pParent)
 			}
 		}
 
-		// Set vertex
-		std::vector<float> VertIdList;
+		// Set vertex positions
+		std::vector<float> flatCoordsBuf;
+
 		if (mc) {
-			DracoDecodeProc(mc->buffer_view, VertIdList, DracoDecodeType::POSITION);
+			DracoDecodeProc(mc->buffer_view, pr, flatCoordsBuf, DracoDecodeType::POSITION);
 		}
 		else {
-			GetDataList(VertIdList, findAttrAccesor(pr, "POSITION"));
+			GetDataList(flatCoordsBuf, findAttrAccessor(pr, "POSITION"));
 		}
+
 		size_t VertNum = 0;
-		if ((pr->type == cgltf_primitive_type_triangles) ||
-			(pr->type == cgltf_primitive_type_triangle_strip) ||
-			(pr->type == cgltf_primitive_type_triangle_fan)){
-			VertNum = VertIdList.size() / 3;
+		std::vector<Point3> pointBuf;
+
+		PrimCategory primCat = GetPrimCategory(pr->type);
+
+		if(primCat == PrimCategory::Points) {
+			VertNum = flatCoordsBuf.size() / 3;
 			NewMesh.setNumVerts((int)(VertNum + VertOffset), TRUE);
 			UINT vIdx = VertOffset;
-			for (std::vector<float>::iterator v = VertIdList.begin(); v != VertIdList.end(); v += 3, vIdx++) {
+			for (std::vector<float>::iterator v = flatCoordsBuf.begin(); v != flatCoordsBuf.end(); v += 3, vIdx++) {
+				Point3 p(*v, *(v + 1), *(v + 2));
+				NewMesh.setVert(vIdx, p * m_scale);
+			}
+		}
+		else if (primCat == PrimCategory::Lines) {
+			pointBuf.clear();
+			VertNum = flatCoordsBuf.size();
+			uint32_t vIdx = VertOffset;
+			for (std::vector<float>::iterator v = flatCoordsBuf.begin(); v != flatCoordsBuf.end(); v += 3, vIdx++) {
+				Point3 p(*v, *(v + 1), *(v + 2));
+				pointBuf.push_back(p * m_scale);
+			}
+		}
+		else if (primCat == PrimCategory::Triangles) {
+			VertNum = flatCoordsBuf.size() / 3;
+			NewMesh.setNumVerts((int)(VertNum + VertOffset), TRUE);
+			UINT vIdx = VertOffset;
+			for (std::vector<float>::iterator v = flatCoordsBuf.begin(); v != flatCoordsBuf.end(); v += 3, vIdx++) {
 				Point3 p(*v, *(v + 1), *(v + 2));
 				NewMesh.setVert(vIdx, p * m_scale);
 			}
 		}
 
-		std::vector<Point3> ShapePointVector;
-		if ((pr->type == cgltf_primitive_type_lines)||
-			(pr->type == cgltf_primitive_type_line_loop)||
-			(pr->type == cgltf_primitive_type_line_strip)) {
-			ShapePointVector.clear();
-			VertNum = VertIdList.size();
-			UINT vIdx = VertOffset;
-			for (std::vector<float>::iterator v = VertIdList.begin(); v != VertIdList.end(); v += 3, vIdx++) {
-				Point3 p(*v, *(v + 1), *(v + 2));
-				ShapePointVector.push_back(p * m_scale);
-			}
-		}
-
 		// Face settings
 		size_t FaceNum = 0;
-		if ((pr->type == cgltf_primitive_type_triangles) ||
-			(pr->type == cgltf_primitive_type_triangle_strip) ||
-			(pr->type == cgltf_primitive_type_triangle_fan)) {
-			std::vector<float> FaceIdList;
+		if ( primCat == PrimCategory::Triangles) {
+			std::vector<uint32_t> FaceIdList;
 			if (mc) {
 				GetDracoMeshIndexList(mc->buffer_view, FaceIdList);
 			}
 			else {
 				if (pr->indices) {
-					GetDataList(FaceIdList, pr->indices);
+					std::vector<float> floatIndices;
+					GetDataList(floatIndices, pr->indices);
+					FaceIdList = FloatToUInt32IndexBuffer(floatIndices);
 				}
 				else {
 					int numf = NewMesh.numVerts / 3;
 					for (int i = 0; i < numf; i++) {
-						float v1 = static_cast<float>(i * 3 + 0 + VertOffset);
-						float v2 = static_cast<float>(i * 3 + 1 + VertOffset);
-						float v3 = static_cast<float>(i * 3 + 2 + VertOffset);
-						FaceIdList.push_back(v1);
-						FaceIdList.push_back(v2);
-						FaceIdList.push_back(v3);
+						FaceIdList.push_back(i * 3 + 0 + VertOffset);
+						FaceIdList.push_back(i * 3 + 1 + VertOffset);
+						FaceIdList.push_back(i * 3 + 2 + VertOffset);
 					}
 				}
 			}
@@ -355,10 +374,10 @@ INode* glTFImporter_Core::CreateMaxNode(cgltf_node* node, INode* pParent)
 				FaceNum = FaceIdList.size() / 3;
 				NewMesh.setNumFaces((int)(FaceNum + FaceOffset), TRUE);
 				UINT fIdx = FaceOffset;
-				for (std::vector<float>::iterator f = FaceIdList.begin(); f != FaceIdList.end(); f += 3, fIdx++) {
-					NewMesh.faces[fIdx].v[0] = static_cast<int>(*(f + 0)) + VertOffset;
-					NewMesh.faces[fIdx].v[1] = static_cast<int>(*(f + 1)) + VertOffset;
-					NewMesh.faces[fIdx].v[2] = static_cast<int>(*(f + 2)) + VertOffset;
+				for (std::vector<uint32_t>::iterator f = FaceIdList.begin(); f != FaceIdList.end(); f += 3, fIdx++) {
+					NewMesh.faces[fIdx].v[0] = *(f + 0) + VertOffset;
+					NewMesh.faces[fIdx].v[1] = *(f + 1) + VertOffset;
+					NewMesh.faces[fIdx].v[2] = *(f + 2) + VertOffset;
 					NewMesh.faces[fIdx].setEdgeVisFlags(EDGE_VIS, EDGE_VIS, EDGE_VIS);
 					NewMesh.faces[fIdx].setMatID(mId);
 					//NewMesh.faces[fIdx].setSmGroup(smGroupBit);
@@ -424,77 +443,69 @@ INode* glTFImporter_Core::CreateMaxNode(cgltf_node* node, INode* pParent)
 		*/
 
 		// Setting ShapeLine
-		if ((pr->type == cgltf_primitive_type_lines) ||
-			(pr->type == cgltf_primitive_type_line_loop)||
-			(pr->type == cgltf_primitive_type_line_strip)) {
-			std::vector<float> KnotIdList;
+		if (primCat == PrimCategory::Lines ) {
+			std::vector<uint32_t> KnotIdList;
+			bool isClosed = false;
 			if (mc) {
 				GetDracoMeshIndexList(mc->buffer_view, KnotIdList);
 			}
 			else {
 				if (pr->indices) {
-					GetDataList(KnotIdList, pr->indices);
+					std::vector<float> floatIndices;
+					GetDataList(floatIndices, pr->indices);
+					KnotIdList = FloatToUInt32IndexBuffer( floatIndices);
 				}
 				else {
-					for (UINT vIdx = 0; vIdx < VertIdList.size()/3; vIdx++) {
-						KnotIdList.push_back(static_cast<float>(vIdx));
+					for (uint32_t vIdx = 0; vIdx < flatCoordsBuf.size()/3; vIdx++) {
+						KnotIdList.push_back(vIdx);
 					}
 				}
 			}
-			UINT vIdx = VertOffset;
-			if (pr->type == cgltf_primitive_type_lines) {
-				for (int idx = 0; idx < KnotIdList.size(); idx += 2) {
-					Spline3D* pSpline = NewShape.NewSpline();
-					Point3 p1 = ShapePointVector[static_cast<int>(KnotIdList[idx])];
-					Point3 p2 = ShapePointVector[static_cast<int>(KnotIdList[idx + 1])];
-					pSpline->AddKnot(SplineKnot(KTYPE_AUTO, LTYPE_LINE, p1, p1, p1));
-					pSpline->AddKnot(SplineKnot(KTYPE_AUTO, LTYPE_LINE, p2, p2, p2));
-					pSpline->SetClosed(0);			// spline is an open curve.
-					pSpline->ComputeBezPoints();	// update internal spline data
-				}
-			}
-			else if (pr->type == cgltf_primitive_type_line_loop) {
-				Spline3D* pSpline = NewShape.NewSpline();
-				for (auto idx : KnotIdList) {
-					Point3 p1 = ShapePointVector[(UINT)idx];
-					pSpline->AddKnot(SplineKnot(KTYPE_AUTO, LTYPE_LINE, p1, p1, p1));
-				}
-				pSpline->SetClosed(1);			// spline is a closed curve.
-				pSpline->ComputeBezPoints();	// update internal spline data
-			}
-			else if (pr->type == cgltf_primitive_type_line_strip) {
-				Spline3D* pSpline = NewShape.NewSpline();
-				for (auto idx : KnotIdList) {
-					Point3 p1 = ShapePointVector[(UINT)idx];
-					pSpline->AddKnot(SplineKnot(KTYPE_AUTO, LTYPE_LINE, p1, p1, p1));
-				}
-				if (KnotIdList[0] == KnotIdList[KnotIdList.size() - 1]) {
-					pSpline->SetClosed(1);			// spline is a closed curve
-				}
-				else {
-					pSpline->SetClosed(0);			// spline is a open curve
-				}
-				pSpline->ComputeBezPoints();	// update internal spline data
+			uint32_t vIdx = VertOffset;
+
+			auto plyShape = PolyShape();
+			auto plyLine = plyShape.NewLine();
+			plyLine->SetNumPts(static_cast<int>(KnotIdList.size()), FALSE);
+
+			switch(pr->type) {
+				case cgltf_primitive_type_lines:
+					for(int idx = 0; idx < KnotIdList.size(); idx += 2) {
+						(*plyLine)[idx] = PolyPt(pointBuf[KnotIdList[idx]]);
+						(*plyLine)[idx+1] = PolyPt(pointBuf[KnotIdList[idx+1]]);						
+					}
+					break;
+				case cgltf_primitive_type_line_loop:
+						plyLine->Close();
+						[[fallthrough]];
+				case cgltf_primitive_type_line_strip:
+					for(int idx = 0; idx < KnotIdList.size(); idx++) {
+						auto pt = PolyPt(pointBuf[idx]);
+						(*plyLine)[idx] = pt;
+					}
+					if (KnotIdList[0] == KnotIdList[KnotIdList.size() - 1])	
+						plyLine->Close();
+					break;
+				default:
+					break;
 			}
 
+			// assign to our final Shape node
+			NewShape = plyShape;
 		}
 
-		// Set the Vertex nodr
+		// Set the Vertex normals
 		std::vector<float> NormalList;
 		if (mc) {
-			DracoDecodeProc(mc->buffer_view, NormalList, DracoDecodeType::NORMAL);
+			DracoDecodeProc(mc->buffer_view, pr, NormalList, DracoDecodeType::NORMAL);
 		}
 		else {
-			GetDataList(NormalList, findAttrAccesor(pr, "NORMAL"));
+			GetDataList(NormalList, findAttrAccessor(pr, "NORMAL"));
 		}
 		size_t normalNum = NormalList.size() / 3;
 		if (normalNum > 0) {
 			int vIdx = NormalOffset;
 			for (std::vector<float>::iterator v = NormalList.begin(); v != NormalList.end(); v += 3, vIdx++) {
-				Point3 p(0.0f, 0.0f, 0.0f);
-				p.x = *v;
-				p.y = *(v+1);
-				p.z = *(v+2);
+				Point3 p( *v, *(v+1), *(v+2));
 				VertNormalTable.push_back(p);
 			}
 			//if (normalNum != VertNormalTable.size())VertNormalTable.clear();
@@ -505,15 +516,15 @@ INode* glTFImporter_Core::CreateMaxNode(cgltf_node* node, INode* pParent)
 		cgltf_type val_type= cgltf_type_vec4;
 		float vcScale = 255.0f;
 		if (mc) {
-			DracoDecodeProc(mc->buffer_view, vClrList, DracoDecodeType::COLOR);
-			cgltf_accessor* acc = findAttrAccesor(pr, "COLOR_0");
+			DracoDecodeProc(mc->buffer_view, pr, vClrList, DracoDecodeType::COLOR);
+			cgltf_accessor* acc = findAttrAccessor(pr, "COLOR_0");
 			if (acc) {
 				if (acc->component_type == cgltf_component_type::cgltf_component_type_r_32f) vcScale = 1.0f;
 				val_type = acc->type;
 			}
 		}
 		else {
-			cgltf_accessor *acc = findAttrAccesor(pr, "COLOR_0");
+			cgltf_accessor *acc = findAttrAccessor(pr, "COLOR_0");
 			GetDataList(vClrList, acc);
 			if (acc) {
 				if (acc->component_type == cgltf_component_type::cgltf_component_type_r_32f) vcScale = 1.0f;
@@ -555,10 +566,10 @@ INode* glTFImporter_Core::CreateMaxNode(cgltf_node* node, INode* pParent)
 		//Set UV1
 		std::vector<float> texCoord1List;
 		if (mc) {
-			DracoDecodeProc(mc->buffer_view, texCoord1List, DracoDecodeType::TEX_COORD);
+			DracoDecodeProc(mc->buffer_view, pr, texCoord1List, DracoDecodeType::TEX_COORD);
 		}
 		else {
-			cgltf_accessor* acc = findAttrAccesor(pr, "TEXCOORD_0");
+			cgltf_accessor* acc = findAttrAccessor(pr, "TEXCOORD_0");
 			//if(CheckBufferSize(acc))
 			GetDataList(texCoord1List, acc);
 		}
@@ -626,7 +637,7 @@ INode* glTFImporter_Core::CreateMaxNode(cgltf_node* node, INode* pParent)
 			//DracoTest(mc->buffer_view, texCoord2List, DracoDecodeType::TEX_COORD);
 		}
 		else {
-			cgltf_accessor* acc = findAttrAccesor(pr, "TEXCOORD_1");
+			cgltf_accessor* acc = findAttrAccessor(pr, "TEXCOORD_1");
 			//if (CheckBufferSize(acc))
 			GetDataList(texCoord2List, acc);
 		}
@@ -670,16 +681,18 @@ INode* glTFImporter_Core::CreateMaxNode(cgltf_node* node, INode* pParent)
 	}
 
 	INode* pNode = NULL;
-	if ((ObjectType == cgltf_primitive_type_triangles) ||
-		(ObjectType == cgltf_primitive_type_triangle_strip)||
-		(ObjectType == cgltf_primitive_type_triangle_fan)) {
+	if(ObjectType == PrimCategory::Points) {
 		TriObject* pTri = CreateNewTriObject();
+		NewMesh.buildBoundingBox();
 		pTri->mesh = NewMesh;
 		pNode = GetCOREInterface()->CreateObjectNode(pTri);
-	}
-	if ((ObjectType == cgltf_primitive_type_lines) ||
-		(ObjectType == cgltf_primitive_type_line_loop)||
-		(ObjectType == cgltf_primitive_type_line_strip)) {
+
+		if (!pNode) return NULL;
+		
+		// Maybe 3ds Max will gain a dedicated points object in the future ?
+		pNode->VertTicks(TRUE); // enable VertexTicks, otherwise there would be no visual in the viewport
+	} 
+	else if (ObjectType == PrimCategory::Lines) {
 		NewShape.UpdateSels();
 		NewShape.InvalidateGeomCache();
 		SplineShape* pSpline = (SplineShape*)GetCOREInterface()->CreateInstance(SHAPE_CLASS_ID, splineShapeClassID);
@@ -687,6 +700,11 @@ INode* glTFImporter_Core::CreateMaxNode(cgltf_node* node, INode* pParent)
 		pNode = GetCOREInterface()->CreateObjectNode(pSpline);
 		pNode->SetWireColor(RGB(255, 255, 255));
 	}
+	else if( ObjectType == PrimCategory::Triangles) {
+		TriObject* pTri = CreateNewTriObject();
+		pTri->mesh = NewMesh;
+		pNode = GetCOREInterface()->CreateObjectNode(pTri);
+	} 
 
 	if (!pNode) return NULL;
 
@@ -774,7 +792,7 @@ INode* glTFImporter_Core::CreateMaxNode(cgltf_node* node, INode* pParent)
 		}
 	}
 
-	AttacheNodeExtentions(pNode, node);
+	AttachNodeExtensions(pNode, node);
 
 	if (ViewVertColor) {
 		pNode->SetCVertMode(TRUE);
@@ -835,51 +853,61 @@ void glTFImporter_Core::CreateNodeInfosRec(cgltf_node *node, INode *targetParent
 	}
 
 	INode *pNewObject = NULL;
-	if (node->camera) {
-		pNewObject = CreateCamera(node);
-		if (_tcslen(pNewObject->GetName()) == 0 && m_AvoidDupName) {
-			TSTR name = _T("Camera");
-			GetCOREInterface()->MakeNameUnique(name);
-			pNewObject->SetName(name);
-		}
-	}
-	else if (node->light) {
-		pNewObject = CreateLight(node);
-		if (_tcslen(pNewObject->GetName()) == 0 && m_AvoidDupName) {
-			TSTR name = _T("Light");
-			GetCOREInterface()->MakeNameUnique(name);
-			pNewObject->SetName(name);
-		}
-	}
-	else {
-		pNewObject = CreateMaxNode(node, targetParent);
-		if (!pNewObject) return;
-		if (_tcslen(pNewObject->GetName()) == 0 && m_AvoidDupName) {
-			TSTR name = _T("Object");
-			GetCOREInterface()->MakeNameUnique(name);
-			pNewObject->SetName(name);
-		}
-		if (!pNewObject->GetMtl()&& pNewObject->GetObjectRef()->SuperClassID()== GEOMOBJECT_CLASS_ID) {
-			pNewObject->SetWireColor(RGB(128,128,128));
-		}
+	TSTR baseName;
 
-		cgltf_size size;
-		cgltf_result ret = cgltf_copy_extras_json(m_glTF_data, &node->extras, NULL, &size);
-		if (size > 0) {
-			std::vector<custAttrParam> attrTbl;
-			CreateParamTableFromExtras(node->extras, size, attrTbl);
-			//AttacheCustAttr(pNewObject->GetObjectRef(), attrTbl);
-			if (m_ExtraToUserProp)
-				SetUserPropParam(pNewObject, attrTbl);
-			if(m_ExtraToCustAttr)
-				AttacheCustAttr(pNewObject, attrTbl);
+	if(node->camera) {
+		baseName = _T("Camera");
+		pNewObject = CreateCamera(node);
+		
+		if (!pNewObject) return;
+	}
+	else if(node->light) {
+		baseName = _T("Light");
+		pNewObject = CreateLight(node);
+		
+		if (!pNewObject) return;
+	}
+	else if(!node->mesh) {
+		baseName = _T("Dummy");
+
+		DummyObject* pObj =  static_cast<DummyObject*>(GetCOREInterface()->CreateInstance(HELPER_CLASS_ID, Class_ID(DUMMY_CLASS_ID, 0)));
+		pObj->SetBox(Box3(Point3(-10, -10, -10), Point3(10, 10, 10)));
+		pNewObject = GetCOREInterface()->CreateObjectNode(pObj);
+
+		if (m_HideDummy) pNewObject->Hide(TRUE);
+	}
+
+	else {
+		baseName = _T("Object");
+		pNewObject = CreateMaxNode(node, targetParent);
+		
+		if (!pNewObject) return;
+		
+		if (!pNewObject->GetMtl() && pNewObject->GetObjectRef()->SuperClassID()== GEOMOBJECT_CLASS_ID) {
+			pNewObject->SetWireColor(RGB(128,128,128));
 		}
 	}
 
 	if (m_AvoidDupName) {
-		TSTR n = pNewObject->GetName();
-		GetCOREInterface()->MakeNameUnique(n);
-		pNewObject->SetName(n);
+		TSTR name = pNewObject->GetName();
+		if(_tcslen(name) == 0) {
+			name = baseName;
+		}
+		GetCOREInterface()->MakeNameUnique(name);
+		pNewObject->SetName(name);
+	}
+
+	// featch and attach extras as Custom Attributes/User Props
+	cgltf_size size;
+	cgltf_result ret = cgltf_copy_extras_json(m_glTF_data, &node->extras, NULL, &size);
+	if (size > 0) {
+		std::vector<custAttrParam> attrTbl;
+		CreateParamTableFromExtras(node->extras, size, attrTbl);
+		//AttachCustAttr(pNewObject->GetObjectRef(), attrTbl);
+		if (m_ExtraToUserProp)
+			SetUserPropParam(pNewObject, attrTbl);
+		if(m_ExtraToCustAttr)
+			AttachCustAttr(pNewObject, attrTbl);
 	}
 
 	m_NodeMap.insert(std::make_pair(node, pNewObject));
@@ -1007,9 +1035,9 @@ void glTFImporter_Core::CreateNodeInfosRec(cgltf_node *node, INode *targetParent
 }
 
 //======================================================================
-// Attache Extention params 
+// Attach Extension params 
 //======================================================================
-void glTFImporter_Core::AttacheNodeExtentions(INode* pNode, cgltf_node* node)
+void glTFImporter_Core::AttachNodeExtensions(INode* pNode, cgltf_node* node)
 {
 	if (!pNode || !node) return;
 

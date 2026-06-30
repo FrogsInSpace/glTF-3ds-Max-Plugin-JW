@@ -371,7 +371,7 @@ void glTFExporter_Core::CreateAnimationPointer(void)
 			pC = pBlock->GetControllerByID(vr_reflection_metalness);
 			CreateMetalicFactorAnimation(pC, m.second);
 
-			IParamBlock2* pBlockEx = GetCustAttrPBlock(pMtl, tstring(_T("VRay Extention")));
+			IParamBlock2* pBlockEx = GetCustAttrPBlock(pMtl, tstring(_T("VRay Extension")));
 			if (pBlockEx) {
 				//pC = pBlock->GetControllerByID(vr_diffuse_roughness);
 				pC = pBlockEx->GetControllerByID(1);
@@ -496,7 +496,7 @@ void glTFExporter_Core::CreateAnimationPointer(void)
 			if (pBlock->GetInt(1)) {
 				pC = pBlock->GetControllerByIndex(2);
 				if (CreateClearcoatFactorAnimation(pC, m.second))	m_AnimationPointer_Used = TRUE;
-	;
+
 				pC = pBlock->GetControllerByID(4);
 				if (CreateClearcoatRoughnessAnimation(pC, m.second)) m_AnimationPointer_Used = TRUE;
 
@@ -512,8 +512,10 @@ void glTFExporter_Core::CreateAnimationPointer(void)
 		if (pBlock) {
 			if (pBlock->GetInt(1)) {
 				pC = pBlock->GetControllerByIndex(2);
-				if (CreateClearcoatFactorAnimation(pC, m.second))	m_AnimationPointer_Used = TRUE;
-				;
+				
+				// TODO: verify that this is indeed correct ( CreateClearcoatFactorAnimation ? ) 
+				if (CreateClearcoatFactorAnimation(pC, m.second)) m_AnimationPointer_Used = TRUE;
+	
 				pC = pBlock->GetControllerByID(2);
 				if (CreateSpecularFactorAnimation(pC, m.second)) m_AnimationPointer_Used = TRUE;
 
@@ -521,6 +523,8 @@ void glTFExporter_Core::CreateAnimationPointer(void)
 				if (CreateSpecularColorAnimation(pC, m.second)) m_AnimationPointer_Used = TRUE;
 
 				Texmap* pTex = pBlock->GetTexmap(3);
+
+				// TODO: verify that this is indeed correct ( see above )
 				CreateUVAnimation(pTex, m.second, TargetTex::ClearcoatMap);
 				pTex = pBlock->GetTexmap(3);
 				CreateUVAnimation(pTex, m.second, TargetTex::SpecularMap);
@@ -618,11 +622,16 @@ UINT glTFExporter_Core::IsUVAnimated(Texmap* pSrcTex)
 	}
 	if (pTex->ClassID() == ColorCorrectTexID) {
 		pTex = pTex->GetParamBlock(0)->GetTexmap(1);
+		if(!pTex) return ret;
 	}
 	if (pTex->ClassID() == RGBMultiTexID) {
-		pTex = pTex->GetParamBlock(0)->GetTexmap(2);
-		if(!pTex)
-			pTex = pTex->GetParamBlock(0)->GetTexmap(3);
+		Texmap *pTex2 = pTex->GetParamBlock(0)->GetTexmap(2);
+		if(pTex2)
+			pTex = pTex2;
+		else
+			pTex = pSrcTex->GetParamBlock(0)->GetTexmap(3);
+		
+		if(!pTex) return ret;
 	}
 
 	StdUVGen* pUVGen = NULL;
@@ -636,9 +645,9 @@ UINT glTFExporter_Core::IsUVAnimated(Texmap* pSrcTex)
 
 	IParamBlock* pBlock = GetParamBlock(pUVGen, 0);
 	Control* pOffsetUC = pBlock->GetController(0);
-	if (pOffsetUC) if (pOffsetUC->IsAnimated()) ret |= UV_ANIMATE_OFSET;
+	if (pOffsetUC) if (pOffsetUC->IsAnimated()) ret |= UV_ANIMATE_OFFSET;
 	Control* pOffsetVC = pBlock->GetController(1);
-	if (pOffsetVC) if (pOffsetVC->IsAnimated()) ret |= UV_ANIMATE_OFSET;
+	if (pOffsetVC) if (pOffsetVC->IsAnimated()) ret |= UV_ANIMATE_OFFSET;
 	Control* pScaleUC = pBlock->GetController(2);
 	if (pScaleUC) if (pScaleUC->IsAnimated()) ret |= UV_ANIMATE_SCALE;
 	Control* pScaleVC = pBlock->GetController(3);
@@ -783,8 +792,8 @@ BOOL glTFExporter_Core::CreateUVAnimation(Texmap *pSrcTex, UINT mtlIdx, TargetTe
 	Control* pOfsU2C = (Control*)GetCOREInterface()->CreateInstance(CTRL_FLOAT_CLASS_ID, Class_ID(0x2007, 0x0));
 	Control* pOfsV2C = (Control*)GetCOREInterface()->CreateInstance(CTRL_FLOAT_CLASS_ID, Class_ID(0x2007, 0x0));
 	for (auto t : KeyFrameList1) {
-		float ofsetU = pUVGen->GetUOffs(t);
-		float ofsetV = pUVGen->GetVOffs(t);
+		float offsetU = pUVGen->GetUOffs(t);
+		float offsetV = pUVGen->GetVOffs(t);
 		float sclU = pUVGen->GetUScl(t);
 		float sclV = pUVGen->GetVScl(t);
 		float rot = pUVGen->GetWAng(t);
@@ -796,25 +805,25 @@ BOOL glTFExporter_Core::CreateUVAnimation(Texmap *pSrcTex, UINT mtlIdx, TargetTe
 
 		if (sclU >= 1.0f) {
 			localoffsetU += (1.0f - (1.0f / sclU)) / 2.0f;
-			ofsetU += localoffsetU;
-			ofsetU *= -1.0f;
+			offsetU += localoffsetU;
+			offsetU *= -1.0f;
 		}
 		else {
 			localoffsetU += (1.0f - sclU) / 2.0f;
-			ofsetU = localoffsetU - ofsetU * sclU;
+			offsetU = localoffsetU - offsetU * sclU;
 		}
 
 		if (sclV >= 1.0f) {
 			localoffsetV += (1.0f - (1.0f / sclV)) / 2.0f;
-			ofsetV -= localoffsetV;
+			offsetV -= localoffsetV;
 		}
 		else {
 			localoffsetV += (1.0f - sclV) / 2.0f;
-			ofsetV = localoffsetV + ofsetV * sclV;
+			offsetV = localoffsetV + offsetV * sclV;
 		}
 
-		pOfsU2C->SetValue(t, &ofsetU);
-		pOfsV2C->SetValue(t, &ofsetV);
+		pOfsU2C->SetValue(t, &offsetU);
+		pOfsV2C->SetValue(t, &offsetV);
 	}
 
 	AnimateOff();
@@ -869,6 +878,9 @@ BOOL glTFExporter_Core::CreateUVAnimation(Texmap *pSrcTex, UINT mtlIdx, TargetTe
 
 		m_TexTransform_Used = TRUE;
 	}
+
+	if(pOfsU2C) pOfsU2C->DeleteThis();
+	if(pOfsV2C) pOfsV2C->DeleteThis();
 
 	return (KeyFrameList1.size() > 0);
 }

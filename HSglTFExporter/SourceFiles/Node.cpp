@@ -82,9 +82,8 @@ void glTFExporter_Core::CreateSceneData(tinygltf::Scene &scene, int XRefIdx, ILa
 			}
 			if (std::find(m_morphTargetTable.begin(), m_morphTargetTable.end(), pNode) == m_morphTargetTable.end()) {
 				tinygltf::Node node = CreateNodeDataRec(pNode);
-				if (node.extensions_json_string == "EXT_mesh_gpu_instancing") {
-				}
-				else {
+				
+				if(node.extensions_json_string != "EXT_mesh_gpu_instancing") {
 					scene.nodes.push_back(m_model.nodes.size() - 1);
 				}
 			}
@@ -99,9 +98,8 @@ void glTFExporter_Core::CreateSceneData(tinygltf::Scene &scene, int XRefIdx, ILa
 			INode* pNode = GetCOREInterface()->GetSelNode(i);
 			if (std::find(m_morphTargetTable.begin(), m_morphTargetTable.end(), pNode) == m_morphTargetTable.end()) {
 				tinygltf::Node node = CreateNodeDataRec(pNode, FALSE);
-				if (node.extensions_json_string == "EXT_mesh_gpu_instancing") {
-				}
-				else {
+				
+				if (node.extensions_json_string != "EXT_mesh_gpu_instancing") {
 					scene.nodes.push_back(m_model.nodes.size() - 1);
 
 					if (node.extensions_json_string == "KHR_physics_rigid_bodies") {

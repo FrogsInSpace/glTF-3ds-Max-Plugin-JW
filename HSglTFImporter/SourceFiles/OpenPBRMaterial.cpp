@@ -425,7 +425,7 @@ void glTFImporter_Core::CreateOpenPBRMaterial(void)
 		bool doubleSided = mtl->double_sided;
 */
 
-		AttacheAlphaModeCustAttr(pSmat, mtl->alpha_mode);
+		AttachAlphaModeCustAttr(pSmat, mtl->alpha_mode);
 
 		CreateUnlitAttr(pSmat, mtl->unlit);
 		CreateVolumeAttr(pSmat, &mtl->volume, mtl->has_volume);

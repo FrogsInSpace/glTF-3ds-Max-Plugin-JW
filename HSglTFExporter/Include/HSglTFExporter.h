@@ -148,12 +148,12 @@ inline const MCHAR* GetCustomAttrName(CustAttrib* p)
 #define PHYSICALMATERIAL_CLASS_ID Class_ID(0x3d6b1cec, 0xdeadc001)
 #endif
 
-#define UV_ANIMATE_OFSET	0x1
+#define UV_ANIMATE_OFFSET	0x1
 #define UV_ANIMATE_SCALE	0x2
 #define UV_ANIMATE_ROTATE	0x4
 
 #define InteractiveLayerName (_T("HSInteractiveGraphLayer"))
-#define InteractiveNodeName (_T("HSInetractiveGraphNode"))
+#define InteractiveNodeName (_T("HSInteractiveGraphNode"))
 
 enum class TargetTex {
 	BaseColorMap = 0,
@@ -591,7 +591,7 @@ public:
 	IParamBlock2* GetCustAttrPBlock(ReferenceTarget* pRef, tstring& AttName);
 
 	void CreateDracoMeshProp(tinygltf::Primitive& primitive, Mesh* pMesh, MeshNormalSpec* pNrmSpec, std::vector<int>& faceIDTable, std::vector<VertexProp>& VertPropTable, std::map<int, int>& vertPropMap, vertPropFlag& flag, Mtl* pMtl, ISkinContextData* pSkinMC, Modifier* pMorphMod, const Matrix3 &OffsetTM);
-	void CreateDracoMorphPrimiteve(tinygltf::Primitive& primitive, Modifier* pMorphMod, std::vector<VertexProp>& VertPropTable);
+	void CreateDracoMorphPrimitive(tinygltf::Primitive& primitive, Modifier* pMorphMod, std::vector<VertexProp>& VertPropTable);
 	//void SetDracoMorphTargetPositionTable(Modifier* pMod, int chID, const std::vector<int>& faceIDTable, draco::Mesh* pMesh, std::vector<int> dracovIDTable, std::vector<Point3>& targetPtTbl);
 	//void ExCreateDracoMeshProp(tinygltf::Primitive& primitive, Mesh* pMesh, MeshNormalSpec* pNrmSpec, std::vector<VertexProp>& vertPropTable, vertPropFlag &flag, Mtl* pMtl, ISkinContextData* pSkinMC, Modifier* pMorphMod, IGameMesh* pGameMesh, const Matrix3& OffsetTM);
 

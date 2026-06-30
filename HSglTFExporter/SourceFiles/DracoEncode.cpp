@@ -119,15 +119,24 @@ void SetDracoMorphTargetPositionTable(Modifier* pMod, int chID, const std::vecto
 		std::vector<Point3> dracoPos;
 		GetDracoMeshIndexList(s_buffer, vIDMapTable, mappedPos, dracoPos);
 
-		for (auto v: VertPropTable) {
-			basevertTable.push_back(s_pBaseMesh->verts[v.originalIdx]);
-			targetvertTable.push_back(mc.GetMorphPoint(v.originalIdx));
+		for (const auto& vProp: VertPropTable) {
+			basevertTable.push_back(s_pBaseMesh->verts[vProp.originalIdx]);
+			targetvertTable.push_back(mc.GetMorphPoint(vProp.originalIdx));
 		}
 		std::vector<int> list2Table;
 		GetDracoMeshIndexList2(list2Table, dracoPos, basevertTable);
 
 		for (int i = 0; i < vIDMapTable.size(); i++) {
-			int idx = list2Table[vIDMapTable[i]];
+			int mapIdx = vIDMapTable[i];
+			
+			/// TODO: how to deal with invalid/outof-bounds index ?
+			//assert(mapIdx >= 0 && mapIdx < list2Table.size());
+			if (mapIdx < 0 || mapIdx >= static_cast<int>(list2Table.size())) {
+				DbgAssert(!"Invalid morph target mapping index");
+				continue;
+			}
+
+			int idx = list2Table[mapIdx];
 			mapTable.push_back(idx);
 		}
 	}
@@ -147,7 +156,7 @@ void SetDracoMorphTargetPositionTable(Modifier* pMod, int chID, const std::vecto
 //========================================================================
 // Generate morph target section of the primitive
 //========================================================================
-void glTFExporter_Core::CreateDracoMorphPrimiteve(tinygltf::Primitive& primitive, Modifier* pMorphMod, std::vector<VertexProp>& VertPropTable)
+void glTFExporter_Core::CreateDracoMorphPrimitive(tinygltf::Primitive& primitive, Modifier* pMorphMod, std::vector<VertexProp>& VertPropTable)
 {
 	primitive.targets.clear();
 	int cnt = GetMorphTargetNum(pMorphMod);
@@ -156,6 +165,14 @@ void glTFExporter_Core::CreateDracoMorphPrimiteve(tinygltf::Primitive& primitive
 		std::vector<Point3> targetPtTbl;
 
 		SetDracoMorphTargetPositionTable(pMorphMod, i, VertPropTable, targetPtTbl);
+
+		/// TODO: needs to be validated: 
+		/// added empty morph target check to avoid null/dangling access later in processing
+		//if (targetPtTbl.empty()) continue;
+		if (targetPtTbl.empty() || targetPtTbl.size() != VertPropTable.size()) {
+			DbgAssert(!"Morph target position table size mismatch or empty.");
+			continue;
+		}
 
 		//----------- Morph TargetPosition
 		{
@@ -226,12 +243,9 @@ int CreatePosDracoBuffer(draco::Mesh &dracoMesh, Mesh *pMesh, std::vector<int> &
 	dracoMesh.attribute(posAttrId)->SetExplicitMapping(numv);
 
 	uint32_t vIndex = 0;
-	for (auto v : VertPropTable) {
-		Point3 p = pMesh->verts[v.originalIdx] *  scale * OffsetTM;
-		float v[3];
-		v[0] = p.x;
-		v[1] = p.y;
-		v[2] = p.z;
+	for (const auto &vProp : VertPropTable) {
+		Point3 p = pMesh->verts[vProp.originalIdx] *  scale * OffsetTM;
+		float v[3] ={ p.x, p.y, p.z };
 		dracoMesh.attribute(posAttrId)->SetAttributeValue(draco::AttributeValueIndex(vIndex++), v);
 	}
 
@@ -299,12 +313,9 @@ int CreateNrmDracoBuffer(draco::Mesh &dracoMesh, Mesh *pMesh, MeshNormalSpec *pN
 	dracoMesh.attribute(nrmAttrId)->SetExplicitMapping(numv);
 
 	uint32_t vIndex = 0;
-	for (auto v : VertPropTable) {
-		Point3 &nrm = v.normal;
-		float v[3];
-		v[0] = nrm.x;
-		v[1] = nrm.y;
-		v[2] = nrm.z;
+	for (const auto& vProp : VertPropTable) {
+		const Point3 &nrm = vProp.normal;
+		float v[3] = { nrm.x,nrm.y,nrm.z };
 		dracoMesh.attribute(nrmAttrId)->SetAttributeValue(draco::AttributeValueIndex(vIndex++), v);
 	}
 
@@ -374,11 +385,9 @@ int CreateUVDracoBuffer(draco::Mesh &dracoMesh, Mesh *pMesh, std::vector<int> &f
 	uint32_t vIndex = 0;
 	//MeshMap *pMap = &pMesh->Map(mapCh);
 	//UVVert *pSrcUV = pMap->tv;
-	for (auto v : VertPropTable) {
-		UVVert p = pMesh->mapVerts(mapCh)[v.uv1];
-		float v[2];
-		v[0] = p.x;
-		v[1] = -p.y;
+	for (const auto& vProp : VertPropTable) {
+		UVVert p = pMesh->mapVerts(mapCh)[vProp.uv1];
+		float v[2] = { p.x, -p.y };
 		dracoMesh.attribute(uvAttrId)->SetAttributeValue(draco::AttributeValueIndex(vIndex++), v);
 	}
 
@@ -449,11 +458,11 @@ int CreateTangentDracoBuffer(draco::Mesh& dracoMesh, IGameMesh* pGameMesh, Mtl *
 	dracoMesh.attribute(tanAttrId)->SetExplicitMapping(numv);
 
 	uint32_t vIndex = 0;
-	for (auto v : VertPropTable) {
-		Point3 normal = pGameMesh->GetNormal(v.faceID, v.corner, TRUE);
+	for (const auto& vProp : VertPropTable) {
+		Point3 normal = pGameMesh->GetNormal(vProp.faceID, vProp.corner, TRUE);
 		normal.FNormalize();
 
-		int indexTangentBinormal = pGameMesh->GetFaceVertexTangentBinormal(v.faceID, v.corner, mapCh);
+		int indexTangentBinormal = pGameMesh->GetFaceVertexTangentBinormal(vProp.faceID, vProp.corner, mapCh);
 		Point3 tangent = pGameMesh->GetTangent(indexTangentBinormal, mapCh) * TangentTM;
 		tangent.FNormalize();
 
@@ -461,11 +470,7 @@ int CreateTangentDracoBuffer(draco::Mesh& dracoMesh, IGameMesh* pGameMesh, Mtl *
 		bitangent.FNormalize();
 
 		float w = GetW(normal, tangent, bitangent);
-		float t[4];
-		t[0] = tangent.x;
-		t[1] = tangent.y;
-		t[2] = tangent.z;
-		t[3] = w;
+		float t[4] = { tangent.x, tangent.y, tangent.z, w };
 		dracoMesh.attribute(tanAttrId)->SetAttributeValue(draco::AttributeValueIndex(vIndex++), t);
 	}
 
@@ -535,12 +540,9 @@ int CreateColDracoBuffer(draco::Mesh &dracoMesh, Mesh *pMesh, std::vector<int> &
 	uint32_t vIndex = 0;
 	//MeshMap *pMap = &pMesh->Map(0);
 	//UVVert *pSrcUV = pMap->tv;
-	for (auto v : VertPropTable) {
-		UVVert p = pMesh->mapVerts(0)[v.vc];
-		float v[3];
-		v[0] = p.x;
-		v[1] = p.y;
-		v[2] = p.z;
+	for (const auto& vProp : VertPropTable) {
+		UVVert p = pMesh->mapVerts(0)[vProp.vc];
+		float v[3] = { p.x, p.y, p.z };
 		dracoMesh.attribute(colAttrId)->SetAttributeValue(draco::AttributeValueIndex(vIndex++), v);
 	}
 
@@ -735,6 +737,15 @@ int CreateWeightDracoBuffer(draco::Mesh &dracoMesh, Mesh *pMesh, std::map<int, s
 //========================================================================
 void glTFExporter_Core::CreateDracoMeshProp(tinygltf::Primitive &primitive, Mesh *pMesh, MeshNormalSpec *pNrmSpec, std::vector<int> &faceIDTable, std::vector<VertexProp>& VertPropTable, std::map<int, int>& vertPropMap, vertPropFlag& flag, Mtl *pMtl, ISkinContextData *pSkinMC, Modifier *pMorphMod, const Matrix3 &OffsetTM)
 {
+
+	DbgAssert(!faceIDTable.empty());
+	DbgAssert(!VertPropTable.empty());
+
+	/// TODO: needs to be validated: 
+	/// added empty checks to avoid null/dangling access later in processing
+	if(faceIDTable.empty() || VertPropTable.empty())
+		 return;
+
 	draco::Mesh dracoMesh;
 	tinygltf::Value::Object dracoAttr;
 
@@ -760,7 +771,7 @@ void glTFExporter_Core::CreateDracoMeshProp(tinygltf::Primitive &primitive, Mesh
 		Point3 minPos = pMesh->verts[pFace[faceIDTable[0]].v[0]] * OffsetTM;;
 		Point3 maxPos = pMesh->verts[pFace[faceIDTable[0]].v[0]] * OffsetTM;;
 
-		for (auto id : VertPropTable) {
+		for (const auto& id : VertPropTable) {
 			Point3 p = pMesh->verts[id.originalIdx] * OffsetTM;
 			if (p.x > maxPos.x)	maxPos.x = p.x;
 			if (p.y > maxPos.y)	maxPos.y = p.y;
@@ -1023,9 +1034,14 @@ void glTFExporter_Core::CreateDracoMeshProp(tinygltf::Primitive &primitive, Mesh
 	primitive.extensions.insert(std::make_pair("KHR_draco_mesh_compression", tinygltf::Value(ary)));
 
 	if (pMorphMod) {
-		s_pDracoMesh = &dracoMesh;
+		/// TODO: static global s_pDracoMesh stores address of local variable dracoMesh.
+		/// This becomes invalid after the function returns (dangling pointer).
+		s_pDracoMesh = &dracoMesh; 
 		s_pBaseMesh = pMesh;
-		CreateDracoMorphPrimiteve(primitive, pMorphMod, VertPropTable);
+		CreateDracoMorphPrimitive(primitive, pMorphMod, VertPropTable);
+
+		s_pDracoMesh = nullptr;
+		s_pBaseMesh = nullptr;
 	}
 	s_buffer.Clear();
 }
@@ -1062,8 +1078,8 @@ void glTFExporter_Core::ExCreateDracoMeshProp(tinygltf::Primitive& primitive, Me
 		Point3 minPos = pMesh->verts[vertPropTable[0].originalIdx] * m_scale * OffsetTM;
 		Point3 maxPos = minPos;
 
-		for (auto v : vertPropTable) {
-			Point3 p = pMesh->verts[v.originalIdx] * m_scale * OffsetTM;
+		for (const auto &vProp : vertPropTable) {
+			Point3 p = pMesh->verts[vProp.originalIdx] * m_scale * OffsetTM;
 			if (p.x > maxPos.x)	maxPos.x = p.x;
 			if (p.y > maxPos.y)	maxPos.y = p.y;
 			if (p.z > maxPos.z)	maxPos.z = p.z;
@@ -1131,8 +1147,8 @@ void glTFExporter_Core::ExCreateDracoMeshProp(tinygltf::Primitive& primitive, Me
 		Point3 minUV = pSrcUV[vertPropTable[0].uv1] * Point3(1.0f, -1.0f, 0.0f);
 		Point3 maxUV = minUV;
 
-		for (auto v : vertPropTable) {
-			UVVert p = pSrcUV[v.uv1];
+		for (const auto& vProp : vertPropTable) {
+			UVVert p = pSrcUV[vProp.uv1];
 			p.y = -p.y;
 			if (p.x > maxUV.x)	maxUV.x = p.x;
 			if (p.y > maxUV.y)	maxUV.y = p.y;
@@ -1165,8 +1181,8 @@ void glTFExporter_Core::ExCreateDracoMeshProp(tinygltf::Primitive& primitive, Me
 		Point3 minUV = pSrcUV[vertPropTable[0].uv1] * Point3(1.0f, -1.0f, 0.0f);
 		Point3 maxUV = minUV;
 
-		for (auto v : vertPropTable) {
-			UVVert p = pSrcUV[v.uv2];
+		for (const auto& vProp : vertPropTable) {
+			UVVert p = pSrcUV[vProp.uv2];
 			p.y = -p.y;
 			if (p.x > maxUV.x)	maxUV.x = p.x;
 			if (p.y > maxUV.y)	maxUV.y = p.y;
@@ -1199,8 +1215,8 @@ void glTFExporter_Core::ExCreateDracoMeshProp(tinygltf::Primitive& primitive, Me
 		Point3 minUV = pSrcUV[vertPropTable[0].vc];
 		Point3 maxUV = minUV;
 
-		for (auto v : vertPropTable) {
-			UVVert p = pSrcUV[v.vc];
+		for (const auto& vProp : vertPropTable) {
+			UVVert p = pSrcUV[vProp.vc];
 			if (p.x > maxUV.x)	maxUV.x = p.x;
 			if (p.y > maxUV.y)	maxUV.y = p.y;
 			if (p.z > maxUV.z)	maxUV.z = p.z;
@@ -1232,19 +1248,19 @@ void glTFExporter_Core::ExCreateDracoMeshProp(tinygltf::Primitive& primitive, Me
 		wTable.clear();
 		bTable.clear();
 
-		for (auto v : vertPropTable) {
-			int numb = pSkinMC->GetNumAssignedBones(v.originalIdx);
+		for (const auto& vProp : vertPropTable) {
+			int numb = pSkinMC->GetNumAssignedBones(vProp.originalIdx);
 			if (numb > 4) numb = 4;
 			std::array<float, 4> wa{ 0.0f, 0.0f, 0.0f, 0.0f };
 			std::array<USHORT, 4> ba{ 0, 0, 0, 0 };
 			for (int j = 0; j < numb; j++) {
-				USHORT boneIdx = pSkinMC->GetAssignedBone(v.originalIdx, j);
-				float w = pSkinMC->GetBoneWeight(v.originalIdx, j);
+				USHORT boneIdx = pSkinMC->GetAssignedBone(vProp.originalIdx, j);
+				float w = pSkinMC->GetBoneWeight(vProp.originalIdx, j);
 				wa[j] = w;
 				ba[j] = boneIdx;
 			}
-			wTable.insert(std::make_pair(v.originalIdx, wa));
-			bTable.insert(std::make_pair(vv.originalIdx, ba));
+			wTable.insert(std::make_pair(vProp.originalIdx, wa));
+			bTable.insert(std::make_pair(vProp.originalIdx, ba));
 		}
 
 		//---------------------------------

@@ -488,7 +488,7 @@ void glTFImporter_Core::CreateArnoldMaterial(void)
 			pBlock1->SetValue(an_sf_specular, m_time, f);
 		}
 
-		AttacheAlphaModeCustAttr(pSmat, mtl->alpha_mode);
+		AttachAlphaModeCustAttr(pSmat, mtl->alpha_mode);
 
 		m_MaterialMap.insert(std::make_pair(mtl, pSmat));
 		SetMtlImportStatus(i + 1);

@@ -252,7 +252,7 @@ const TCHAR* HSglTF2Exporter::LongDesc()
 
 const TCHAR* HSglTF2Exporter::ShortDesc()
 {
-	return _T("GL Transmissoin Format 2.0");
+	return _T("GL Transmission Format 2.0");
 }
 
 const TCHAR* HSglTF2Exporter::AuthorName()
@@ -721,7 +721,7 @@ const TCHAR *HSglTFExporter::LongDesc()
 	
 const TCHAR *HSglTFExporter::ShortDesc()
 {			
-	return _T("GL Transmissoin Format 2.0 (HSglTFExporter)");
+	return _T("GL Transmission Format 2.0 (HSglTFExporter)");
 }
 
 const TCHAR *HSglTFExporter::AuthorName()
@@ -876,7 +876,7 @@ BOOL glTFExporter_Core::ExportPreProcess(const TCHAR* filename, BOOL suppressPro
 	s_TitleString = _T("HS glTF exporter for 3dsmax ") + tstring(HS_GLTF_EXPORTER_VER);
 
 	TSTR profle;
-	profle.printf(_T("%s\\%s"), GetCOREInterface()->GetDir(APP_PLUGCFG_DIR), _T("HSglTFImpoter.ini"));
+	profle.printf(_T("%s\\%s"), GetCOREInterface()->GetDir(APP_PLUGCFG_DIR), _T("HSglTFImporter.ini"));
 
 	int x = MaxSDK::Util::GetPrivateProfileInt(_T("ExpSettings"), _T("scale"), 39370, profle);
 	HH_scale = x / 1000.0f;
@@ -981,15 +981,19 @@ BOOL glTFExporter_Core::ExportPreProcess(const TCHAR* filename, BOOL suppressPro
 		_stprintf_s(buf, MAX_PATH, _T("%d"), HH_CubicSplineT);
 		MaxSDK::Util::WritePrivateProfileString(_T("ExpSettings"), _T("CubicSplineT"), buf, profle);
 	}
-	{
+
+	// only show messagebox if not suppressed
+	if(!suppressPrompts) {
+		{
 #define MESSAGE_STR _T("Negative transform(Mirrored Object) detected, meshes may not export correctly to glTF.\nThe use of the ResetXForm utility is highly recommended.")
-		INodeTab tbl;
-		GetMirroredNode(tbl);
-		if (tbl.Count() > 0) {
-			int ret = MessageBox(NULL, MESSAGE_STR, _T("WARNING:Mirrored Objexct detected"), MB_OKCANCEL | MB_ICONWARNING);
-			if (ret == IDCANCEL) {
-				if (!exportSelected) GetCOREInterface()->SelectNodeTab(tbl, TRUE);
-				return TRUE;
+			INodeTab tbl;
+			GetMirroredNode(tbl);
+			if(tbl.Count() > 0) {
+				int ret = MessageBox(NULL, MESSAGE_STR, _T("WARNING:Mirrored Objexct detected"), MB_OKCANCEL | MB_ICONWARNING);
+				if(ret == IDCANCEL) {
+					if(!exportSelected) GetCOREInterface()->SelectNodeTab(tbl, TRUE);
+					return TRUE;
+				}
 			}
 		}
 	}

@@ -188,7 +188,7 @@ void glTFImporter_Core::CreateScanlineMaterial(void)
 		*/
 
 
-		AttacheAlphaModeCustAttr(pSmat, mtl->alpha_mode);
+		AttachAlphaModeCustAttr(pSmat, mtl->alpha_mode);
 
 		//CreateIORAttr(pSmat, &mtl->ior, mtl->has_ior);
 		//CreateTransmissionAttr(pSmat, &mtl->transmission, mtl->has_transmission);

@@ -34,13 +34,13 @@ void glTFImporter_Core::SetSceneProperties(void)
 	if (size > 0) {
 		std::vector<custAttrParam> attrTbl;
 		CreateParamTableFromExtras(*extras, size, attrTbl, TRUE);
-		AttacheSceneProp(attrTbl);
+		AttachSceneProp(attrTbl);
 	}
 }
 
 //======================================================================
 //======================================================================
-void glTFImporter_Core::AttacheSceneProp(std::vector<custAttrParam>& attrTbl)
+void glTFImporter_Core::AttachSceneProp(std::vector<custAttrParam>& attrTbl)
 {
 	if (attrTbl.size() == 0) return;
 

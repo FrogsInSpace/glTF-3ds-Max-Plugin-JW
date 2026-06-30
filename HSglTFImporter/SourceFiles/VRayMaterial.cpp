@@ -520,7 +520,7 @@ void glTFImporter_Core::CreateVRayMaterial(void)
 			//pBlock0->SetValue(fm_thin_film_ior, m_time, iridescence->iridescence_ior);
 		}
 
-		AttacheAlphaModeCustAttr(pSmat, mtl->alpha_mode);
+		AttachAlphaModeCustAttr(pSmat, mtl->alpha_mode);
 		CreateSpecularAttr(pSmat, &mtl->specular, mtl->has_specular);
 		CreateDiffuseTransmissionAttr(pSmat, &mtl->diffuse_transmission, mtl->has_diffuse_transmission);
 

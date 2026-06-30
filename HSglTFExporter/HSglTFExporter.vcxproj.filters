@@ -19,7 +19,7 @@
     <ClCompile Include="SourceFiles\EXT_mesh_gpu_instancing.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="SourceFiles\HSglTFExpoter.cpp">
+    <ClCompile Include="SourceFiles\HSglTFExporter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="SourceFiles\Materials.cpp">

@@ -87,6 +87,10 @@ BOOL glTFExporter_Core::WebpEncode(Texmap* pTex, WebpTextureStruct &str)
 
 	BitmapInfo bi = pBmp->GetBitmapInfo();
 
+	// safeguard agains WebP spec resolution limits (16383), Max bitmap could be larger)
+	if(bi.Width() <= 0 || bi.Height() < 0 || bi.Width() > 16383 || bi.Height() > 16383)
+		return FALSE;
+
 	tstring filename = bi.Filename();
 	std::filesystem::path destname(filename);
 #if MAX_RELEASE > 26000
@@ -96,10 +100,11 @@ BOOL glTFExporter_Core::WebpEncode(Texmap* pTex, WebpTextureStruct &str)
 #endif
 	tstring retname = fl + _T("\\") + tstring(destname.stem()) + _T(".webp");
 
-	int width = bi.Width();
-	int height = bi.Height();
-	int elements = 4;
-	std::vector< std::uint8_t > in(width * height * elements);
+	size_t width = bi.Width();
+	size_t height = bi.Height();
+	size_t elements = 4;
+	
+	std::vector<std::uint8_t> in(width * height * elements);
 
 	for (int y = 0; y < height; ++y){
 		for (int x = 0; x < width; ++x)	{
@@ -114,7 +119,7 @@ BOOL glTFExporter_Core::WebpEncode(Texmap* pTex, WebpTextureStruct &str)
 
 	std::uint8_t* data = nullptr;
 	auto size = 0ull;
-	int stride = width * elements;
+	size_t stride = width * elements;
 
 	{
 		if (str.LossLess) {

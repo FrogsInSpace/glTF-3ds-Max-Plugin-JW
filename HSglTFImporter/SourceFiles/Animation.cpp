@@ -899,7 +899,7 @@ void glTFImporter_Core::SetRoughScaleController(Mtl* pMtl, Control* pCtrl, cgltf
 	}
 	else if (pMtl->ClassID() == VRayMaterialID) {
 		IParamBlock2* pBlock = NULL;
-		GetCustAttrPBlock(pMtl, tstring(_T("VRay Extention")), pBlock);
+		GetCustAttrPBlock(pMtl, tstring(_T("VRay Extension")), pBlock);
 		if (pBlock) {
 			pBlock->SetControllerByID(1, 0, pCtrl);
 		}

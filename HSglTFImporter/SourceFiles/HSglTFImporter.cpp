@@ -24,6 +24,8 @@
 
 #define CGLTF_IMPLEMENTATION
 
+//#define USE_REFACTORED_SETSPARSEDATA
+
 #include "HSglTFImporter.h"
 #include <IMaterialViewportShading.h>
 #include <shlwapi.h>
@@ -121,6 +123,7 @@ Pencil+® is registered trademarks of P SOFTHOUSE Co., Ltd..\r\n \
 	(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE\r\n \
 	OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.\r\n"
 );
+
 
 static glTFImporter_Core theImporterCore;
 
@@ -297,7 +300,7 @@ public:
 	}
 	void SetDebugModeFn(int i) {
 		TSTR profle;
-		profle.printf(_T("%s\\%s"), GetCOREInterface()->GetDir(APP_PLUGCFG_DIR), _T("HSglTFImpoter.ini"));
+		profle.printf(_T("%s\\%s"), GetCOREInterface()->GetDir(APP_PLUGCFG_DIR), _T("HSglTFImporter.ini"));
 		if(i)
 			MaxSDK::Util::WritePrivateProfileString(_T("ImpSettings"), _T("DebugMode"), _T("1"), profle);
 		else
@@ -631,7 +634,7 @@ const TCHAR *HSglTFImporter::LongDesc()
 	
 const TCHAR *HSglTFImporter::ShortDesc() 
 {			
-	return _T("GL Transmissoin Format 2.0 (HSglTFImporter)");
+	return _T("GL Transmission Format 2.0 (HSglTFImporter)");
 }
 
 const TCHAR *HSglTFImporter::AuthorName()
@@ -696,7 +699,7 @@ const TCHAR *HSglTF2Importer::LongDesc()
 
 const TCHAR *HSglTF2Importer::ShortDesc()
 {
-	return _T("GL Transmissoin Format 2.0");
+	return _T("GL Transmission Format 2.0");
 }
 
 const TCHAR *HSglTF2Importer::AuthorName()
@@ -769,7 +772,7 @@ BOOL glTFImporter_Core::ImportPreProcess(const TCHAR* filename, BOOL suppressPro
 
 
 	TSTR profle;
-	profle.printf(_T("%s\\%s"), GetCOREInterface()->GetDir(APP_PLUGCFG_DIR), _T("HSglTFImpoter.ini"));
+	profle.printf(_T("%s\\%s"), GetCOREInterface()->GetDir(APP_PLUGCFG_DIR), _T("HSglTFImporter.ini"));
 
 	HH_DebugMode = MaxSDK::Util::GetPrivateProfileInt(_T("ImpSettings"), _T("DebugMode"), 0, profle);
 
@@ -941,9 +944,9 @@ BOOL glTFImporter_Core::ImportPreProcess(const TCHAR* filename, BOOL suppressPro
 		if (HH_ColorManagement) {
 			pColMgr->SetColorPipelineMode(MaxSDK::ColorManagement::ColorPipelineMode::kOCIO_CUSTOM);
 			MaxSDK::ColorManagement::IModeSettings* pModeSetting = pColMgr->Settings();
-			TSTR profle;
-			profle.printf(_T("%sColorManagement\\ocio_configs\\glTF_PBR_Neutral_Tone_Mapper\\%s"), GetCOREInterface()->GetDir(APP_MAX_SYS_ROOT_DIR), _T("glTF_PBR_Neutral_Tone_Mapper.ocio"));
-			auto ret = pModeSetting->SetOCIOConfigFilePath(profle);
+			TSTR oicoConfigFile;
+			oicoConfigFile.printf(_T("%sColorManagement\\ocio_configs\\glTF_PBR_Neutral_Tone_Mapper\\%s"), GetCOREInterface()->GetDir(APP_MAX_SYS_ROOT_DIR), _T("glTF_PBR_Neutral_Tone_Mapper.ocio"));
+			auto ret = pModeSetting->SetOCIOConfigFilePath(oicoConfigFile);
 		}
 	}
 #endif
@@ -1010,15 +1013,13 @@ BOOL glTFImporter_Core::ImportScene(void)
 
 	LogOutput(_T("Import:") + tstring(m_fullpath));
 
-#if 0
 	for (int i = 0; i < m_glTF_data->extensions_used_count; i++) {
-		if (!strcmp(m_glTF_data->extensions_used[i], "KHR_draco_mesh_compression")) {
-			MessageBox(GetCOREInterface()->GetMAXHWnd(), _T("Draco compression is not supported."), _T(""), MB_OK);
+		if (!strcmp(m_glTF_data->extensions_used[i], "EXT_meshopt_compression")) {
+			MessageBox(GetCOREInterface()->GetMAXHWnd(), _T("EXT_meshopt_compression is not supported."), _T("File Import Failed"), MB_OK | MB_ICONWARNING);
 			cgltf_free(m_glTF_data);
 			return FALSE;
 		}
 	}
-#endif
 
 	m_Quantization = FALSE;
 	if (m_glTF_data->extensions_used_count>0) {
@@ -1096,7 +1097,9 @@ BOOL glTFImporter_Core::ImportScene(void)
 		if (size > 0) {
 			std::vector<custAttrParam> attrTbl;
 			CreateParamTableFromExtras(m.first->extras, size, attrTbl);
-			AttacheCustAttr(m.second, attrTbl);
+
+			/// TODO: validate if this should check m_ExtraToCustAttr before
+			AttachCustAttr(m.second, attrTbl);
 		}
 	}
 
@@ -1168,7 +1171,7 @@ BOOL glTFImporter_Core::ImportScene(void)
 
 #endif
 
-	// Attache Skin
+	// Attach Skin
 	SetSkinImportStatus(0);
 	for (auto n : m_NodeMap) {
 		if (n.first->skin) {
@@ -1328,8 +1331,160 @@ BOOL glTFImporter_Core::ImportScene(void)
 }
 
 //======================================================================
-// Create data list specified by the accesor
+// Create data list specified by the accessor
 // =====================================================================
+
+#ifdef USE_REFACTORED_SETSPARSEDATA
+
+//======================================================================
+// Gemini AI refactored version of the original SetSparseData ( see below )
+// Does not crash with Khronos meshopt samples like the original, but fails to import any meshdata
+// =====================================================================
+void glTFImporter_Core::SetSparseData(std::vector<float>& retVal, cgltf_accessor* acc)
+{
+	if (!acc) return;
+
+	cgltf_type type = acc->type;
+	size_t count = acc->count;
+	cgltf_component_type componentType = acc->component_type;
+	cgltf_buffer_view* bufferView = acc->buffer_view;
+
+	// 1. Explicitly track component byte size & validate enum definitions
+	size_t size = 0;
+	switch (componentType) {
+		case cgltf_component_type_r_8:   size = sizeof(char);           break;
+		case cgltf_component_type_r_8u:  size = sizeof(unsigned char);  break;
+		case cgltf_component_type_r_16:  size = sizeof(short);          break;
+		case cgltf_component_type_r_16u: size = sizeof(unsigned short); break;
+		case cgltf_component_type_r_32u: size = sizeof(unsigned int);   break;
+		case cgltf_component_type_r_32f: size = sizeof(float);          break;
+		default:
+			// Safety fallback: Unhandled or malicious component type enum
+			return;
+	}
+
+	// 2. Safely translate type dimensions and catch unhandled enums
+	size_t dataLen = 0;
+	switch (type) {
+		case cgltf_type_scalar: dataLen = 1;  break;
+		case cgltf_type_vec2:   dataLen = 2;  break;
+		case cgltf_type_vec3:   dataLen = 3;  break;
+		case cgltf_type_vec4:   dataLen = 4;  break;
+		case cgltf_type_mat2:   dataLen = 4;  break;
+		case cgltf_type_mat3:   dataLen = 9;  break;
+		case cgltf_type_mat4:   dataLen = 16; break;
+		default:
+			// Safety fallback: Unhandled or invalid structural dimension type
+			return;
+	}
+
+	// 3. Fallback tracking when no buffer backing is explicitly present
+	cgltf_buffer* buffer = nullptr;
+	if (bufferView) {
+		buffer = bufferView->buffer;
+	}
+	else {
+		// Prevent 64-bit multiplication overflows during allocation sizes
+		if (count > 0 && dataLen > (std::numeric_limits<size_t>::max() / count)) {
+			return; 
+		}
+
+		// Optimally allocate space directly on the vector to avoid re-allocation loops
+		size_t totalElements = count * dataLen;
+		try {
+			retVal.insert(retVal.end(), totalElements, 0.0f);
+		} catch (const std::bad_alloc&) {
+			// Guard against system out-of-memory states if count is exceptionally large
+			return;
+		}
+		return;
+	}
+
+	// Validate that the underlying buffer container is actually populated
+	if (!buffer || !buffer->data) {
+		return;
+	}
+
+	// 4. Calculate stride step safely and verify internal element fit
+	size_t bs = bufferView->stride;
+	size_t step = (bs > 0) ? bs : dataLen * size;
+
+	// Ensure our element data fits cleanly within the designated step/stride span
+	if (dataLen * size > step) {
+		return;
+	}
+
+	// 5. Defend against integer multiplication overflow before processing loop
+	if (count > 0 && step > (std::numeric_limits<size_t>::max() / count)) {
+		return;
+	}
+
+	// Calculate structural block placement and boundaries across 64-bit constraints
+	size_t baseOffset = bufferView->offset + acc->offset;
+	size_t totalRequiredBytes = baseOffset + (count * step);
+
+	// Final buffer boundary validation checking the file definition vs real memory size
+	if (totalRequiredBytes > buffer->size) {
+		return;
+	}
+
+	// Base pointer address mapping across the complete validated byte span
+	const char* const basePtr = static_cast<const char*>(buffer->data) + baseOffset;
+
+	for (size_t i = 0; i < count; i++) {
+		const char* const elementPtr = basePtr + (i * step);
+
+		for (size_t j = 0; j < dataLen; j++) {
+			const char* const componentPtr = elementPtr + (j * size);
+
+			switch (componentType) {
+				case cgltf_component_type_r_8: {
+					char v;
+					std::memcpy(&v, componentPtr, sizeof(v));
+					retVal.push_back(static_cast<float>(v));
+					break;
+				}
+				case cgltf_component_type_r_8u: {
+					unsigned char v;
+					std::memcpy(&v, componentPtr, sizeof(v));
+					retVal.push_back(static_cast<float>(v));
+					break;
+				}
+				case cgltf_component_type_r_16: {
+					short v;
+					std::memcpy(&v, componentPtr, sizeof(v));
+					retVal.push_back(static_cast<float>(v));
+					break;
+				}
+				case cgltf_component_type_r_16u: {
+					unsigned short v;
+					std::memcpy(&v, componentPtr, sizeof(v));
+					retVal.push_back(static_cast<float>(v));
+					break;
+				}
+				case cgltf_component_type_r_32u: {
+					unsigned int v;
+					std::memcpy(&v, componentPtr, sizeof(v));
+					retVal.push_back(static_cast<float>(v));
+					break;
+				}
+				case cgltf_component_type_r_32f: {
+					float v;
+					std::memcpy(&v, componentPtr, sizeof(v));
+					retVal.push_back(v);
+					break;
+				}
+			}
+		}
+	}
+}
+
+#else
+/// TODO: throws exception when importing Khronos gltf-meshopt samples
+/// !!! This function crashes at memcpy when importing Khronos meshopt samples 
+/// BrainStem\glTF-Meshopt\BrainStem.gltf
+/// glTF-Meshopt\DragonAttenuation.gltf
+
 void glTFImporter_Core::SetSparseData(std::vector<float>& retVal, cgltf_accessor* acc)
 {
 	if (!acc) return;
@@ -1429,7 +1584,7 @@ void glTFImporter_Core::SetSparseData(std::vector<float>& retVal, cgltf_accessor
 		}
 	}
 }
-
+#endif USE_REFACTORED_SETSPARSEDATA
 //======================================================================
 // Chane data size specified by the sparse
 //======================================================================
@@ -1563,7 +1718,7 @@ BOOL glTFImporter_Core::GetDataList(std::vector<float>& retVal, cgltf_accessor* 
 }
 
 //======================================================================
-// Attache the modfier
+// Attach the modfier
 // =====================================================================
 Modifier *AddModifier(INode* pNode, const Class_ID &CID)
 {
@@ -1585,7 +1740,7 @@ Modifier *AddModifier(INode* pNode, const Class_ID &CID)
 	return pMod;
 }
 //======================================================================
-// Attache the modfier
+// Attach the modfier
 //======================================================================
 void AddModifier(INode* pNode, Modifier* pMod)
 {

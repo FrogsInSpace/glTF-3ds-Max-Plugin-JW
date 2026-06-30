@@ -194,8 +194,11 @@ BOOL glTFExporter_Core::SetIridescenceParams(MtlBase *pMtl, IridescenceStruct &s
 	pBlock->GetValueByName(_T("iridescenceIor"), m_time, str.ior, FOREVER, 0);
 	pBlock->GetValueByName(_T("iridescenceThicknessMinimum"), m_time, str.minimum, FOREVER, 0);
 	pBlock->GetValueByName(_T("iridescenceThicknessMaximum"), m_time, str.maximum, FOREVER, 0);
-	pBlock->GetValueByName(_T("iridescenceTexture"), m_time, str.texture, FOREVER, 0);
-	pBlock->GetValueByName(_T("iridescenceThicknessTexture"), m_time, str.thicknessTexture, FOREVER, 0);
+
+	if(str.texture)
+		pBlock->GetValueByName(_T("iridescenceTexture"), m_time, str.texture, FOREVER, 0);
+	if(str.thicknessTexture)
+		pBlock->GetValueByName(_T("iridescenceThicknessTexture"), m_time, str.thicknessTexture, FOREVER, 0);
 
 	Control* pC = pBlock->GetControllerByIndex(2);
 	if (pC) if (pC->IsAnimated()) animated = TRUE;
@@ -226,8 +229,12 @@ BOOL glTFExporter_Core::SetVolumeParams(MtlBase* pMtl, VolumeStruct& str, BOOL& 
 
 	pBlock->GetValueByName(_T("thicknessFactor"), m_time, str.thickness, FOREVER, 0);
 	pBlock->GetValueByName(_T("attenuationDistance"), m_time, str.distance, FOREVER, 0);
-	pBlock->GetValueByName(_T("attenuationColor"), m_time, str.color, FOREVER, 0);
-	pBlock->GetValueByName(_T("thicknessTexture"), m_time, str.pThicknessMap, FOREVER, 0);
+	
+	if(str.color) 
+		pBlock->GetValueByName(_T("attenuationColor"), m_time, str.color, FOREVER, 0);
+
+	if(str.pThicknessMap)
+		pBlock->GetValueByName(_T("thicknessTexture"), m_time, str.pThicknessMap, FOREVER, 0);
 
 	Control* pC = pBlock->GetControllerByIndex(2);
 	if (pC) if (pC->IsAnimated()) animated = TRUE;
@@ -255,7 +262,8 @@ BOOL glTFExporter_Core::SetTransmissionParams(MtlBase* pMtl, TransmissionStruct&
 	if (pBlock->GetInt(1, m_time) == 0) return FALSE;
 
 	pBlock->GetValueByName(_T("transmissionFactor"), m_time, str.factor, FOREVER, 0);
-	pBlock->GetValueByName(_T("transmissionTexture"), m_time, str.pTex, FOREVER, 0);
+	if(str.pTex)
+		pBlock->GetValueByName(_T("transmissionTexture"), m_time, str.pTex, FOREVER, 0);
 
 	Control* pC = pBlock->GetControllerByIndex(2);
 	if (pC) if (pC->IsAnimated()) animated = TRUE;
@@ -278,10 +286,16 @@ BOOL glTFExporter_Core::SetSheenParams(MtlBase* pMtl, SheenStruct& str, BOOL& an
 	if (!pBlock) return FALSE;
 	if (pBlock->GetInt(1, m_time) == 0) return FALSE;
 
-	pBlock->GetValueByName(_T("sheenColorFactor"), m_time, str.color, FOREVER, 0);
-	pBlock->GetValueByName(_T("sheenRoughnessFactor"), m_time, str.roughness, FOREVER, 0);
-	pBlock->GetValueByName(_T("sheenColorTexture"), m_time, str.pColMap, FOREVER, 0);
-	pBlock->GetValueByName(_T("sheenRoughnessTexture"), m_time, str.pRoughnessMap, FOREVER, 0);
+	if(str.color) 
+		pBlock->GetValueByName(_T("sheenColorFactor"), m_time, str.color, FOREVER, 0);
+	
+	pBlock->GetValueByName(_T("sheenRoughnessFactor"), m_time, str.roughness, FOREVER, 0);	
+	
+	if(str.pColMap)
+		pBlock->GetValueByName(_T("sheenColorTexture"), m_time, str.pColMap, FOREVER, 0);	
+	
+	if(str.pRoughnessMap)
+		pBlock->GetValueByName(_T("sheenRoughnessTexture"), m_time, str.pRoughnessMap, FOREVER, 0);
 
 	Control* pC = pBlock->GetControllerByIndex(2);
 	if (pC) if (pC->IsAnimated()) animated = TRUE;
@@ -310,9 +324,13 @@ BOOL glTFExporter_Core::SetClearCoatParams(MtlBase* pMtl, ClearCoatStruct& str, 
 
 	pBlock->GetValueByName(_T("clearcoatFactor"), m_time, str.factor, FOREVER, 0);
 	pBlock->GetValueByName(_T("clearcoatRoughnessFactor"), m_time, str.roughness, FOREVER, 0);
-	pBlock->GetValueByName(_T("clearcoatTexture"), m_time, str.pMap, FOREVER, 0);
-	pBlock->GetValueByName(_T("clearcoatRoughnessTexture"), m_time, str.pRoughnessMap, FOREVER, 0);
-	pBlock->GetValueByName(_T("clearcoatNormalTexture"), m_time, str.pNormalMap, FOREVER, 0);
+	
+	if(str.pMap)
+		pBlock->GetValueByName(_T("clearcoatTexture"), m_time, str.pMap, FOREVER, 0);
+	if(str.pRoughnessMap)
+		pBlock->GetValueByName(_T("clearcoatRoughnessTexture"), m_time, str.pRoughnessMap, FOREVER, 0);
+	if(str.pRoughnessMap)
+		pBlock->GetValueByName(_T("clearcoatNormalTexture"), m_time, str.pNormalMap, FOREVER, 0);
 
 	Control* pC = pBlock->GetControllerByIndex(2);
 	if (pC) if (pC->IsAnimated()) animated = TRUE;
@@ -376,7 +394,9 @@ BOOL glTFExporter_Core::SetAnisotropyParams(MtlBase* pMtl, AnisotropyStruct& str
 
 	pBlock->GetValueByName(_T("anisotropyStrength"), m_time, str.strength, FOREVER, 0);
 	pBlock->GetValueByName(_T("anisotropyRotation"), m_time, str.rotation, FOREVER, 0);
-	pBlock->GetValueByName(_T("anisotropyTexture"), m_time, str.texture, FOREVER, 0);
+
+	if(str.texture)
+		pBlock->GetValueByName(_T("anisotropyTexture"), m_time, str.texture, FOREVER, 0);
 
 	Control* pC = pBlock->GetControllerByIndex(2);
 	if (pC) animated = pC->IsAnimated();
@@ -401,9 +421,15 @@ BOOL glTFExporter_Core::SetSpecularParams(MtlBase* pMtl, SpecularStruct& str, BO
 	if (pBlock->GetInt(1, m_time) == 0) return FALSE;
 
 	pBlock->GetValueByName(_T("specularFactor"), m_time, str.factor, FOREVER, 0);
-	pBlock->GetValueByName(_T("specularColorFactor"), m_time, str.color, FOREVER, 0);
-	pBlock->GetValueByName(_T("specularTexture"), m_time, str.pMap, FOREVER, 0);
-	pBlock->GetValueByName(_T("specularColorTexture"), m_time, str.pColMap, FOREVER, 0);
+
+	if(str.color )
+		pBlock->GetValueByName(_T("specularColorFactor"), m_time, str.color, FOREVER, 0);
+		
+	if(str.pMap )
+		pBlock->GetValueByName(_T("specularTexture"), m_time, str.pMap, FOREVER, 0);
+		
+	if(str.pColMap )
+		pBlock->GetValueByName(_T("specularColorTexture"), m_time, str.pColMap, FOREVER, 0);
 
 	Control* pC = pBlock->GetControllerByIndex(2);
 	if (pC) animated = pC->IsAnimated();
@@ -428,9 +454,15 @@ BOOL glTFExporter_Core::SetDiffuseTransmissionParams(MtlBase* pMtl, DiffuseTrans
 	if (pBlock->GetInt(1, m_time) == 0) return FALSE;
 
 	pBlock->GetValueByName(_T("diffuseTransmissionFactor"), m_time, str.TransmissionFactor, FOREVER, 0);
-	pBlock->GetValueByName(_T("diffuseTransmissionClr"), m_time, str.TransmissionColor, FOREVER, 0);
-	pBlock->GetValueByName(_T("diffuseTransmissionColorTexture"), m_time, str.TransmissionColorTexture, FOREVER, 0);
-	pBlock->GetValueByName(_T("diffuseTransmissionTexture"), m_time, str.TransmissionTexture, FOREVER, 0);
+
+	if(str.TransmissionColor)
+		pBlock->GetValueByName(_T("diffuseTransmissionClr"), m_time, str.TransmissionColor, FOREVER, 0);
+
+	if(str.TransmissionColorTexture)
+		pBlock->GetValueByName(_T("diffuseTransmissionColorTexture"), m_time, str.TransmissionColorTexture, FOREVER, 0);
+	
+	if(str.TransmissionTexture)
+		pBlock->GetValueByName(_T("diffuseTransmissionTexture"), m_time, str.TransmissionTexture, FOREVER, 0);
 
 	Control* pC = pBlock->GetControllerByIndex(2);
 	if (pC) animated = pC->IsAnimated();
@@ -487,7 +519,7 @@ BOOL glTFExporter_Core::SetVRayExtParams(MtlBase* pMtl, vrayExtStruct& str)
 {
 	str.roughness = 1.0f;
 
-	IParamBlock2* pBlock = GetCustAttrPBlock(pMtl, tstring(_T("VRay Extention")));
+	IParamBlock2* pBlock = GetCustAttrPBlock(pMtl, tstring(_T("VRay Extension")));
 	if (!pBlock) return FALSE;
 
 	pBlock->GetValueByName(_T("PBR roughness"), m_time, str.roughness, FOREVER, 0);
