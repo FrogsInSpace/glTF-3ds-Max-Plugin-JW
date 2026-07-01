@@ -969,7 +969,7 @@ BOOL glTFImporter_Core::ImportPreProcess(const TCHAR* filename, BOOL suppressPro
 	ClassDesc* cd = ce->FullCD();
 	m_pPNG_BmpIO = (IBitmapIO_Png*)cd->GetInterface(BMPIO_INTERFACE);
 
-	if (ImportScene()) {
+	if (ImportScene(suppressPrompts)) {
 		if (m_EnableBkColor) {
 			SetEnvironmentMap(s_ImageFileString);
 			//GetCOREInterface()->SetBackGround(m_time, m_BkColor);
@@ -980,7 +980,7 @@ BOOL glTFImporter_Core::ImportPreProcess(const TCHAR* filename, BOOL suppressPro
 		}
 	}
 	else {
-		return FALSE;
+		return TRUE;
 	}
 
 	s_ImportedNodeTab.ZeroCount();
@@ -995,7 +995,7 @@ BOOL glTFImporter_Core::ImportPreProcess(const TCHAR* filename, BOOL suppressPro
 //======================================================================
 // Read file→scene object
 //======================================================================
-BOOL glTFImporter_Core::ImportScene(void)
+BOOL glTFImporter_Core::ImportScene(BOOL suppressPrompts)
 {
 	setlocale(LC_NUMERIC, "en_US");
 
@@ -1013,19 +1013,16 @@ BOOL glTFImporter_Core::ImportScene(void)
 
 	LogOutput(_T("Import:") + tstring(m_fullpath));
 
-	for (int i = 0; i < m_glTF_data->extensions_used_count; i++) {
-		if (!strcmp(m_glTF_data->extensions_used[i], "EXT_meshopt_compression")) {
-			MessageBox(GetCOREInterface()->GetMAXHWnd(), _T("EXT_meshopt_compression is not supported."), _T("File Import Failed"), MB_OK | MB_ICONWARNING);
-			cgltf_free(m_glTF_data);
-			return FALSE;
-		}
-	}
-
 	m_Quantization = FALSE;
 	if (m_glTF_data->extensions_used_count>0) {
 		for (int i = 0; i < m_glTF_data->extensions_used_count;i++) {
 			char *ptr = m_glTF_data->extensions_used[i];
-			if(_stricmp(ptr, "KHR_mesh_quantization")==0)	m_Quantization = TRUE;
+			if (!_stricmp(ptr, "EXT_meshopt_compression")) {
+				if(!suppressPrompts) MessageBox(GetCOREInterface()->GetMAXHWnd(), _T("WARNING:EXT_meshopt_compression is not supported."), _T("File Import Failed"), MB_OK | MB_ICONWARNING);
+				cgltf_free(m_glTF_data);
+				return FALSE;
+			}
+			else if(_stricmp(ptr, "KHR_mesh_quantization")==0)	m_Quantization = TRUE;
 		}
 	}
 

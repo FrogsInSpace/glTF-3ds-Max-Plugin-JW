@@ -348,7 +348,7 @@ class glTFImporter_Core
 {
 public:
 	BOOL ImportPreProcess(const TCHAR* filename, BOOL suppressPrompts, int ver);
-	BOOL ImportScene(void);
+	BOOL ImportScene(BOOL suppressPrompts);
 
 	BOOL GetDataList(std::vector<float>& data, cgltf_accessor *acc);
 	void SetSparseData(std::vector<float>& retVal, cgltf_accessor *acc);
