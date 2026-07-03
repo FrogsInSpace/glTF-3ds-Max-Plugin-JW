@@ -472,6 +472,8 @@ INT_PTR CALLBACK HSglTFExporterOptionsDlgProc(HWND hWnd, UINT message, WPARAM wP
 
 		EnableWindow(GetDlgItem(hWnd, IDC_FULLFRAME_CHK), HH_ExportAnimation);
 		EnableWindow(GetDlgItem(hWnd, IDC_ANIMPTR_CHK), HH_ExportAnimation);
+		EnableWindow(GetDlgItem(hWnd, IDC_CUBICSPLINE_CHK), HH_ExportAnimation);
+
 		EnableWindow(GetDlgItem(hWnd, IDC_GPUINSTNCE_CHK), HH_Instancing);
 		EnableWindow(GetDlgItem(hWnd, IDC_WM_CHK), HH_Instancing);
 
@@ -499,6 +501,8 @@ INT_PTR CALLBACK HSglTFExporterOptionsDlgProc(HWND hWnd, UINT message, WPARAM wP
 			EnableWindow(GetDlgItem(hWnd, IDC_INTERACT_CHK), FALSE);
 			EnableWindow(GetDlgItem(hWnd, IDC_INTERACT_COMBO), FALSE);
 			EnableWindow(GetDlgItem(hWnd, IDC_CAMERA_COMBO), FALSE);
+			EnableWindow(GetDlgItem(hWnd, IDC_STATIC_INT1), FALSE);
+			EnableWindow(GetDlgItem(hWnd, IDC_STATIC_INT2), FALSE);
 		}
 
 		return TRUE;
@@ -516,6 +520,7 @@ INT_PTR CALLBACK HSglTFExporterOptionsDlgProc(HWND hWnd, UINT message, WPARAM wP
 		case IDC_ANIM_CHK:
 			EnableWindow(GetDlgItem(hWnd, IDC_FULLFRAME_CHK), IsDlgButtonChecked(hWnd, IDC_ANIM_CHK));
 			EnableWindow(GetDlgItem(hWnd, IDC_ANIMPTR_CHK), IsDlgButtonChecked(hWnd, IDC_ANIM_CHK));
+			EnableWindow(GetDlgItem(hWnd, IDC_CUBICSPLINE_CHK), IsDlgButtonChecked(hWnd, IDC_ANIM_CHK));
 			break;
 		case IDC_INSTANCE_CHK:
 			EnableWindow(GetDlgItem(hWnd, IDC_GPUINSTNCE_CHK), IsDlgButtonChecked(hWnd, IDC_INSTANCE_CHK));

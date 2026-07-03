@@ -1,6 +1,6 @@
 ﻿//{{NO_DEPENDENCIES}}
-// Microsoft Visual C++ generated include file.
-// Used by HSglTFExporter.rc
+// Microsoft Visual C++ で生成されたインクルード ファイル。
+// HSglTFExporter.rc で使用
 //
 #define IDS_LIBDESCRIPTION              1
 #define IDS_CATEGORY                    2
@@ -14,12 +14,15 @@
 #define IDC_CLOSEBUTTON                 1000
 #define IDC_WM_CHK                      1000
 #define IDC_DRACO_CHECK                 1004
+#define IDC_MESHOP_CHECK                1006
 #define IDC_FTYPE_RADIO1                1015
 #define IDC_FTYPE_RADIO2                1016
 #define IDC_FTYPE_RADIO3                1017
 #define IDC_INSTANCE_CHK                1018
 #define IDC_EXPSHAPE_CHK                1019
 #define IDC_RENDERSHAPE_CHK             1020
+#define IDC_EXPSHAPE_CHK2               1020
+#define IDC_QUANT_CHK                   1020
 #define IDC_LICENSE_EDIT                1021
 #define IDC_EXPORTTAN_CHK               1021
 #define IDC_LICENSE_STATIC              1022
@@ -65,6 +68,8 @@
 #define IDC_INTERACT_COMBO              1058
 #define IDC_CAMERA_COMBO                1059
 #define IDC_PROGRESS1                   1060
+#define IDC_STATIC_INT1                 1061
+#define IDC_STATIC_INT2                 1062
 #define IDC_COPYIMAGE_CHECK             1100
 #define IDC_EDIT                        1490
 #define IDC_SPIN                        1496
@@ -75,7 +80,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        106
 #define _APS_NEXT_COMMAND_VALUE         40001
-#define _APS_NEXT_CONTROL_VALUE         1061
+#define _APS_NEXT_CONTROL_VALUE         1063
 #define _APS_NEXT_SYMED_VALUE           1051
 #endif
 #endif

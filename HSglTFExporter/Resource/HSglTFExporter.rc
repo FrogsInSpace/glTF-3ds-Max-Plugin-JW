@@ -15,7 +15,36 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// English (United States) resources
+// 日本語 (日本) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_JPN)
+LANGUAGE LANG_JAPANESE, SUBLANG_DEFAULT
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#include ""winres.h""\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+#endif    // 日本語 (日本) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
+// 英語 (米国) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
@@ -46,54 +75,55 @@ BEGIN
     CONTROL         "gltf + bin",IDC_FTYPE_RADIO1,"Button",BS_AUTORADIOBUTTON,25,16,50,10
     CONTROL         "Embed gllf",IDC_FTYPE_RADIO2,"Button",BS_AUTORADIOBUTTON,25,27,50,10
     CONTROL         "glb",IDC_FTYPE_RADIO3,"Button",BS_AUTORADIOBUTTON,25,38,50,10
-    GROUPBOX        "Object",IDC_STATIC,118,7,133,90,WS_GROUP
-    CONTROL         "Keep Instance structure",IDC_INSTANCE_CHK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,127,16,92,11
-    CONTROL         "EXT_mesh_gpu_instancing",IDC_GPUINSTNCE_CHK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,135,27,97,9
-    CONTROL         "Export Tangents",IDC_EXPORTTAN_CHK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,127,39,100,11
-    CONTROL         "WireColor To Mtl",IDC_WCLRMTL_CHK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,127,50,100,11
-    CONTROL         "Export Spline Object",IDC_EXPSHAPE_CHK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,127,61,92,11
-    CONTROL         "Export User Prop",IDC_EXPORTUPROP_CHK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,127,72,100,11
+    GROUPBOX        "Object",IDC_STATIC,118,7,133,92,WS_GROUP
+    CONTROL         "Keep Instance structure",IDC_INSTANCE_CHK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,127,15,92,11
+    CONTROL         "EXT_mesh_gpu_instancing",IDC_GPUINSTNCE_CHK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,135,26,97,9
+    CONTROL         "Export Tangents",IDC_EXPORTTAN_CHK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,127,35,100,11
+    CONTROL         "WireColor To Mtl",IDC_WCLRMTL_CHK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,127,45,100,11
+    CONTROL         "Export Spline Object",IDC_EXPSHAPE_CHK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,127,55,92,11
+    CONTROL         "Export User Prop",IDC_EXPORTUPROP_CHK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,127,64,100,11
     GROUPBOX        "Animation",IDC_STATIC,7,63,107,55
     CONTROL         "Export",IDC_ANIM_CHK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,72,44,9
     CONTROL         "Bake Anim (FullFrame)",IDC_FULLFRAME_CHK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,19,82,93,9
     CONTROL         "KHR_animation_pointer",IDC_ANIMPTR_CHK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,19,92,91,10
     GROUPBOX        "Morph Target",IDC_STATIC,7,118,107,22
     CONTROL         "Export Normal(Slow)",IDC_MORPHNRM_CHK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,17,127,86,11
-    GROUPBOX        "Metal/Rough/Occ Map",IDC_STATIC,118,100,133,96
-    CONTROL         "Use original map",IDC_MRO_RADIO1,"Button",BS_AUTORADIOBUTTON,127,110,80,11
-    CONTROL         "Build Mtl/Rgh/Occ map",IDC_MRO_RADIO2,"Button",BS_AUTORADIOBUTTON,127,121,114,11
-    CONTROL         "Build Mtl/Rgh + Occ map",IDC_MRO_RADIO3,"Button",BS_AUTORADIOBUTTON,127,132,111,11
-    LTEXT           "Size:",IDC_SIZE_STATIC,137,146,20,8
-    COMBOBOX        IDC_SIZE_LIST,159,143,84,52,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    LTEXT           "Type:",IDC_TYPE_STATIC,138,160,16,8
-    COMBOBOX        IDC_TYPE_LIST,159,159,45,52,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    PUSHBUTTON      "Setting...",IDC_IMGSET_BTN,207,158,36,15,NOT WS_VISIBLE
+    GROUPBOX        "Metal/Rough/Occ Map",IDC_STATIC,118,98,133,70
+    CONTROL         "Use original map",IDC_MRO_RADIO1,"Button",BS_AUTORADIOBUTTON,127,107,80,11
+    CONTROL         "Build Mtl/Rgh/Occ map",IDC_MRO_RADIO2,"Button",BS_AUTORADIOBUTTON,127,117,114,11
+    CONTROL         "Build Mtl/Rgh + Occ map",IDC_MRO_RADIO3,"Button",BS_AUTORADIOBUTTON,127,127,111,11
+    LTEXT           "Size:",IDC_SIZE_STATIC,137,138,20,8
+    COMBOBOX        IDC_SIZE_LIST,159,135,84,52,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "Type:",IDC_TYPE_STATIC,138,152,16,8
+    COMBOBOX        IDC_TYPE_LIST,159,151,45,52,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "Setting...",IDC_IMGSET_BTN,207,150,36,15,NOT WS_VISIBLE
     GROUPBOX        "Multi Scenes",IDC_STATIC,11,143,111,50,WS_GROUP
     CONTROL         "Single Scene",IDC_SCENE_RADIO1,"Button",BS_AUTORADIOBUTTON,15,152,57,11
     CONTROL         "Scenes by Layer",IDC_SCENE_RADIO2,"Button",BS_AUTORADIOBUTTON,15,163,69,11
     CONTROL         "Scenes by XRef",IDC_SCENE_RADIO3,"Button",BS_AUTORADIOBUTTON,15,173,67,11
     LTEXT           "Default:",IDC_DEFSCN_STATIC,22,185,27,8
     COMBOBOX        IDC_DEF_SCENE,49,183,53,52,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    GROUPBOX        "Physics/collision",IDC_STATIC,118,175,132,23
-    CONTROL         "Enabled",IDC_DRACO_CHECK,"Button",BS_AUTOCHECKBOX | WS_GROUP | WS_TABSTOP,129,205,49,11
-    LTEXT           "Encode Level:",IDC_STATIC,173,206,47,11,NOT WS_VISIBLE
-    CONTROL         "",IDC_EDIT,"CustEdit",NOT WS_VISIBLE | WS_TABSTOP,221,205,22,10
-    CONTROL         "",IDC_SPIN,"SpinnerControl",NOT WS_VISIBLE,244,205,7,10
-    CONTROL         "Copy Image Files to gltf Folder",IDC_COPYIMAGE_CHECK,
-                    "Button",BS_AUTOCHECKBOX | NOT WS_VISIBLE | WS_TABSTOP,129,232,119,8
-    CONTROL         "w/Mtl",IDC_WM_CHK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,220,16,30,13
-    CONTROL         "ResetXForm To Mirror Obj",IDC_RESETXFORM_CHK,"Button",BS_AUTOCHECKBOX | NOT WS_VISIBLE | WS_TABSTOP,127,83,100,11
+    GROUPBOX        "Physics/collision",IDC_STATIC,118,167,132,20
+    CONTROL         "Enabled",IDC_DRACO_CHECK,"Button",BS_AUTOCHECKBOX | WS_GROUP | WS_TABSTOP,129,197,49,11
+    LTEXT           "Encode Level:",IDC_STATIC,173,197,47,11,NOT WS_VISIBLE
+    CONTROL         "",IDC_EDIT,"CustEdit",NOT WS_VISIBLE | WS_TABSTOP,221,196,22,10
+    CONTROL         "",IDC_SPIN,"SpinnerControl",NOT WS_VISIBLE,244,184,7,10
+    CONTROL         "w/Mtl",IDC_WM_CHK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,220,15,30,13
+    CONTROL         "ResetXForm To Mirror Obj",IDC_RESETXFORM_CHK,"Button",BS_AUTOCHECKBOX | NOT WS_VISIBLE | WS_TABSTOP,127,84,100,11
     CONTROL         "Apply scale with system unit",IDC_SCL_CHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,51,102,10
-    CONTROL         "Reference",IDC_REFERENCE_CHK,"Button",BS_AUTOCHECKBOX | NOT WS_VISIBLE | WS_TABSTOP,129,223,81,8
-    CONTROL         "Enabled",IDC_PHYSQ_CHK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,129,183,41,10
+    CONTROL         "Reference",IDC_REFERENCE_CHK,"Button",BS_AUTOCHECKBOX | NOT WS_VISIBLE | WS_TABSTOP,129,235,81,8
+    CONTROL         "Enabled",IDC_PHYSQ_CHK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,129,176,41,10
     CONTROL         "Export",IDC_INTERACT_CHK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,208,37,10
     COMBOBOX        IDC_INTERACT_COMBO,47,219,53,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     GROUPBOX        "Interactivity",IDC_STATIC,4,199,114,47
-    LTEXT           "Default:",IDC_STATIC,18,221,27,8
-    LTEXT           "Camera:",IDC_STATIC,16,233,28,8
+    LTEXT           "Default:",IDC_STATIC_INT1,18,221,27,8
+    LTEXT           "Camera:",IDC_STATIC_INT2,16,233,28,8
     COMBOBOX        IDC_CAMERA_COMBO,47,234,53,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    GROUPBOX        "Draco Compress",IDC_STATIC,119,197,132,23
+    GROUPBOX        "Draco Compress",IDC_STATIC,119,189,132,19
     CONTROL         "CUBICSPLINE(Translate)",IDC_CUBICSPLINE_CHK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,19,102,91,10
+    CONTROL         "Enabled",IDC_MESHOP_CHECK,"Button",BS_AUTOCHECKBOX | NOT WS_VISIBLE | WS_GROUP | WS_TABSTOP,128,219,49,11
+    GROUPBOX        "EXT_meshopt_compression",IDC_STATIC,118,210,132,19,NOT WS_VISIBLE
+    CONTROL         "KHR_mesh_quantization",IDC_QUANT_CHK,"Button",BS_AUTOCHECKBOX | NOT WS_VISIBLE | WS_TABSTOP,127,74,92,11
 END
 
 IDD_MAIN_DIALOG DIALOGEX 0, 0, 257, 321
@@ -122,7 +152,6 @@ BEGIN
 
     IDD_EXPORT_DIALOG, DIALOG
     BEGIN
-        BOTTOMMARGIN, 243
     END
 
     IDD_MAIN_DIALOG, DIALOG
@@ -192,7 +221,7 @@ BEGIN
     IDS_CLASS_NAME2         "HSglTF2Exporter"
 END
 
-#endif    // English (United States) resources
+#endif    // 英語 (米国) resources
 /////////////////////////////////////////////////////////////////////////////
 
 
