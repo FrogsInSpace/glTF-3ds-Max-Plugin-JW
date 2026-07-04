@@ -152,7 +152,6 @@ void glTFExporter_Core::ExCreateMeshData(INode* pNode, tinygltf::Node& node)
 	BezierShape* pShape = NULL;
 
 	vertPropFlag propFlag;
-
 	//------------------------------------------
 	//------------------------------------------
 	{
@@ -255,6 +254,7 @@ void glTFExporter_Core::ExCreateMeshData(INode* pNode, tinygltf::Node& node)
 	}
 	propFlag.mapCh1Used = MapUsed(pMtl) && pMesh->mapSupport(1);
 	propFlag.mapCh2Used = MapUsed(pMtl) && pMesh->mapSupport(2);
+
 	propFlag.VColorUsed = pNode->GetCVertMode() && pMesh->Map(0).tv;
 
 	Matrix3 TangentTM;
@@ -553,9 +553,10 @@ void glTFExporter_Core::ExCreateMeshData(INode* pNode, tinygltf::Node& node)
 
 				MeshMap* pMap = &pMesh->Map(mapCh);
 				UVVert* pSrcUV = pMap->tv;
-				TVFace* pTVFace = pMesh->mapFaces(mapCh);
+				TVFace* pTVFace = pMap->tf;// pMesh->mapFaces(mapCh);
 				//Point3 minUV = *pSrcUV * Point3(1.0f, -1.0f, 0.0f);
 				//Point3 maxUV = *pSrcUV * Point3(1.0f, -1.0f, 0.0f);
+
 				Point3 minUV = pSrcUV[pTVFace[faceIDTable[0]].t[0]];
 				minUV.y = 1.0f - minUV.y;
 				Point3 maxUV = minUV;

@@ -576,6 +576,9 @@ INode* glTFImporter_Core::CreateMaxNode(cgltf_node* node, INode* pParent)
 
 		size_t tex1Num = texCoord1List.size() / 2;
 		if (NewMesh.mapSupport(1)&& tex1Num==0) {
+			NewMesh.setNumMapVerts(1, VertOffset, TRUE);
+			NewMesh.setNumMapFaces(1, FaceOffset, TRUE);
+
 			//tex1Num=VertNum;
 			/*
 			NewMesh.setNumMapVerts(1, VertNum + VertOffset, TRUE);
@@ -634,7 +637,7 @@ INode* glTFImporter_Core::CreateMaxNode(cgltf_node* node, INode* pParent)
 		// Vertex UV2 settings
 		std::vector<float> texCoord2List;
 		if (mc) {
-			//DracoTest(mc->buffer_view, texCoord2List, DracoDecodeType::TEX_COORD);
+			DracoDecodeProc(mc->buffer_view, pr, texCoord2List, DracoDecodeType::TEX_COORD, 1);
 		}
 		else {
 			cgltf_accessor* acc = findAttrAccessor(pr, "TEXCOORD_1");
@@ -642,7 +645,11 @@ INode* glTFImporter_Core::CreateMaxNode(cgltf_node* node, INode* pParent)
 			GetDataList(texCoord2List, acc);
 		}
 		size_t tex2Num = texCoord2List.size() / 2;
-		if (tex2Num > 0) {
+		if (NewMesh.mapSupport(2) && tex2Num == 0) {
+			NewMesh.setNumMapVerts(2, VertOffset, TRUE);
+			NewMesh.setNumMapFaces(2, FaceOffset, TRUE);
+		}
+		else if (tex2Num > 0) {
 			//NewMesh.setMapSupport(2, TRUE);
 			NewMesh.setNumMapVerts(2, (int)(VertNum + VertOffset), TRUE);
 			NewMesh.setNumMapFaces(2, (int)(FaceNum + FaceOffset), TRUE);

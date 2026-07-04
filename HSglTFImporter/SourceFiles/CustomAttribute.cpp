@@ -20,6 +20,8 @@
 #include "HSglTFImporter.h"
 #include "jsmn.h"
 
+#include <maxscript/util/listener.h>
+
 #define USE_REFACTORED_CREATEPARAMTABLE
 
 bool isNumber(const char* str)
@@ -389,135 +391,154 @@ void glTFImporter_Core::SetUserPropParam(INode *pNode, std::vector<custAttrParam
 //======================================================================
 Class_ID glTFImporter_Core::AttachCustAttr(Animatable* pAnim, std::vector<custAttrParam>& attrTbl, tstring AttrName)
 {
-	Class_ID ret(0, 0);
+	Class_ID ret(0,0);
+	if(attrTbl.empty()) return ret;
 
-	if (attrTbl.size() == 0) return ret;
+	const bool hasName = AttrName.size() > 1;
+	const TSTR nn = hasName ? TSTR(AttrName.c_str()) : _T("Custom_Attributes");
 
 	TSTR ComStr;
-	ComStr = _T("CAT_DEF = attributes Custom_Attributes\nversion:0\n(\nParameters main rollout:params \n(\n");
+	ComStr = _T("CAT_DEF = attributes Custom_Attributes\nversion:0\n(\nparameters main rollout:params\n(\n");
 
-	TSTR nn = _T("Custom_Attributes");
-	if (AttrName.size() > 1) {
-		nn = TSTR(AttrName.c_str());
-		TSTR SubStr = _T("");
-		SubStr.printf(_T("'ExtensionName' Type:#string Default:\"%s\"\n"), AttrName.c_str());
-		ComStr += SubStr;
-	}
+	TSTR paramBlock, rolloutBlock;
 
-	for (auto param : attrTbl) {
-		TSTR SubStr = _T("");
-		TSTR name(StringToWString(param.name.c_str()).c_str());
-		switch (param.type) {
-		case TYPE_BOOL:
-			if(param.iParam)
-				SubStr.printf(_T("'%s' Type:#boolean UI:'%s' Default:true\n"), name, name);
-			else
-				SubStr.printf(_T("'%s' Type:#boolean UI:'%s' Default:false\n"), name, name);
-			break;
-		case TYPE_INT:
-			SubStr.printf(_T("'%s' Type:#integer UI:'%s' Default:%d\n"), name, name, param.iParam);
-			break;
-		case TYPE_DWORD:
-			SubStr.printf(_T("'%s' Type:#integer UI:'%s' Default:%dL\n"), name, name, param.iParam);
-			break;
-		case TYPE_FLOAT:
-			SubStr.printf(_T("'%s' Type:#float UI:'%s' Default:%f\n"), name, name, param.fParam);
-			break;
-		case TYPE_RGBA:
-			SubStr.printf(_T("'%s' Type:#rgb UI:'%s' Default:(color %d %d %d) align:#center\n"), name, name, UINT(255.0f * param.cParam.r), UINT(255.0f * param.cParam.g), UINT(255.0f * param.cParam.b));
-			break;
-		case TYPE_STRING:
-			if(param.inVisible)
-				SubStr.printf(_T("'%s' Type:#string Default:@\"%s\"\n"), name, StringToWString(param.sParam.c_str()).c_str());
-			else
-				SubStr.printf(_T("'%s' Type:#string UI:'%s' Default:@\"%s\"\n"), name, name, StringToWString(param.sParam.c_str()).c_str());
-			break;
-		case TYPE_TEXMAP:
-			SubStr.printf(_T("'%s' Type:#texturemap UI:'%s' \n"), name, name);
-			break;
+	for(const auto& param : attrTbl)
+	{
+		const TSTR name(StringToWString(param.name.c_str()).c_str());
+
+		switch(param.type)
+		{
+			case TYPE_BOOL:
+				paramBlock.printf(_T("'%s' Type:#boolean UI:'%s' Default:%s\n"),
+					name, name, param.iParam ? _T("true") : _T("false"));
+
+				rolloutBlock.printf(_T("checkbox '%s' \"%s\" Width:160 Height:16 Align:#center\n"),
+					name, name);
+				break;
+
+			case TYPE_INT:
+				paramBlock.printf(_T("'%s' Type:#integer UI:'%s' Default:%d\n"),
+					name, name, param.iParam);
+
+				rolloutBlock.printf(_T("spinner '%s' \"%s\" Width:160 Height:16 Align:#center Type:#integer Range:[%d,%d,%d]\n"),
+					name, name, param.iminParam, param.imaxParam, param.iParam);
+				break;
+
+			case TYPE_DWORD:
+				paramBlock.printf(_T("'%s' Type:#integer UI:'%s' Default:%dL\n"),
+					name, name, param.iParam);
+
+				rolloutBlock.printf(_T("edittext '%s' \"%s\" Width:160 Height:16 Align:#center Type:#integer\n"),
+					name, name);
+				break;
+
+			case TYPE_FLOAT:
+				paramBlock.printf(_T("'%s' Type:#float UI:'%s' Default:%f\n"),
+					name, name, param.fParam);
+
+				rolloutBlock.printf(_T("spinner '%s' \"%s\" Width:160 Height:16 Align:#center Type:#float Range:[%f,%f,%f]\n"),
+					name, name, param.fminParam, param.fmaxParam, param.fParam);
+				break;
+
+			case TYPE_RGBA:
+				paramBlock.printf(_T("'%s' Type:#rgb UI:'%s' Default:(color %d %d %d)\n"),
+					name, name,
+					(int)(255.f*param.cParam.r),
+					(int)(255.f*param.cParam.g),
+					(int)(255.f*param.cParam.b));
+
+				rolloutBlock.printf(_T("colorPicker '%s' \"%s\" Width:160 Height:25 Align:#center Color:(color %d %d %d)\n"),
+					name, name,
+					(int)(255.f*param.cParam.r),
+					(int)(255.f*param.cParam.g),
+					(int)(255.f*param.cParam.b));
+				break;
+
+			case TYPE_STRING:
+			{
+				const TSTR val(StringToWString(param.sParam.c_str()).c_str());
+
+				if(param.inVisible)
+					paramBlock.printf(_T("'%s' Type:#string Default:@\"%s\"\n"),
+						name, val);
+				else
+					paramBlock.printf(_T("'%s' Type:#string UI:'%s' Default:@\"%s\"\n"),
+						name, name, val);
+
+				if(!param.inVisible)
+					rolloutBlock.printf(_T("edittext '%s' \"%s\" Width:300 Height:17 Align:#center labelOnTop:false\n"),
+						name, name);
+				break;
+			}
+
+			case TYPE_TEXMAP:
+				paramBlock.printf(_T("'%s' Type:#texturemap UI:'%s'\n"),
+					name, name);
+
+				rolloutBlock.printf(_T(
+					"label 'lb_%s' \"%s\" Width:140 Height:17 Align:#center across:2\n"
+					"mapbutton '%s' \"%s\" Width:140 Height:17 Align:#center\n"),
+					name, name, name, name);
+				break;
 		}
-		ComStr += SubStr;
 	}
 
-	TSTR SubStr = _T("");
-	SubStr.printf(_T(")\nRollout Params \"%s\"\n(\n"), nn.data());
-	ComStr += SubStr;
+	ComStr += paramBlock;
+	ComStr += _T(")\nRollout Params \"");
+	ComStr += nn;
+	ComStr += _T("\"\n(\n");
+	ComStr += rolloutBlock;
+	ComStr += _T(")\n)\n");
 
-	for (auto param : attrTbl) {
-		TSTR SubStr = _T("");
-		TSTR name(StringToWString(param.name.c_str()).c_str());
-		switch (param.type) {
-		case TYPE_BOOL:
-			SubStr.printf(_T("checkbox '%s' \"%s\" Width:160 Height:16 Align:#Center Offset:[0,0]\n"), name, name);
-			break;
-		case TYPE_INT:
-			SubStr.printf(_T("spinner '%s' \"%s\" Width:160 Height:16 Align:#Center Offset:[0,0] Type:#integer Range:[%d,%d,%d]\n"), name, name, param.iminParam, param.imaxParam, param.iParam);
-			break;
-		case TYPE_DWORD:
-			SubStr.printf(_T("edittext '%s' \"%s\" Width:160 Height:16 Align:#Center Offset:[0,0] Type:#integer\n"), name, name, param.iParam);
-			break;
-		case TYPE_FLOAT:
-			SubStr.printf(_T("spinner '%s' \"%s\" Width:160 Height:16 Align:#Center Offset:[0,0] Type:#float Range:[%f,%f,%f]\n"), name, name, param.fminParam, param.fmaxParam, param.fParam);
-			break;
-		case TYPE_RGBA:
-			SubStr.printf(_T("colorPicker '%s' \"%s\" Width:160 Height:25 Align:#Center Offset:[0,0] Type:#rgb Color:(color %d %d %d)\n"), name, name, UINT(255.0f * param.cParam.r), UINT(255.0f * param.cParam.g), UINT(255.0f * param.cParam.b));
-			break;
-		case TYPE_STRING:
-			if (!param.inVisible)
-				SubStr.printf(_T("edittext '%s' \"%s\" Width:300 Height:17 Align:#Center Offset:[0,0] Type:#string labelOnTop:false\n"), name, name);
-			break;
-		case TYPE_TEXMAP:
-			SubStr.printf(_T("label 'lb_%s' \"%s\" Width:140 Height:17 Align:#Center Offset:[0,0] labelOnTop:false across:2\n"), name, name);
-			ComStr += SubStr;
-			SubStr.printf(_T("mapbutton '%s' \"%s\" Width:140 Height:17 Align:#Center Offset:[0,0] labelOnTop:false\n"), name, name);
-			break;
-		}
-		ComStr += SubStr;
+	FPValue obj(TYPE_VALUE,&undefined);
+
+	switch(pAnim->SuperClassID())
+	{
+		case BASENODE_CLASS_ID: obj = FPValue(TYPE_INODE, pAnim); break;
+		case MATERIAL_CLASS_ID: obj = FPValue(TYPE_MTL,pAnim); break;
+		case TEXMAP_CLASS_ID:   obj = FPValue(TYPE_TEXMAP,pAnim); break;
 	}
 
-	FPValue CurrentCustAttrObj = FPValue(TYPE_VALUE, &undefined);
-	SClass_ID cid = pAnim->SuperClassID();
-	if (pAnim->SuperClassID() == BASENODE_CLASS_ID) {
-		CurrentCustAttrObj = FPValue(TYPE_INODE, pAnim);
-		//GetCOREInterface()->SelectNode((INode*)pAnim);
-	}
-	else if (pAnim->SuperClassID() == MATERIAL_CLASS_ID) {
-		CurrentCustAttrObj = FPValue(TYPE_MTL, pAnim);
-	}
-	else if (pAnim->SuperClassID() == TEXMAP_CLASS_ID) {
-		CurrentCustAttrObj = FPValue(TYPE_TEXMAP, pAnim);
-	}
-	else {
-		CurrentCustAttrObj = FPValue(TYPE_VALUE, &undefined);
-	}
-	SetCurrentAttrObj(CurrentCustAttrObj);
-	ComStr += _T(")\n)\nCustAttributes.add (HSglTFImporter.GetCurrentAnim()) CAT_DEF\n");
+	SetCurrentAttrObj(obj);
+
+	ComStr += _T("CustAttributes.add (HSglTFImporter.GetCurrentAnim()) CAT_DEF\n");
+
+	static unsigned int caDefCounter = 0;
+	caDefCounter++;
 
 
 	FPValue fpv;
-	//mputs(ComStr);
+	BOOL mxsOk = FALSE;
+
 #if MAX_RELEASE >= 24000
-	ExecuteMAXScriptScript(ComStr, MAXScript::ScriptSource::NonEmbedded, TRUE);
-	ExecuteMAXScriptScript(_T("CAT_DEF.classid"), MAXScript::ScriptSource::NonEmbedded, TRUE, &fpv);
-#else
-	ExecuteMAXScriptScript(ComStr, TRUE);
-	ExecuteMAXScriptScript(_T("CAT_DEF.classid"), TRUE, &fpv);
+
+#ifdef _DEBUG
+	if((caDefCounter % 1000) == 0)
+	{
+		the_listener->edit_stream->printf(_T("CA count: %d\n"), caDefCounter);
+		ExecuteMAXScriptScript(_T("format \"Heap: %\\n\" (heapSize)"), MAXScript::ScriptSource::NonEmbedded, TRUE);
+	}
 #endif
 
-	if (fpv.type == TYPE_INT64_TAB) {
+
+	mxsOk = ExecuteMAXScriptScript(ComStr, MAXScript::ScriptSource::NonEmbedded, TRUE, &fpv);
+#else
+	mxsOk = ExecuteMAXScriptScript(ComStr, TRUE, &fpv);
+#endif
+
+	if(!mxsOk) {
+		the_listener->edit_stream->printf(_T("Failure creating Custom Attributes. Imported data might be incomplete...\n"));
+		return ret;
+	}
+
+	if(fpv.type == TYPE_INT64_TAB)
+	{
 		ret.SetPartA((ulong)(*fpv.i64_tab)[0]);
 		ret.SetPartB((ulong)(*fpv.i64_tab)[1]);
 	}
+
 	m_CustAttrMap[ret] = AttrName;
 
-#if 0
-	pAnim->AllocCustAttribContainer();
-	ICustAttribContainer* pContainer = pAnim->GetCustAttribContainer();
-	if(pContainer) {
-		SimpleCustAttrib* ca = new SimpleCustAttrib();
-		pContainer->InsertCustAttrib(0, ca);
-	}
-#endif
 	return ret;
 }
 
@@ -805,6 +826,7 @@ void glTFImporter_Core::CreateSheenAttr(Mtl* pMtl, cgltf_sheen* sheen, BOOL enab
 	}
 
 	Class_ID retID = AttachCustAttr(pMtl, attrTbl, _T("Sheen"));
+	if (retID == Class_ID(0, 0)) return;
 
 	ICustAttribContainer* pContainer = pMtl->GetCustAttribContainer();
 	if(pContainer) {
@@ -887,6 +909,7 @@ void glTFImporter_Core::CreateClearcoatAttr(Mtl* pMtl, cgltf_clearcoat* clearcoa
 	}
 
 	Class_ID retID = AttachCustAttr(pMtl, attrTbl, _T("Clearcoat"));
+	if (retID == Class_ID(0, 0)) return;
 
 	ICustAttribContainer* pContainer = pMtl->GetCustAttribContainer();
 	if(pContainer) {
@@ -944,6 +967,7 @@ void glTFImporter_Core::CreateTransmissionAttr(Mtl* pMtl, cgltf_transmission* tr
 
 
 	Class_ID retID = AttachCustAttr(pMtl, attrTbl, _T("Transmission"));
+	if (retID == Class_ID(0, 0)) return;
 
 	ICustAttribContainer* pContainer = pMtl->GetCustAttribContainer();
 	if(pContainer) {
@@ -1026,6 +1050,7 @@ void glTFImporter_Core::CreateAnisotropyAttr(Mtl* pMtl, cgltf_anisotropy* anisot
 
 
 	Class_ID retID = AttachCustAttr(pMtl, attrTbl, _T("Anisotropy"));
+	if (retID == Class_ID(0, 0)) return;
 
 	ICustAttribContainer* pContainer = pMtl->GetCustAttribContainer();
 	if(pContainer) {
@@ -1091,6 +1116,7 @@ void glTFImporter_Core::CreateDiffuseTransmissionAttr(Mtl* pMtl, cgltf_diffuse_t
 	}
 
 	Class_ID retID = AttachCustAttr(pMtl, attrTbl, _T("DiffuseTransmission"));
+	if (retID == Class_ID(0, 0)) return;
 
 	ICustAttribContainer* pContainer = pMtl->GetCustAttribContainer();
 	if(pContainer) {
@@ -1159,6 +1185,7 @@ void glTFImporter_Core::CreateSpecularAttr(Mtl* pMtl, cgltf_specular* specular, 
 	}
 
 	Class_ID retID = AttachCustAttr(pMtl, attrTbl, _T("Specular"));
+	if (retID == Class_ID(0, 0)) return;
 
 	ICustAttribContainer* pContainer = pMtl->GetCustAttribContainer();
 	if(pContainer) {
@@ -1260,8 +1287,6 @@ void glTFImporter_Core::CreateKTX2EncodingAttr(Texmap* pTex, const tstring& path
 
 	Class_ID retID = AttachCustAttr(pTex, attrTbl, _T("KTX2 Encode"));
 }
-
-
 
 //======================================================================
 //======================================================================
@@ -1366,7 +1391,6 @@ DWORD glTFImporter_Core::CreateInteractivityAttr(ReferenceTarget* pRef, const In
 	return str.id;
 }
 
-
 //======================================================================
 //======================================================================
 BOOL glTFImporter_Core::GetInteractivityPointerID(ReferenceTarget* pRef, DWORD &id)
@@ -1422,7 +1446,6 @@ BOOL glTFImporter_Core::RemoveInteractivityAttr(ReferenceTarget* pRef)
 
 	return FALSE;
 }
-
 
 //======================================================================
 //======================================================================

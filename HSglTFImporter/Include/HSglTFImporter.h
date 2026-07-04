@@ -305,7 +305,7 @@ extern Texmap* CreateAlphaChOSLNode(AColor col);
 extern Texmap* CreateColorMultiplyOSLNode(Texmap* pTex, Color col);
 
 extern void GetDracoMeshIndexList(cgltf_buffer_view* bufferView, std::vector<uint32_t> &tbl);
-extern void DracoDecodeProc(cgltf_buffer_view* bufferView, cgltf_primitive* primitive, std::vector<float> &tbl, DracoDecodeType type);
+extern void DracoDecodeProc(cgltf_buffer_view* bufferView, cgltf_primitive* primitive, std::vector<float> &tbl, DracoDecodeType type, UINT AttrCh=0);
 
 extern void OpenProgreessDlg(cgltf_data* m_glTF_data);
 extern void CloseProgreessDlg(void);
@@ -348,7 +348,7 @@ class glTFImporter_Core
 {
 public:
 	BOOL ImportPreProcess(const TCHAR* filename, BOOL suppressPrompts, int ver);
-	BOOL ImportScene(void);
+	BOOL ImportScene(BOOL suppressPrompts);
 
 	BOOL GetDataList(std::vector<float>& data, cgltf_accessor *acc);
 	void SetSparseData(std::vector<float>& retVal, cgltf_accessor *acc);
