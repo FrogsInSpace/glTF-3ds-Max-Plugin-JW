@@ -15,7 +15,7 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// 日本語 (日本) resources
+// Japanese (Japan) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_JPN)
 LANGUAGE LANG_JAPANESE, SUBLANG_DEFAULT
@@ -39,12 +39,12 @@ END
 
 #endif    // APSTUDIO_INVOKED
 
-#endif    // 日本語 (日本) resources
+#endif    // Japanese (Japan) resources
 /////////////////////////////////////////////////////////////////////////////
 
 
 /////////////////////////////////////////////////////////////////////////////
-// 英語 (ニュートラル) resources
+// English (Neutral) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
 LANGUAGE LANG_ENGLISH, SUBLANG_NEUTRAL
@@ -308,7 +308,7 @@ BEGIN
     IDS_CLASS_NAME2         "HSglTFTool"
 END
 
-#endif    // 英語 (ニュートラル) resources
+#endif    // English (Neutral) resources
 /////////////////////////////////////////////////////////////////////////////
 
 
