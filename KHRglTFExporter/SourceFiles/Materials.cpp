@@ -17,7 +17,7 @@
  // AUTHOR: Satoshi Hayashi 
  //***************************************************************************/
 
-#include "HSglTFExporter.h"
+#include "KHRglTFExporter.h"
 #include <gamma.h>
 
 #define MaterialSwitcherClassID		Class_ID(0x4ecd74a6, 0x0)
@@ -984,7 +984,7 @@ BOOL glTFExporter_Core::CreateVolumeTexture(tinygltf::Material& material, const 
 	col.push_back(tinygltf::Value(str.color.b));
 	if (str.color != Color(1.0f, 1.0f, 1.0f) || animated) obj.insert(std::make_pair("attenuationColor", tinygltf::Value(col)));
 	if (str.thickness != 0.0f || animated) obj.insert(std::make_pair("thicknessFactor", tinygltf::Value((str.thickness))));
-	if (str.distance < HS_FLT_MAX) {
+	if (str.distance < KHR_FLT_MAX) {
 		if (str.distance != 0.0f || animated) obj.insert(std::make_pair("attenuationDistance", tinygltf::Value(str.distance)));
 	}
 	if (obj.size() == 0) return TRUE;

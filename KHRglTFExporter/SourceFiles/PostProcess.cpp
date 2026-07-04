@@ -17,7 +17,7 @@
  // AUTHOR: Satoshi Hayashi 
  //***************************************************************************/
 
-#include "HSglTFExporter.h"
+#include "KHRglTFExporter.h"
 
 #ifdef _DEBUG_
 

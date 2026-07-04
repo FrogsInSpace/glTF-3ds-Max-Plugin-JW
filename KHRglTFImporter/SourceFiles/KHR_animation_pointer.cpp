@@ -17,7 +17,7 @@
  // AUTHOR: Satoshi Hayashi 
  //***************************************************************************/
 
-#include "HSglTFImporter.h"
+#include "KHRglTFImporter.h"
 #include "define.h"
 
 //Control* CheckIfAlreadyExist(Mtl* pMtl);

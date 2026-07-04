@@ -214,11 +214,11 @@ END
 STRINGTABLE
 BEGIN
     IDS_LIBDESCRIPTION      "glTF Exporter"
-    IDS_CATEGORY            "HS Tools"
-    IDS_CLASS_NAME          "HSglTFExporter"
+    IDS_CATEGORY            "Khronos glTF Tools"
+    IDS_CLASS_NAME          "KHRglTFExporter"
     IDS_PARAMS              "Parameters"
     IDS_SPIN                "Spin"
-    IDS_CLASS_NAME2         "HSglTF2Exporter"
+    IDS_CLASS_NAME2         "KHRglTF2Exporter"
 END
 
 #endif    // English (United States) resources

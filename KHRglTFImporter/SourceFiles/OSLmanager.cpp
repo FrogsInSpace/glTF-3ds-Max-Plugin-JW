@@ -18,13 +18,13 @@
  //***************************************************************************/
 
 
-#include "HSglTFImporter.h"
+#include "KHRglTFImporter.h"
 #include <MaxOSLInterface.h>
 #include <maxscript\maxscript.h>
 
 //----------------------------------------------------------------------
 //----------------------------------------------------------------------
-static TSTR CutOffCode = _T("shader HSFloatCutOff\n\
+static TSTR CutOffCode = _T("shader KHRFloatCutOff\n\
 [[string help = \"CutOff a float number\",\n\
 string label = \"Cut Off\",\n\
 string category = \"Math Float\"]]\n\
@@ -66,7 +66,7 @@ static TSTR FlipNormalCode = _T("shader NormalFlip\n\
 #if 0
 //----------------------------------------------------------------------
 //----------------------------------------------------------------------
-static TSTR AlphaFromTexCode = _T("shader HSglTFAlphaChannel\n\
+static TSTR AlphaFromTexCode = _T("shader KHRglTFAlphaChannel\n\
 [[string help = \"Alpha Channel\",\n\
 string label = \"Alpha Channel\",\n\
 string version = \"1.0\"]]\n\
@@ -80,7 +80,7 @@ string version = \"1.0\"]]\n\
 #endif
 //----------------------------------------------------------------------
 //----------------------------------------------------------------------
-static TSTR AlphaFromColor4 = _T("shader HSglTFAlphaChannel\n\
+static TSTR AlphaFromColor4 = _T("shader KHRglTFAlphaChannel\n\
 [[string help = \"Alpha Channel\",\n\
 string label = \"Alpha Channel\",\n\
 string version = \"1.0\"]]\n\
@@ -94,7 +94,7 @@ string version = \"1.0\"]]\n\
 
 //----------------------------------------------------------------------
 //----------------------------------------------------------------------
-static TSTR MetalRoughOccCode = _T("shader HSglTFMtlRghOccDivide\n\
+static TSTR MetalRoughOccCode = _T("shader KHRglTFMtlRghOccDivide\n\
 [[string help = \"Divide RBG Channel\",\n\
 string label = \"Divide RGB Channel\",\n\
 string version = \"1.0\"]]\n\
@@ -112,7 +112,7 @@ string version = \"1.0\"]]\n\
 
 //----------------------------------------------------------------------
 //----------------------------------------------------------------------
-static TSTR SpecGlossFilterCode = _T("shader HSglTFSpecGlossFilter\n\
+static TSTR SpecGlossFilterCode = _T("shader KHRglTFSpecGlossFilter\n\
 [[ string help = \"Marge diffuse and Specular map\",\n\
 string label = \"SpecGloss Filter\",\n\
 string category = \"Math Float\" ]]\n\
@@ -142,8 +142,8 @@ int GetOSLMapType(Texmap* pTex)
 	if (name == _T("OSLBitmap2"))		return OSL_BitmapLookUp;
 	if (name == _T("UberBitmap2"))		return OSL_UberBitmap;
 	if (name == _T("UberBitmap2b"))		return OSL_UberBitmap;
-	if (name == _T("HSFloatCutOff"))	return OSL_CutOff;
-	if (name == _T("HSglTFAlphaChannel"))	return OSL_AlphaCh;
+	if (name == _T("KHRFloatCutOff"))	return OSL_CutOff;
+	if (name == _T("KHRglTFAlphaChannel"))	return OSL_AlphaCh;
 	if (name == _T("ColorScale"))		return OSL_ColorScale;
 	if (name == _T("ColorMul"))		return OSL_ColorMultiply;
 

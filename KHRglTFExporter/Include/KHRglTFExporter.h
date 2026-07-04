@@ -73,10 +73,10 @@
 //using namespace tinygltf;
 
 
-#define HS_GLTF_EXPORTER_VER (_T("2.00"))
+#define KHR_GLTF_EXPORTER_VER (_T("2.00"))
 
-#define HSglTFExporter_CLASS_ID		Class_ID(0x38586030, 0x1b315b3e)
-#define HSglTF2Exporter_CLASS_ID	Class_ID(0x56337879, 0x5a732c12)
+#define KHRglTFExporter_CLASS_ID	Class_ID(0x38586030, 0x1b315b3e)
+#define KHRglTF2Exporter_CLASS_ID	Class_ID(0x56337879, 0x5a732c12)
 
 #define IPOS_CONTROL_CLASS_ID		Class_ID(0x118f7e02,0xffee238a)
 #define multiClassID				Class_ID(MULTI_CLASS_ID,0)
@@ -100,10 +100,10 @@
 
 #define MixTexID					Class_ID(0x230, 0x0)
 
-//#define Arnold_StandardSufaceID		Class_ID(0x7e73161f, 0x62f74b4c)
+//#define Arnold_StandardSufaceID	Class_ID(0x7e73161f, 0x62f74b4c)
 #define ArnoldNormalMapID			Class_ID(0x7e73161f, 0x461fb78c)
 #define ArnoldSwitchShaderID		Class_ID(0x7e73161f, 0xa844c228)
-//#define VRayMaterialID				Class_ID(0x37bf3f2f, 0x7034695c)
+//#define VRayMaterialID			Class_ID(0x37bf3f2f, 0x7034695c)
 #define VRayNormalMapID				Class_ID(0x71fa6e51, 0x72057c2f)
 #define VRayBitmapID				Class_ID(0x6769144b, 0x2c1017d)
 #define VRayCompTexID				Class_ID(0x20d9613e, 0x2af82b3c)
@@ -123,7 +123,7 @@
 #define OSL_ColorScale		5
 #define OSL_ColorMultiply	6
 
-#define HS_FLT_MAX      3.402823466e+37F        // max value
+#define KHR_FLT_MAX      3.402823466e+37F        // max value
 
 #define Ignore_XRefScene	-2
 
@@ -152,8 +152,8 @@ inline const MCHAR* GetCustomAttrName(CustAttrib* p)
 #define UV_ANIMATE_SCALE	0x2
 #define UV_ANIMATE_ROTATE	0x4
 
-#define InteractiveLayerName (_T("HSInteractiveGraphLayer"))
-#define InteractiveNodeName (_T("HSInteractiveGraphNode"))
+#define InteractiveLayerName (_T("KHRInteractiveGraphLayer"))
+#define InteractiveNodeName (_T("KHRInteractiveGraphNode"))
 
 enum class TargetTex {
 	BaseColorMap = 0,

@@ -17,7 +17,7 @@
  // AUTHOR: Satoshi Hayashi 
  //***************************************************************************/
 
-#include "HSglTFExporter.h"
+#include "KHRglTFExporter.h"
 #include <iInstanceMgr.h>
 
 extern Matrix3 GetOffsetTM(INode* pNode);

@@ -17,9 +17,9 @@
  // AUTHOR: Satoshi Hayashi 
  //***************************************************************************/
 
-#include "HSglTFExporter.h"
+#include "KHRglTFExporter.h"
 
-extern ClassDesc2* GetHSglTFExporterDesc();
+extern ClassDesc2* GetKHRglTFExporterDesc();
 
 HINSTANCE hInstance;
 int controlsInit = FALSE;
@@ -49,7 +49,7 @@ __declspec( dllexport ) ClassDesc* LibClassDesc(int i)
 {
 	switch(i)
 	{
-		case 0: return GetHSglTFExporterDesc();
+		case 0: return GetKHRglTFExporterDesc();
 		default: return 0;
 	}
 }

@@ -17,7 +17,7 @@
  // AUTHOR: Satoshi Hayashi 
  //***************************************************************************/
 
-#include "HSglTFExporter.h"
+#include "KHRglTFExporter.h"
 #include <lslights.h>
 
 #define ArnoldLightClassID Class_ID(0x6705f00d, 0xca131d05)

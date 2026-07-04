@@ -18,7 +18,7 @@
  //***************************************************************************/
 
 //#define BUILDING_LIBCURL
-#include "HSglTFImporter.h"
+#include "KHRglTFImporter.h"
 #include <maxscript\maxscript.h>
 #include <gamma.h>
 #include <Materials\\TextureOutput.h>
@@ -151,7 +151,7 @@ tstring glTFImporter_Core::CreateTextureFileName(cgltf_texture* tex, tstring &or
 					fname = canonicalPath.wstring();
 				}
 			}
-			catch (const std::exception& e) {
+			catch (...) {
 				fname = _T("");
 			}
 

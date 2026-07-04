@@ -17,7 +17,7 @@
  // AUTHOR: Satoshi Hayashi 
  //***************************************************************************/
 
-#include "HSglTFImporter.h"
+#include "KHRglTFImporter.h"
 
 //======================================================================
 //======================================================================
@@ -99,7 +99,7 @@ void glTFImporter_Core::SetSceneInfos(void)
 	string += _T("Generator: ");
 	string += StringToWString(asset->generator).c_str();
 	string += _T("\r\n");
-	string += _T("Importer: HSglTFImporter");
+	string += _T("Importer: KHRglTFImporter");
 	PropVar.pwszVal = (wchar_t*)string.data();
 
 	GetCOREInterface()->AddProperty(PROPSET_SUMMARYINFO, &PropSpec, &PropVar);

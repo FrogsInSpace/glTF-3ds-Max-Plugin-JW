@@ -17,7 +17,7 @@
  // AUTHOR: Satoshi Hayashi 
  //***************************************************************************/
 
-#include "HSglTFExporter.h"
+#include "KHRglTFExporter.h"
 
 #define MASSFX_RIGID_BODY		Class_ID(0xa750e, 0x6e6ba)
 #define Gravity_ClassID			Class_ID(0xe523c, 0x0)

@@ -2,8 +2,8 @@
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup Label="Globals">
     <ProjectGuid>{4DCC8EB2-9C05-48F9-B619-34A40F7D84C1}</ProjectGuid>
-    <ProjectName>HSglTFImporter</ProjectName>
-    <RootNamespace>HSglTFImporter</RootNamespace>
+    <ProjectName>KHRglTFImporter</ProjectName>
+    <RootNamespace>KHRglTFImporter</RootNamespace>
     <ConfigurationType>DynamicLibrary</ConfigurationType>
   </PropertyGroup>
   <ItemGroup Label="ProjectConfigurations">
@@ -79,7 +79,7 @@
       <PreprocessorDefinitions>_DEBUG;NOMINMAX;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <PrecompiledHeaderOutputFile>$(IntDir)HSglTFImporter.pch</PrecompiledHeaderOutputFile>
+      <PrecompiledHeaderOutputFile>$(IntDir)KHRglTFImporter.pch</PrecompiledHeaderOutputFile>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <ObjectFileName>$(IntDir)</ObjectFileName>
       <ProgramDataBaseFileName>$(IntDir)</ProgramDataBaseFileName>
@@ -104,14 +104,14 @@
       <AdditionalDependencies>odbc32.lib;odbccp32.lib;comctl32.lib;shlwapi.lib;bmm.lib;core.lib;geom.lib;gfx.lib;mesh.lib;maxutil.lib;maxscrpt.lib;gup.lib;paramblk2.lib;MNMath.lib;bonesDef.lib;assetmanagement.lib;Morpher.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <AdditionalLibraryDirectories>$(MaxSDKPath)\lib\x64\Release;$(MaxSDKPath)\samples\modifiers\morpher\Lib\x64\Release;..\3rd_Party_Products</AdditionalLibraryDirectories>
-      <ModuleDefinitionFile>.\SourceFiles\HSglTFImporter.def</ModuleDefinitionFile>
+      <ModuleDefinitionFile>.\SourceFiles\KHRglTFImporter.def</ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>$(OutDir)$(TargetName).pdb</ProgramDatabaseFile>
       <SubSystem>Windows</SubSystem>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <DataExecutionPrevention>
       </DataExecutionPrevention>
-      <ImportLibrary>$(IntDir)HSglTFImporter.lib</ImportLibrary>
+      <ImportLibrary>$(IntDir)KHRglTFImporter.lib</ImportLibrary>
       <TargetMachine>MachineX64</TargetMachine>
     </Link>
     <PostBuildEvent>
@@ -138,7 +138,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <PrecompiledHeader>
       </PrecompiledHeader>
-      <PrecompiledHeaderOutputFile>$(IntDir)HSglTFImporter.pch</PrecompiledHeaderOutputFile>
+      <PrecompiledHeaderOutputFile>$(IntDir)KHRglTFImporter.pch</PrecompiledHeaderOutputFile>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <ObjectFileName>$(IntDir)</ObjectFileName>
       <ProgramDataBaseFileName>$(IntDir)</ProgramDataBaseFileName>
@@ -157,14 +157,14 @@
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <AdditionalLibraryDirectories>$(MaxSDKPath)\lib\x64\Release;$(MaxSDKPath)\samples\modifiers\morpher\Lib\x64\Release;..\3rd_Party_Products</AdditionalLibraryDirectories>
-      <ModuleDefinitionFile>.\SourceFiles\HSglTFImporter.def</ModuleDefinitionFile>
-      <ProgramDatabaseFile>$(IntDir)HSglTFImporter.pdb</ProgramDatabaseFile>
+      <ModuleDefinitionFile>.\SourceFiles\KHRglTFImporter.def</ModuleDefinitionFile>
+      <ProgramDatabaseFile>$(IntDir)KHRglTFImporter.pdb</ProgramDatabaseFile>
       <SubSystem>Windows</SubSystem>
       <SetChecksum>true</SetChecksum>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <DataExecutionPrevention>
       </DataExecutionPrevention>
-      <ImportLibrary>$(IntDir)HSglTFImporter.lib</ImportLibrary>
+      <ImportLibrary>$(IntDir)KHRglTFImporter.lib</ImportLibrary>
       <TargetMachine>MachineX64</TargetMachine>
     </Link>
     <PostBuildEvent>
@@ -181,8 +181,8 @@
     <ClCompile Include="SourceFiles\DracoDecode.cpp" />
     <ClCompile Include="SourceFiles\glTFMaterial.cpp" />
     <ClCompile Include="SourceFiles\gltfx_reference.cpp" />
-    <ClCompile Include="SourceFiles\HSglTFImporter.cpp" />
-    <ClCompile Include="SourceFiles\HSglTFTool.cpp" />
+    <ClCompile Include="SourceFiles\KHRglTFImporter.cpp" />
+    <ClCompile Include="SourceFiles\KHRglTFTool.cpp" />
     <ClCompile Include="SourceFiles\KHR_animation_pointer.cpp" />
     <ClCompile Include="SourceFiles\KHR_collision_shapes.cpp" />
     <ClCompile Include="SourceFiles\KTX2Reader.cpp" />
@@ -205,14 +205,14 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Include\define.h" />
-    <ClInclude Include="Include\HSglTFImporter.h" />
+    <ClInclude Include="Include\KHRglTFImporter.h" />
     <ClInclude Include="Resource\resource.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="SourceFiles\HSglTFImporter.def" />
+    <None Include="SourceFiles\KHRglTFImporter.def" />
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="Resource\HSglTFImporter.rc" />
+    <ResourceCompile Include="Resource\KHRglTFImporter.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)/Microsoft.Cpp.targets" />
 </Project>

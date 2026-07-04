@@ -18,7 +18,7 @@
  //***************************************************************************/
 
 
-#include "HSglTFExporter.h"
+#include "KHRglTFExporter.h"
 #include <ilayer.h>
 #include <CS\BIPEXP.H>
 #include <CATAPI\CATClassID.H>

@@ -18,7 +18,7 @@
  //***************************************************************************/
 
 
-#include "HSglTFImporter.h"
+#include "KHRglTFImporter.h"
 #include <iEditNormals.h>
 #include <MeshNormalSpec.h>
 #include <iMaterialViewportShading.h>

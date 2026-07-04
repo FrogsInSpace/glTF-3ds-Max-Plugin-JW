@@ -26,7 +26,7 @@
 
 //#define USE_REFACTORED_SETSPARSEDATA
 
-#include "HSglTFImporter.h"
+#include "KHRglTFImporter.h"
 #include <IMaterialViewportShading.h>
 #include <shlwapi.h>
 #include <ilayermanager.h>
@@ -135,12 +135,12 @@ void SetSparseData(std::vector<float>& dataList, cgltf_accessor& acc);
 
 
 #if 0
-class HSglTF2Importer : public SceneImport
+class KHRglTF2Importer : public SceneImport
 {
 public:
 	//Constructor/Destructor
-	HSglTF2Importer();
-	virtual ~HSglTF2Importer();
+	KHRglTF2Importer();
+	virtual ~KHRglTF2Importer();
 
 	virtual int			ExtCount();					// Number of extensions supported
 	virtual const TCHAR* Ext(int n);					// Extension #n (i.e. "3DS")
@@ -155,26 +155,26 @@ public:
 	virtual int				DoImport(const TCHAR* name, ImpInterface* i, Interface* gi, BOOL suppressPrompts = FALSE);	// Import file
 
 };
-class HSglTF2ImporterClassDesc : public ClassDesc2
+class KHRglTF2ImporterClassDesc : public ClassDesc2
 {
 public:
 	virtual int           IsPublic() override { return TRUE; }
-	virtual void* Create(BOOL /*loading = FALSE*/) override { return new HSglTF2Importer(); }
+	virtual void* Create(BOOL /*loading = FALSE*/) override { return new KHRglTF2Importer(); }
 	virtual const TCHAR* ClassName() override { return GetString(IDS_CLASS_NAME2); }
 	virtual SClass_ID     SuperClassID() override { return SCENE_IMPORT_CLASS_ID; }
-	virtual Class_ID      ClassID() override { return HSglTF2Importer_CLASS_ID; }
+	virtual Class_ID      ClassID() override { return KHRglTF2Importer_CLASS_ID; }
 	virtual const TCHAR* Category() override { return GetString(IDS_CATEGORY); }
 
-	virtual const TCHAR* InternalName() override { return _T("HSglTF2Importer"); } // Returns fixed parsable name (scripter-visible name)
+	virtual const TCHAR* InternalName() override { return _T("KHRglTF2Importer"); } // Returns fixed parsable name (scripter-visible name)
 	virtual HINSTANCE     HInstance() override { return hInstance; } // Returns owning module handle
 #if MAX_RELEASE>=24000
 	const wchar_t* ClassDesc::NonLocalizedClassName(void) { return GetString(IDS_CLASS_NAME2); }
 #endif
 };
-ClassDesc2* GetHSglTF2ImporterDesc()
+ClassDesc2* GetKHRglTF2ImporterDesc()
 {
-	static HSglTF2ImporterClassDesc HSglTF2ImporterDesc;
-	return &HSglTF2ImporterDesc;
+	static KHRglTF2ImporterClassDesc KHRglTF2ImporterDesc;
+	return &KHRglTF2ImporterDesc;
 }
 #endif
 
@@ -212,12 +212,12 @@ BOOL ISFlatHierarchy(void) {	return HH_FlatHierarchy;}
 //======================================================================
 // Define Importer class
 //======================================================================
-class HSglTFImporter : public SceneImport
+class KHRglTFImporter : public SceneImport
 {
 public:
 	//Constructor/Destructor
-	HSglTFImporter();
-	virtual ~HSglTFImporter();
+	KHRglTFImporter();
+	virtual ~KHRglTFImporter();
 
 	virtual int				ExtCount();					// Number of extensions supported
 	virtual const TCHAR *	Ext(int n);					// Extension #n (i.e. "3DS")
@@ -235,26 +235,26 @@ public:
 //======================================================================
 // Plugin descriptor
 //======================================================================
-class HSglTFImporterClassDesc : public ClassDesc2 
+class KHRglTFImporterClassDesc : public ClassDesc2 
 {
 public:
 	virtual int           IsPublic() override                       { return TRUE; }
-	virtual void*         Create(BOOL /*loading = FALSE*/) override { return new HSglTFImporter(); }
+	virtual void*         Create(BOOL /*loading = FALSE*/) override { return new KHRglTFImporter(); }
 	virtual const TCHAR * ClassName() override                      { return GetString(IDS_CLASS_NAME); }
 	virtual SClass_ID     SuperClassID() override                   { return SCENE_IMPORT_CLASS_ID; }
-	virtual Class_ID      ClassID() override                        { return HSglTFImporter_CLASS_ID; }
+	virtual Class_ID      ClassID() override                        { return KHRglTFImporter_CLASS_ID; }
 	virtual const TCHAR*  Category() override                       { return GetString(IDS_CATEGORY); }
 
-	virtual const TCHAR*  InternalName() override                   { return _T("HSglTFImporter"); } // Returns fixed parsable name (scripter-visible name)
+	virtual const TCHAR*  InternalName() override                   { return _T("KHRglTFImporter"); } // Returns fixed parsable name (scripter-visible name)
 	virtual HINSTANCE     HInstance() override                      { return hInstance; } // Returns owning module handle
 #if MAX_RELEASE>=24000
 	const wchar_t *ClassDesc::NonLocalizedClassName(void) { return GetString(IDS_CLASS_NAME); }
 #endif
 };
-ClassDesc2* GetHSglTFImporterDesc()
+ClassDesc2* GetKHRglTFImporterDesc()
 {
-	static HSglTFImporterClassDesc HSglTFImporterDesc;
-	return &HSglTFImporterDesc;
+	static KHRglTFImporterClassDesc KHRglTFImporterDesc;
+	return &KHRglTFImporterDesc;
 }
 //======================================================================
 //======================================================================
@@ -267,7 +267,7 @@ enum {
 	fnGetObjByUniqueIDFn,
 	fnRemoveUniqueIndexFn,
 };
-class HSglTFImpExtentActions : public FPStaticInterface {
+class KHRglTFImpExtentActions : public FPStaticInterface {
 public:
 	virtual FPValue GetCurrentAnimFn(void) = 0;
 	virtual FPValue GetImportGeomArrayFn(void) = 0;
@@ -277,9 +277,9 @@ public:
 	virtual ReferenceTarget* GetObjByUniqueIDFn(DWORD) = 0;
 	virtual BOOL RemoveUniqueIndexFn(ReferenceTarget*) = 0;
 };
-class HSglTFImpExtentActionsIMP : public HSglTFImpExtentActions {
+class KHRglTFImpExtentActionsIMP : public KHRglTFImpExtentActions {
 public:
-	DECLARE_DESCRIPTOR(HSglTFImpExtentActionsIMP)
+	DECLARE_DESCRIPTOR(KHRglTFImpExtentActionsIMP)
 
 	BEGIN_FUNCTION_MAP
 	FN_0(fnIdGetCurrentAnimFn, TYPE_FPVALUE_BV, GetCurrentAnimFn);
@@ -300,7 +300,7 @@ public:
 	}
 	void SetDebugModeFn(int i) {
 		TSTR profle;
-		profle.printf(_T("%s\\%s"), GetCOREInterface()->GetDir(APP_PLUGCFG_DIR), _T("HSglTFImporter.ini"));
+		profle.printf(_T("%s\\%s"), GetCOREInterface()->GetDir(APP_PLUGCFG_DIR), _T("KHRglTFImporter.ini"));
 		if(i)
 			MaxSDK::Util::WritePrivateProfileString(_T("ImpSettings"), _T("DebugMode"), _T("1"), profle);
 		else
@@ -322,7 +322,7 @@ public:
 		return theImporterCore.RemoveInteractivityAttr(pRef);
 	}
 };
-static HSglTFImpExtentActionsIMP HSglTFImpExtentActionsFP(HSGLTFIMP_INTERFACE_ID, _T("HSglTFImp"), 0, GetHSglTFImporterDesc(), 0,
+static KHRglTFImpExtentActionsIMP KHRglTFImpExtentActionsFP(KHRGLTFIMP_INTERFACE_ID, _T("KHRglTFImp"), 0, GetKHRglTFImporterDesc(), 0,
 	fnIdGetCurrentAnimFn,		_T("GetCurrentAnim"),		0, TYPE_FPVALUE_BV, 0, 0,
 	fnIdGetImportGeomArrayFn,	_T("GetImportGeomArray"),	0, TYPE_FPVALUE_BV, 0, 0,
 	fnIdSetDebugModeFn,			_T("SetDebugMode"),			0, TYPE_VOID,		0, 1, _T("param"), 0, TYPE_INT,
@@ -332,15 +332,15 @@ static HSglTFImpExtentActionsIMP HSglTFImpExtentActionsFP(HSGLTFIMP_INTERFACE_ID
 	fnRemoveUniqueIndexFn,		_T("RemoveUniqueIndex"),	0, TYPE_BOOL,		0, 1, _T("target"), 0, TYPE_REFTARG,
 	p_end
 );
-FPInterfaceDesc* HSglTFImporter::GetDesc() { return &HSglTFImpExtentActionsFP; }
+FPInterfaceDesc* KHRglTFImporter::GetDesc() { return &KHRglTFImpExtentActionsFP; }
 
 
 //======================================================================
 // Param setting dialog CallBack
 //======================================================================
-INT_PTR CALLBACK HSglTFImporterOptionsDlgProc(HWND hWnd,UINT message,WPARAM wParam, LPARAM lParam) {
+INT_PTR CALLBACK KHRglTFImporterOptionsDlgProc(HWND hWnd,UINT message,WPARAM wParam, LPARAM lParam) {
 
-	static HSglTFImporter* imp = nullptr;
+	static KHRglTFImporter* imp = nullptr;
 	static ISpinnerControl *pSpin1;
 	static ISpinnerControl* pSpin2;
 	static ISpinnerControl* pSpin3;
@@ -351,7 +351,7 @@ INT_PTR CALLBACK HSglTFImporterOptionsDlgProc(HWND hWnd,UINT message,WPARAM wPar
 	switch(message) {
 	case WM_INITDIALOG:
 		SetWindowText(hWnd, s_TitleString.c_str());
-		imp = (HSglTFImporter *)lParam;
+		imp = (KHRglTFImporter *)lParam;
 		pSpin1 = GetISpinner(::GetDlgItem(hWnd, IDC_SPIN_SCALE));
 		pSpin1->SetLimits(0.0f, 1000.0f, TRUE);
 		pSpin1->SetAutoScale(TRUE);
@@ -600,16 +600,16 @@ INT_PTR CALLBACK HSglTFImporterOptionsDlgProc(HWND hWnd,UINT message,WPARAM wPar
 	return 0;
 }
 
-//--- HSglTFImporter -------------------------------------------------------
-HSglTFImporter::HSglTFImporter()
+//--- KHRglTFImporter -------------------------------------------------------
+KHRglTFImporter::KHRglTFImporter()
 {
 }
 
-HSglTFImporter::~HSglTFImporter() 
+KHRglTFImporter::~KHRglTFImporter() 
 {
 }
 
-int HSglTFImporter::ExtCount()
+int KHRglTFImporter::ExtCount()
 {
 #ifdef _DEBUG
 	return 3;
@@ -617,7 +617,7 @@ int HSglTFImporter::ExtCount()
 	return 2;
 }
 
-const TCHAR *HSglTFImporter::Ext(int i)
+const TCHAR *KHRglTFImporter::Ext(int i)
 {		
 	switch(i) {
 	case 0:	return _T("glTF");
@@ -627,63 +627,63 @@ const TCHAR *HSglTFImporter::Ext(int i)
 	return _T("glTF");
 }
 
-const TCHAR *HSglTFImporter::LongDesc()
+const TCHAR *KHRglTFImporter::LongDesc()
 {
 	return _T("GL Transmission Format 2.0 importer for 3dsmax");
 }
 	
-const TCHAR *HSglTFImporter::ShortDesc() 
+const TCHAR *KHRglTFImporter::ShortDesc() 
 {			
-	return _T("GL Transmission Format 2.0 (HSglTFImporter)");
+	return _T("GL Transmission Format 2.0 (KHRglTFImporter)");
 }
 
-const TCHAR *HSglTFImporter::AuthorName()
+const TCHAR *KHRglTFImporter::AuthorName()
 {			
 	return _T("Satoshi Hayashi");
 }
 
-const TCHAR *HSglTFImporter::CopyrightMessage() 
+const TCHAR *KHRglTFImporter::CopyrightMessage() 
 {	
 	return _T("Satoshi Hayashi");
 }
 
-const TCHAR *HSglTFImporter::OtherMessage1() 
+const TCHAR *KHRglTFImporter::OtherMessage1() 
 {		
 	//TODO: Return Other message #1 if any
 	return _T("");
 }
 
-const TCHAR *HSglTFImporter::OtherMessage2() 
+const TCHAR *KHRglTFImporter::OtherMessage2() 
 {		
 	//TODO: Return other message #2 in any
 	return _T("");
 }
 
-unsigned int HSglTFImporter::Version()
+unsigned int KHRglTFImporter::Version()
 {				
 	return 100;
 }
 
-void HSglTFImporter::ShowAbout(HWND /*hWnd*/)
+void KHRglTFImporter::ShowAbout(HWND /*hWnd*/)
 {			
 	// Optional
 }
 #if 0
-//--- HSglTFImporter -------------------------------------------------------
-HSglTF2Importer::HSglTF2Importer()
+//--- KHRglTFImporter -------------------------------------------------------
+KHRglTF2Importer::KHRglTF2Importer()
 {
 }
 
-HSglTF2Importer::~HSglTF2Importer()
+KHRglTF2Importer::~KHRglTF2Importer()
 {
 }
 
-int HSglTF2Importer::ExtCount()
+int KHRglTF2Importer::ExtCount()
 {
 	return 2;
 }
 
-const TCHAR *HSglTF2Importer::Ext(int i)
+const TCHAR *KHRglTF2Importer::Ext(int i)
 {
 	switch (i) {
 	case 0:	return _T("glTF");
@@ -692,48 +692,48 @@ const TCHAR *HSglTF2Importer::Ext(int i)
 	return _T("glTF");
 }
 
-const TCHAR *HSglTF2Importer::LongDesc()
+const TCHAR *KHRglTF2Importer::LongDesc()
 {
 	return _T("GL Transmission Format 2.0 importer for 3dsmax");
 }
 
-const TCHAR *HSglTF2Importer::ShortDesc()
+const TCHAR *KHRglTF2Importer::ShortDesc()
 {
 	return _T("GL Transmission Format 2.0");
 }
 
-const TCHAR *HSglTF2Importer::AuthorName()
+const TCHAR *KHRglTF2Importer::AuthorName()
 {
 	return _T("Satoshi Hayashi");
 }
 
-const TCHAR *HSglTF2Importer::CopyrightMessage()
+const TCHAR *KHRglTF2Importer::CopyrightMessage()
 {
 	return _T("(C) Satoshi Hayashi");
 }
 
-const TCHAR *HSglTF2Importer::OtherMessage1()
+const TCHAR *KHRglTF2Importer::OtherMessage1()
 {
 	//TODO: Return Other message #1 if any
 	return _T("");
 }
 
-const TCHAR *HSglTF2Importer::OtherMessage2()
+const TCHAR *KHRglTF2Importer::OtherMessage2()
 {
 	//TODO: Return other message #2 in any
 	return _T("");
 }
 
-unsigned int HSglTF2Importer::Version()
+unsigned int KHRglTF2Importer::Version()
 {
 	return 100;
 }
 
-void HSglTF2Importer::ShowAbout(HWND /*hWnd*/)
+void KHRglTF2Importer::ShowAbout(HWND /*hWnd*/)
 {
 	// Optional
 }
-int HSglTF2Importer::DoImport(const TCHAR* filename, ImpInterface* importerInt, Interface* ip, BOOL suppressPrompts)
+int KHRglTF2Importer::DoImport(const TCHAR* filename, ImpInterface* importerInt, Interface* ip, BOOL suppressPrompts)
 {
 	return theImporterCore.ImportPreProcess(filename, suppressPrompts, 2);
 }
@@ -741,7 +741,7 @@ int HSglTF2Importer::DoImport(const TCHAR* filename, ImpInterface* importerInt, 
 //======================================================================
 // Execute import
 //======================================================================
-int HSglTFImporter::DoImport(const TCHAR* filename, ImpInterface* importerInt, Interface* ip, BOOL suppressPrompts)
+int KHRglTFImporter::DoImport(const TCHAR* filename, ImpInterface* importerInt, Interface* ip, BOOL suppressPrompts)
 {
 	return theImporterCore.ImportPreProcess(filename, suppressPrompts, 1);
 }
@@ -754,7 +754,7 @@ BOOL glTFImporter_Core::ImportPreProcess(const TCHAR* filename, BOOL suppressPro
 	TCHAR buf[MAX_PATH];
 
 
-	s_TitleString = _T("HS glTF importer for 3dsmax ") + tstring(HS_GLTF_IMPORTER_VER);
+	s_TitleString = _T("Khronos glTF importer for 3dsmax ") + tstring(KHR_GLTF_IMPORTER_VER);
 
 	SubClassList* subList = GetCOREInterface()->GetDllDir().ClassDir().GetClassList(MATERIAL_CLASS_ID);
 	int idx = subList->FindClass(Arnold_StandardSufaceID);
@@ -772,7 +772,7 @@ BOOL glTFImporter_Core::ImportPreProcess(const TCHAR* filename, BOOL suppressPro
 
 
 	TSTR profle;
-	profle.printf(_T("%s\\%s"), GetCOREInterface()->GetDir(APP_PLUGCFG_DIR), _T("HSglTFImporter.ini"));
+	profle.printf(_T("%s\\%s"), GetCOREInterface()->GetDir(APP_PLUGCFG_DIR), _T("KHRglTFImporter.ini"));
 
 	HH_DebugMode = MaxSDK::Util::GetPrivateProfileInt(_T("ImpSettings"), _T("DebugMode"), 0, profle);
 
@@ -813,7 +813,7 @@ BOOL glTFImporter_Core::ImportPreProcess(const TCHAR* filename, BOOL suppressPro
 	HH_ApplyScale = MaxSDK::Util::GetPrivateProfileInt(_T("ImpSettings"), _T("ApplyScale"), 1, profle);
 
 	if (!suppressPrompts) {
-		if (DialogBoxParam(hInstance, MAKEINTRESOURCE(IDD_PANEL), GetActiveWindow(), HSglTFImporterOptionsDlgProc, (LPARAM)this) == 0) return TRUE;
+		if (DialogBoxParam(hInstance, MAKEINTRESOURCE(IDD_PANEL), GetActiveWindow(), KHRglTFImporterOptionsDlgProc, (LPARAM)this) == 0) return TRUE;
 
 		_stprintf_s(buf, MAX_PATH, _T("%d"), (int)(HH_scale*1000.0f));
 		MaxSDK::Util::WritePrivateProfileString(_T("ImpSettings"), _T("scale"), buf, profle);

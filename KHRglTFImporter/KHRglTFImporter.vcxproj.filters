@@ -10,7 +10,7 @@
     <ClCompile Include="SourceFiles\CustomAttribute.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="SourceFiles\HSglTFTool.cpp">
+    <ClCompile Include="SourceFiles\KHRglTFTool.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="SourceFiles\KHR_animation_pointer.cpp">
@@ -40,7 +40,7 @@
     <ClCompile Include="SourceFiles\ProgressDialog.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="SourceFiles\HSglTFImporter.cpp">
+    <ClCompile Include="SourceFiles\KHRglTFImporter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="SourceFiles\DllEntry.cpp">
@@ -93,7 +93,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Include\HSglTFImporter.h">
+    <ClInclude Include="Include\KHRglTFImporter.h">
       <Filter>Header</Filter>
     </ClInclude>
     <ClInclude Include="Include\define.h">
@@ -118,12 +118,12 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="Resource\HSglTFImporter.rc">
+    <ResourceCompile Include="Resource\KHRglTFImporter.rc">
       <Filter>Resource</Filter>
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="SourceFiles\HSglTFImporter.def">
+    <None Include="SourceFiles\KHRglTFImporter.def">
       <Filter>Source Files</Filter>
     </None>
   </ItemGroup>

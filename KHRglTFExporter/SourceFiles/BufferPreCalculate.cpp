@@ -1,6 +1,6 @@
 // TODO: This file appears to be redundant and not used anywhere and may be removable ?
 
-#include "HSglTFExporter.h"
+#include "KHRglTFExporter.h"
 
 
 static std::vector<Texmap*> TexmapList;

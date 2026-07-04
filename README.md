@@ -16,8 +16,8 @@ This project adds glTF™ (2.0) file access capabilities to Autodesk 3ds Max®, 
 
 This project consists of two main plug-in build projects:
 
-- **`HSglTFImporter`**: A plug-in to import glTF files into 3ds Max scenes.
-- **`HSglTFExporter`**: A plug-in to export 3ds Max scene data to glTF files.
+- **`KHRglTFImporter`**: A plug-in to import glTF files into 3ds Max scenes.
+- **`KHRglTFExporter`**: A plug-in to export 3ds Max scene data to glTF files.
 
 ---
 
@@ -83,10 +83,10 @@ The example below adds the build configuration for 3ds Max 2027 by cloning and e
 
 ---
 
-- **Solution File (`HSglTF.sln`)**
+- **Solution File (`KHRglTF.sln`)**
   Duplicate all lines containing `Max2026` and change the target to `Max2027` in the new lines.
 
-- **Project Files (`HSglTFImporter.vcxproj`, `HSglTFExporter.vcxproj`)**
+- **Project Files (`KHRglTFImporter.vcxproj`, `KHRglTFExporter.vcxproj`)**
   Duplicate the XML `<ProjectConfiguration>` elements containing `Max2026`. Update the year to `Max2027` for both the **Release** and **Hybrid** configurations.
 
 - **Property Sheets (`MaxSDKSetup.props`)**
@@ -98,8 +98,8 @@ The example below adds the build configuration for 3ds Max 2027 by cloning and e
 
 Once built, the following plug-in files are generated:
 
-1. `HSglTFImporter.dli`
-2. `HSglTFExporter.dlo`
+1. `KHRglTFImporter.dli`
+2. `KHRglTFExporter.dlo`
 
 Copy these files into the `Plugins` folder of your 3ds Max installation directory.
 

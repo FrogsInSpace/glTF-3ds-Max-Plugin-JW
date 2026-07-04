@@ -1,4 +1,4 @@
-#include "HSglTFImporter.h"
+#include "KHRglTFImporter.h"
 #include <iostream>
 #include <json/json.h>
 

@@ -53,6 +53,7 @@
 #define IDC_SETFILE_BTN                 1041
 #define IDC_IMAGEFILESTR                1042
 #define IDC_LICENSE_BTN                 1043
+#define IDC_MAT_CA_CHK                  1150
 #define IDC_RADIO1                      1044
 #define IDC_RADIO2                      1045
 #define IDC_RADIO3                      1046

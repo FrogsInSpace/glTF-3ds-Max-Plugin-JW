@@ -27,7 +27,7 @@
 #define STB_IMAGE_IMPLEMENTATION
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 
-#include "HSglTFExporter.h"
+#include "KHRglTFExporter.h"
 #include <maxscript/maxscript.h>
 #include <AssetManagement/iassetmanager.h>
 #include <AssetManagement/AssetUser.h>
@@ -161,12 +161,12 @@ inline IPoint2 GetBitmapSize(void){	return theExporterCore.m_CreateBitmapSize;}
 //======================================================================
 // Exportee class definition
 //======================================================================
-class HSglTFExporter : public SceneExport
+class KHRglTFExporter : public SceneExport
 {
 public:
 	//Constructor/Destructor
-	HSglTFExporter();
-	virtual ~HSglTFExporter();
+	KHRglTFExporter();
+	virtual ~KHRglTFExporter();
 
 	virtual int				ExtCount();					// Number of extensions supported
 	virtual const TCHAR *	Ext(int n);					// Extension #n (i.e. "3DS")
@@ -182,12 +182,12 @@ public:
 	BOOL					SupportsOptions(int ext, DWORD options) {return(options == SCENE_EXPORT_SELECTED) ? TRUE : FALSE;}
 };
 #if 0
-class HSglTF2Exporter : public SceneExport
+class KHRglTF2Exporter : public SceneExport
 {
 public:
 	//Constructor/Destructor
-	HSglTF2Exporter();
-	virtual ~HSglTF2Exporter();
+	KHRglTF2Exporter();
+	virtual ~KHRglTF2Exporter();
 
 	virtual int				ExtCount();					// Number of extensions supported
 	virtual const TCHAR *	Ext(int n);					// Extension #n (i.e. "3DS")
@@ -202,42 +202,42 @@ public:
 	virtual int				DoExport(const TCHAR *name, ExpInterface *i, Interface *gi, BOOL suppressPrompts = FALSE, DWORD  options = 0);	// Export file
 
 };
-class HSglTF2ExporterClassDesc : public ClassDesc2
+class KHRglTF2ExporterClassDesc : public ClassDesc2
 {
 public:
 	virtual int           IsPublic() override { return TRUE; }
-	virtual void*         Create(BOOL /*loading = FALSE*/) override { return new HSglTF2Exporter(); }
+	virtual void*         Create(BOOL /*loading = FALSE*/) override { return new KHRglTF2Exporter(); }
 	virtual const TCHAR* ClassName() override { return GetString(IDS_CLASS_NAME2); }
 	virtual SClass_ID     SuperClassID() override { return SCENE_EXPORT_CLASS_ID; }
-	virtual Class_ID      ClassID() override { return HSglTF2Exporter_CLASS_ID; }
+	virtual Class_ID      ClassID() override { return KHRglTF2Exporter_CLASS_ID; }
 	virtual const TCHAR* Category() override { return GetString(IDS_CATEGORY); }
 
-	virtual const TCHAR* InternalName() override { return _T("HSglTF2Exporter"); } // Returns fixed parsable name (scripter-visible name)
+	virtual const TCHAR* InternalName() override { return _T("KHRglTF2Exporter"); } // Returns fixed parsable name (scripter-visible name)
 	virtual HINSTANCE     HInstance() override { return hInstance; } // Returns owning module handle
 #if MAX_RELEASE>=24000
 	const wchar_t* ClassDesc::NonLocalizedClassName(void) { return GetString(IDS_CLASS_NAME2); }
 #endif
 };
-ClassDesc2* GetHSglTF2ExporterDesc()
+ClassDesc2* GetKHRglTF2ExporterDesc()
 {
-	static HSglTF2ExporterClassDesc HSglTF2ExporterDesc;
-	return &HSglTF2ExporterDesc;
+	static KHRglTF2ExporterClassDesc KHRglTF2ExporterDesc;
+	return &KHRglTF2ExporterDesc;
 }
-//--- HSglTFImporter -------------------------------------------------------
-HSglTF2Exporter::HSglTF2Exporter()
-{
-}
-
-HSglTF2Exporter::~HSglTF2Exporter()
+//--- KHRglTFImporter -------------------------------------------------------
+KHRglTF2Exporter::KHRglTF2Exporter()
 {
 }
 
-int HSglTF2Exporter::ExtCount()
+KHRglTF2Exporter::~KHRglTF2Exporter()
+{
+}
+
+int KHRglTF2Exporter::ExtCount()
 {
 	return 2;
 }
 
-const TCHAR* HSglTF2Exporter::Ext(int i)
+const TCHAR* KHRglTF2Exporter::Ext(int i)
 {
 	switch (i) {
 	case 0:	return _T("glTF");
@@ -245,46 +245,46 @@ const TCHAR* HSglTF2Exporter::Ext(int i)
 	}
 }
 
-const TCHAR* HSglTF2Exporter::LongDesc()
+const TCHAR* KHRglTF2Exporter::LongDesc()
 {
 	return _T("GL Transmission Format 2.0 exporter for 3dsmax");
 }
 
-const TCHAR* HSglTF2Exporter::ShortDesc()
+const TCHAR* KHRglTF2Exporter::ShortDesc()
 {
 	return _T("GL Transmission Format 2.0");
 }
 
-const TCHAR* HSglTF2Exporter::AuthorName()
+const TCHAR* KHRglTF2Exporter::AuthorName()
 {
 	return _T("Satoshi Hayashi");
 }
 
-const TCHAR* HSglTF2Exporter::CopyrightMessage()
+const TCHAR* KHRglTF2Exporter::CopyrightMessage()
 {
 	return _T("(C) Satoshi Hayashi");
 }
 
-const TCHAR* HSglTF2Exporter::OtherMessage1()
+const TCHAR* KHRglTF2Exporter::OtherMessage1()
 {
 	return _T("");
 }
 
-const TCHAR* HSglTF2Exporter::OtherMessage2()
+const TCHAR* KHRglTF2Exporter::OtherMessage2()
 {
 	return _T("");
 }
 
-unsigned int HSglTF2Exporter::Version()
+unsigned int KHRglTF2Exporter::Version()
 {
 	return 100;
 }
 
-void HSglTF2Exporter::ShowAbout(HWND /*hWnd*/)
+void KHRglTF2Exporter::ShowAbout(HWND /*hWnd*/)
 {
 	// Optional
 }
-int HSglTF2Exporter::DoExport(const TCHAR* filename, ExpInterface* exporterInt, Interface* ip, BOOL suppressPrompts, DWORD options)
+int KHRglTF2Exporter::DoExport(const TCHAR* filename, ExpInterface* exporterInt, Interface* ip, BOOL suppressPrompts, DWORD options)
 {
 	if (!IsValid()) {
 		MessageBox(GetCOREInterface()->GetMAXHWnd(), TEXT("License Expired."), TEXT("License Expired"), MB_ICONINFORMATION);;
@@ -297,26 +297,26 @@ int HSglTF2Exporter::DoExport(const TCHAR* filename, ExpInterface* exporterInt, 
 //======================================================================
 // Plugin description
 //======================================================================
-class HSglTFExporterClassDesc : public ClassDesc2 
+class KHRglTFExporterClassDesc : public ClassDesc2 
 {
 public:
 	virtual int           IsPublic() override                       { return TRUE; }
-	virtual void*         Create(BOOL /*loading = FALSE*/) override { return new HSglTFExporter(); }
+	virtual void*         Create(BOOL /*loading = FALSE*/) override { return new KHRglTFExporter(); }
 	virtual const TCHAR * ClassName() override                      { return GetString(IDS_CLASS_NAME); }
 	virtual SClass_ID     SuperClassID() override                   { return SCENE_EXPORT_CLASS_ID; }
-	virtual Class_ID      ClassID() override                        { return HSglTFExporter_CLASS_ID; }
+	virtual Class_ID      ClassID() override                        { return KHRglTFExporter_CLASS_ID; }
 	virtual const TCHAR*  Category() override                       { return GetString(IDS_CATEGORY); }
 
-	virtual const TCHAR*  InternalName() override                   { return _T("HSglTFImporter"); } // Returns fixed parsable name (scripter-visible name)
+	virtual const TCHAR*  InternalName() override                   { return _T("KHRglTFImporter"); } // Returns fixed parsable name (scripter-visible name)
 	virtual HINSTANCE     HInstance() override                      { return hInstance; } // Returns owning module handle
 #if MAX_RELEASE>=24000
 	const wchar_t *ClassDesc::NonLocalizedClassName(void) { return GetString(IDS_CLASS_NAME); }
 #endif
 };
-ClassDesc2* GetHSglTFExporterDesc()
+ClassDesc2* GetKHRglTFExporterDesc()
 {
-	static HSglTFExporterClassDesc HSglTFExporterDesc;
-	return &HSglTFExporterDesc;
+	static KHRglTFExporterClassDesc KHRglTFExporterDesc;
+	return &KHRglTFExporterDesc;
 }
 
 //======================================================================
@@ -328,9 +328,9 @@ DWORD WINAPI StatusBarFn(LPVOID arg)
 //======================================================================
 // Parameter Setting Dialog CallBack
 //======================================================================
-INT_PTR CALLBACK HSglTFRapidCompOptionsDlgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) 
+INT_PTR CALLBACK KHRglTFRapidCompOptionsDlgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) 
 {
-	static HSglTFExporter* exp = nullptr;
+	static KHRglTFExporter* exp = nullptr;
 
 	switch (message) {
 	case WM_INITDIALOG:
@@ -396,14 +396,14 @@ INT_PTR CALLBACK HSglTFRapidCompOptionsDlgProc(HWND hWnd, UINT message, WPARAM w
 //======================================================================
 // Parameter Setting Dialog CallBack
 //======================================================================
-INT_PTR CALLBACK HSglTFExporterOptionsDlgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
+INT_PTR CALLBACK KHRglTFExporterOptionsDlgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
 
-	static HSglTFExporter* exp = nullptr;
+	static KHRglTFExporter* exp = nullptr;
 	//static ISpinnerControl *pSpin;
 
 	switch (message) {
 	case WM_INITDIALOG:
-		exp = (HSglTFExporter*)lParam;
+		exp = (KHRglTFExporter*)lParam;
 
 		ShowWindow(GetDlgItem(hWnd, IDC_ANIMPTR_CHK), HH_ViewAnimPointer);
 		if (!HH_ViewAnimPointer) HH_AnimPointer = FALSE;
@@ -486,10 +486,10 @@ INT_PTR CALLBACK HSglTFExporterOptionsDlgProc(HWND hWnd, UINT message, WPARAM wP
 		CheckDlgButton(hWnd, IDC_REFERENCE_CHK, HH_ReferenceFileMode);
 
 		if (theExporterCore.m_InteractiveLayerTable.size()) {
-			tstring BaseLayerName = _T("HSInteractiveGraphLayer");
+			tstring BaseLayerName = _T("KHRInteractiveGraphLayer");
 			for (ILayer* pLayer : theExporterCore.m_InteractiveLayerTable) {
 				tstring name(pLayer->GetName().data());
-				if (name == _T("HSInteractiveGraphLayer__ExtensionNode__")) continue;
+				if (name == _T("KHRInteractiveGraphLayer__ExtensionNode__")) continue;
 				if (name.find(BaseLayerName) != std::string::npos) {
 					tstring str = name.substr(BaseLayerName.size());
 					SendMessage(GetDlgItem(hWnd, IDC_INTERACT_COMBO), CB_ADDSTRING, 0, (LPARAM)str.c_str());
@@ -612,9 +612,9 @@ INT_PTR CALLBACK HSglTFExporterOptionsDlgProc(HWND hWnd, UINT message, WPARAM wP
 //======================================================================
 // Main Dialog CallBack
 //======================================================================
-INT_PTR CALLBACK HSglTFExporterMainDlgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+INT_PTR CALLBACK KHRglTFExporterMainDlgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-	static HSglTFExporter* exp = nullptr;
+	static KHRglTFExporter* exp = nullptr;
 	static HWND hExportWnd = NULL;
 	static HWND hRapidCompWnd = NULL;
 
@@ -628,11 +628,11 @@ INT_PTR CALLBACK HSglTFExporterMainDlgProc(HWND hWnd, UINT message, WPARAM wPara
 		tabItem.pszText = const_cast<TCHAR*>(_T("Main Settings"));
 		tabItem.cchTextMax = 16;
 		TabCtrl_InsertItem(::GetDlgItem(hWnd, IDC_TAB1), 0, &tabItem);
-		hExportWnd = ::CreateDialogParam(hInstance, MAKEINTRESOURCE(IDD_EXPORT_DIALOG), hWnd, HSglTFExporterOptionsDlgProc, (LPARAM)NULL);
+		hExportWnd = ::CreateDialogParam(hInstance, MAKEINTRESOURCE(IDD_EXPORT_DIALOG), hWnd, KHRglTFExporterOptionsDlgProc, (LPARAM)NULL);
 #ifdef _DEBUG
 		tabItem.pszText = _T("Post Proc");
 		TabCtrl_InsertItem(::GetDlgItem(hWnd, IDC_TAB1), 1, &tabItem);
-		hRapidCompWnd = ::CreateDialogParam(hInstance, MAKEINTRESOURCE(IDD_RAPIDCOMP_DIALOG), hWnd, HSglTFRapidCompOptionsDlgProc, (LPARAM)NULL);
+		hRapidCompWnd = ::CreateDialogParam(hInstance, MAKEINTRESOURCE(IDD_RAPIDCOMP_DIALOG), hWnd, KHRglTFRapidCompOptionsDlgProc, (LPARAM)NULL);
 #endif
 	}
 
@@ -650,7 +650,7 @@ INT_PTR CALLBACK HSglTFExporterMainDlgProc(HWND hWnd, UINT message, WPARAM wPara
 		ShowWindow(hRapidCompWnd, SW_HIDE);
 		SetWindowText(hWnd, s_TitleString.c_str());
 
-		exp = (HSglTFExporter*)lParam;
+		exp = (KHRglTFExporter*)lParam;
 
 		ShowWindow(GetDlgItem(hWnd, IDC_LICENSE_BTN), FALSE);
 
@@ -695,21 +695,21 @@ INT_PTR CALLBACK HSglTFExporterMainDlgProc(HWND hWnd, UINT message, WPARAM wPara
 }
 
 
-//--- HSglTFImporter -------------------------------------------------------
-HSglTFExporter::HSglTFExporter()
+//--- KHRglTFImporter -------------------------------------------------------
+KHRglTFExporter::KHRglTFExporter()
 {
 }
 
-HSglTFExporter::~HSglTFExporter()
+KHRglTFExporter::~KHRglTFExporter()
 {
 }
 
-int HSglTFExporter::ExtCount()
+int KHRglTFExporter::ExtCount()
 {
 	return 2;
 }
 
-const TCHAR *HSglTFExporter::Ext(int i)
+const TCHAR *KHRglTFExporter::Ext(int i)
 {		
 	switch(i) {
 	case 0:	return _T("glTF");
@@ -719,51 +719,51 @@ const TCHAR *HSglTFExporter::Ext(int i)
 	return _T("glTF");
 }
 
-const TCHAR *HSglTFExporter::LongDesc()
+const TCHAR *KHRglTFExporter::LongDesc()
 {
-	return _T("GL Transmission Format 2.0 exporter (HSglTFExporter)");
+	return _T("GL Transmission Format 2.0 exporter (KHRglTFExporter)");
 }
 	
-const TCHAR *HSglTFExporter::ShortDesc()
+const TCHAR *KHRglTFExporter::ShortDesc()
 {			
-	return _T("GL Transmission Format 2.0 (HSglTFExporter)");
+	return _T("GL Transmission Format 2.0 (KHRglTFExporter)");
 }
 
-const TCHAR *HSglTFExporter::AuthorName()
+const TCHAR *KHRglTFExporter::AuthorName()
 {			
 	return _T("Satoshi Hayashi");
 }
 
-const TCHAR *HSglTFExporter::CopyrightMessage()
+const TCHAR *KHRglTFExporter::CopyrightMessage()
 {	
 	return _T("Satoshi Hayashi");
 }
 
-const TCHAR *HSglTFExporter::OtherMessage1()
+const TCHAR *KHRglTFExporter::OtherMessage1()
 {		
 	//TODO: Return Other message #1 if any
 	return _T("");
 }
 
-const TCHAR *HSglTFExporter::OtherMessage2()
+const TCHAR *KHRglTFExporter::OtherMessage2()
 {		
 	//TODO: Return other message #2 in any
 	return _T("");
 }
 
-unsigned int HSglTFExporter::Version()
+unsigned int KHRglTFExporter::Version()
 {				
 	return 100;
 }
 
-void HSglTFExporter::ShowAbout(HWND /*hWnd*/)
+void KHRglTFExporter::ShowAbout(HWND /*hWnd*/)
 {			
 	// Optional
 }
 
 // -----------------------------------------------------------
 // -----------------------------------------------------------
-int HSglTFExporter::DoExport(const TCHAR* filename, ExpInterface* exporterInt, Interface* ip, BOOL suppressPrompts, DWORD options)
+int KHRglTFExporter::DoExport(const TCHAR* filename, ExpInterface* exporterInt, Interface* ip, BOOL suppressPrompts, DWORD options)
 {
 	LogInit(tstring(filename));
 	LogOutput(_T("DoExport Start."));
@@ -878,10 +878,10 @@ void glTFExporter_Core::FreeSceneData(void)
 //======================================================================
 BOOL glTFExporter_Core::ExportPreProcess(const TCHAR* filename, BOOL suppressPrompts, int ver)
 {
-	s_TitleString = _T("HS glTF exporter for 3dsmax ") + tstring(HS_GLTF_EXPORTER_VER);
+	s_TitleString = _T("Khronos glTF exporter for 3dsmax ") + tstring(KHR_GLTF_EXPORTER_VER);
 
 	TSTR profle;
-	profle.printf(_T("%s\\%s"), GetCOREInterface()->GetDir(APP_PLUGCFG_DIR), _T("HSglTFImporter.ini"));
+	profle.printf(_T("%s\\%s"), GetCOREInterface()->GetDir(APP_PLUGCFG_DIR), _T("KHRglTFImporter.ini"));
 
 	int x = MaxSDK::Util::GetPrivateProfileInt(_T("ExpSettings"), _T("scale"), 39370, profle);
 	HH_scale = x / 1000.0f;
@@ -926,7 +926,7 @@ BOOL glTFExporter_Core::ExportPreProcess(const TCHAR* filename, BOOL suppressPro
 	CreateInteractiveLayerTable();
 
 	if (!suppressPrompts) {
-		if (DialogBoxParam(hInstance, MAKEINTRESOURCE(IDD_MAIN_DIALOG), GetActiveWindow(), HSglTFExporterMainDlgProc, (LPARAM)this) == 0) {
+		if (DialogBoxParam(hInstance, MAKEINTRESOURCE(IDD_MAIN_DIALOG), GetActiveWindow(), KHRglTFExporterMainDlgProc, (LPARAM)this) == 0) {
 			return TRUE;
 		}
 

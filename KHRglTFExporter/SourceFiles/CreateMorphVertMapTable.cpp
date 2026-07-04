@@ -1,4 +1,4 @@
-#include "HSglTFExporter.h"
+#include "KHRglTFExporter.h"
 
 #define EPS 0.0001f
 

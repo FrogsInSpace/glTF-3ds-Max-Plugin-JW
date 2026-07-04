@@ -1,5 +1,5 @@
 
-#include "HSglTFExporter.h"
+#include "KHRglTFExporter.h"
 #include <bitmap.h>
 #include <gamma.h>
 

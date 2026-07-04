@@ -19,7 +19,7 @@
 
 #pragma comment(lib, "Morpher.lib")
 
-#include "HSglTFImporter.h"
+#include "KHRglTFImporter.h"
 #include <iEditNormals.h>
 #include <MeshNormalSpec.h>
 #include <ilayermanager.h>

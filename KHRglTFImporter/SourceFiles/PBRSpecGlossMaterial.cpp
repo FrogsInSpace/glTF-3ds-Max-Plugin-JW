@@ -17,7 +17,7 @@
  // AUTHOR: Satoshi Hayashi 
  //***************************************************************************/
 
-#include "HSglTFImporter.h"
+#include "KHRglTFImporter.h"
 #include "define.h"
 
 Mtl* glTFImporter_Core::CreatePBRSpecGlossMtl(cgltf_material* mtl)

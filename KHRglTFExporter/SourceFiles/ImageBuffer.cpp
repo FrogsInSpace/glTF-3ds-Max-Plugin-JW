@@ -17,7 +17,7 @@
  // AUTHOR: Satoshi Hayashi 
  //***************************************************************************/
 
-#include "HSglTFExporter.h"
+#include "KHRglTFExporter.h"
 #include <AssetManagement/iassetmanager.h>
 #include <AssetManagement/AssetUser.h>
 

@@ -19,7 +19,7 @@
 
 #define TINYGLTF_ENABLE_DRACO
 
-#include "HSglTFExporter.h"
+#include "KHRglTFExporter.h"
 #include <include\MorpherApi.h>
 
 #undef max

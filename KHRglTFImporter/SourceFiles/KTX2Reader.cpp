@@ -18,7 +18,7 @@
  //***************************************************************************/
 
 
-#include "HSglTFImporter.h"
+#include "KHRglTFImporter.h"
 #include <vector>
 #include <iostream>
 

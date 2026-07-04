@@ -506,30 +506,23 @@ Class_ID glTFImporter_Core::AttachCustAttr(Animatable* pAnim, std::vector<custAt
 	static unsigned int caDefCounter = 0;
 	caDefCounter++;
 
+#ifdef _DEBUG
+	the_listener->edit_stream->printf(_T("%d\n"), caDefCounter);
+	//the_listener->edit_stream->printf(_T("%d\n"), MSTR(s.c_str()).data());
+#endif
 
 	FPValue fpv;
-	BOOL mxsOk = FALSE;
-
 #if MAX_RELEASE >= 24000
+	if((++caDefCounter % 500u) == 0)
+		ExecuteMAXScriptScript(_T("gc light:true"),MAXScript::ScriptSource::NonEmbedded, TRUE);
 
-#ifdef _DEBUG
-	if((caDefCounter % 1000) == 0)
-	{
-		the_listener->edit_stream->printf(_T("CA count: %d\n"), caDefCounter);
-		ExecuteMAXScriptScript(_T("format \"Heap: %\\n\" (heapSize)"), MAXScript::ScriptSource::NonEmbedded, TRUE);
-	}
-#endif
-
-
-	mxsOk = ExecuteMAXScriptScript(ComStr, MAXScript::ScriptSource::NonEmbedded, TRUE, &fpv);
+	ExecuteMAXScriptScript(ComStr, MAXScript::ScriptSource::NonEmbedded,  TRUE, &fpv);
 #else
-	mxsOk = ExecuteMAXScriptScript(ComStr, TRUE, &fpv);
-#endif
+	if((++caDefCounter % 500u) == 0)
+		ExecuteMAXScriptScript(_T("gc light:true"), TRUE);
 
-	if(!mxsOk) {
-		the_listener->edit_stream->printf(_T("Failure creating Custom Attributes. Imported data might be incomplete...\n"));
-		return ret;
-	}
+	ExecuteMAXScriptScript(ComStr,TRUE, &fpv);
+#endif
 
 	if(fpv.type == TYPE_INT64_TAB)
 	{
@@ -826,7 +819,6 @@ void glTFImporter_Core::CreateSheenAttr(Mtl* pMtl, cgltf_sheen* sheen, BOOL enab
 	}
 
 	Class_ID retID = AttachCustAttr(pMtl, attrTbl, _T("Sheen"));
-	if (retID == Class_ID(0, 0)) return;
 
 	ICustAttribContainer* pContainer = pMtl->GetCustAttribContainer();
 	if(pContainer) {
@@ -909,7 +901,6 @@ void glTFImporter_Core::CreateClearcoatAttr(Mtl* pMtl, cgltf_clearcoat* clearcoa
 	}
 
 	Class_ID retID = AttachCustAttr(pMtl, attrTbl, _T("Clearcoat"));
-	if (retID == Class_ID(0, 0)) return;
 
 	ICustAttribContainer* pContainer = pMtl->GetCustAttribContainer();
 	if(pContainer) {
@@ -967,7 +958,6 @@ void glTFImporter_Core::CreateTransmissionAttr(Mtl* pMtl, cgltf_transmission* tr
 
 
 	Class_ID retID = AttachCustAttr(pMtl, attrTbl, _T("Transmission"));
-	if (retID == Class_ID(0, 0)) return;
 
 	ICustAttribContainer* pContainer = pMtl->GetCustAttribContainer();
 	if(pContainer) {
@@ -1050,7 +1040,6 @@ void glTFImporter_Core::CreateAnisotropyAttr(Mtl* pMtl, cgltf_anisotropy* anisot
 
 
 	Class_ID retID = AttachCustAttr(pMtl, attrTbl, _T("Anisotropy"));
-	if (retID == Class_ID(0, 0)) return;
 
 	ICustAttribContainer* pContainer = pMtl->GetCustAttribContainer();
 	if(pContainer) {
@@ -1116,7 +1105,6 @@ void glTFImporter_Core::CreateDiffuseTransmissionAttr(Mtl* pMtl, cgltf_diffuse_t
 	}
 
 	Class_ID retID = AttachCustAttr(pMtl, attrTbl, _T("DiffuseTransmission"));
-	if (retID == Class_ID(0, 0)) return;
 
 	ICustAttribContainer* pContainer = pMtl->GetCustAttribContainer();
 	if(pContainer) {
@@ -1185,7 +1173,6 @@ void glTFImporter_Core::CreateSpecularAttr(Mtl* pMtl, cgltf_specular* specular, 
 	}
 
 	Class_ID retID = AttachCustAttr(pMtl, attrTbl, _T("Specular"));
-	if (retID == Class_ID(0, 0)) return;
 
 	ICustAttribContainer* pContainer = pMtl->GetCustAttribContainer();
 	if(pContainer) {
@@ -1287,6 +1274,8 @@ void glTFImporter_Core::CreateKTX2EncodingAttr(Texmap* pTex, const tstring& path
 
 	Class_ID retID = AttachCustAttr(pTex, attrTbl, _T("KTX2 Encode"));
 }
+
+
 
 //======================================================================
 //======================================================================
@@ -1391,6 +1380,7 @@ DWORD glTFImporter_Core::CreateInteractivityAttr(ReferenceTarget* pRef, const In
 	return str.id;
 }
 
+
 //======================================================================
 //======================================================================
 BOOL glTFImporter_Core::GetInteractivityPointerID(ReferenceTarget* pRef, DWORD &id)
@@ -1446,6 +1436,7 @@ BOOL glTFImporter_Core::RemoveInteractivityAttr(ReferenceTarget* pRef)
 
 	return FALSE;
 }
+
 
 //======================================================================
 //======================================================================

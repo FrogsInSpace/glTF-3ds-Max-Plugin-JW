@@ -17,10 +17,10 @@
  // AUTHOR: Satoshi Hayashi 
  //***************************************************************************/
 
-#include "HSglTFImporter.h"
+#include "KHRglTFImporter.h"
 
-extern ClassDesc2* GetHSglTFImporterDesc();
-extern ClassDesc2* GetHSglTFToolDesc();
+extern ClassDesc2* GetKHRglTFImporterDesc();
+extern ClassDesc2* GetKHRglTFToolDesc();
 
 
 HINSTANCE hInstance;
@@ -51,8 +51,8 @@ __declspec( dllexport ) ClassDesc* LibClassDesc(int i)
 {
 	switch(i)
 	{
-		case 0: return GetHSglTFImporterDesc();
-		case 1: return GetHSglTFToolDesc();
+		case 0: return GetKHRglTFImporterDesc();
+		case 1: return GetKHRglTFToolDesc();
 		default: return 0;
 	}
 }
@@ -63,13 +63,11 @@ __declspec( dllexport ) ULONG LibVersion()
 }
 __declspec( dllexport ) int LibInitialize(void)
 {
-	#pragma message(TODO("Perform initialization here."))
 	return TRUE;
 }
 
 __declspec( dllexport ) int LibShutdown(void)
 {
-	#pragma message(TODO("Perform un-initialization here."))
 	return TRUE;
 }
 

@@ -67,17 +67,17 @@ extern BOOL IsLogOut(void);
 
 
 
-#define HS_APP_CODE 200
-#define HS_GLTF_IMPORTER_VER (_T("2.00"))
+#define KHR_APP_CODE 200
+#define KHR_GLTF_IMPORTER_VER (_T("2.00"))
 
-#define HS_UV_MODE 1
+#define KHR_UV_MODE 1
 
-#define HSglTFImporter_CLASS_ID		Class_ID(0x87a91a65, 0xa2560866)
-#define HSglTF2Importer_CLASS_ID	Class_ID(0x24081954, 0x30fd74c7)
-#define HSglTFExporter_CLASS_ID		Class_ID(0x38586030, 0x1b315b3e)
-#define HSglTF2Exporter_CLASS_ID	Class_ID(0x56337879, 0x5a732c12)
+#define KHRglTFImporter_CLASS_ID	Class_ID(0x87a91a65, 0xa2560866)
+#define KHRglTF2Importer_CLASS_ID	Class_ID(0x24081954, 0x30fd74c7)
+#define KHRglTFExporter_CLASS_ID	Class_ID(0x38586030, 0x1b315b3e)
+#define KHRglTF2Exporter_CLASS_ID	Class_ID(0x56337879, 0x5a732c12)
 
-#define HSGLTFIMP_INTERFACE_ID		Interface_ID(0xc230161, 0x37060a2b)
+#define KHRGLTFIMP_INTERFACE_ID		Interface_ID(0xc230161, 0x37060a2b)
 
 #define EDIT_NORMALS_CLASS_ID		Class_ID(0x4aa52ae3, 0x35ca1cde)
 

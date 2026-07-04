@@ -19,7 +19,7 @@
     <ClCompile Include="SourceFiles\EXT_mesh_gpu_instancing.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="SourceFiles\HSglTFExporter.cpp">
+    <ClCompile Include="SourceFiles\KHRglTFExporter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="SourceFiles\Materials.cpp">
@@ -108,7 +108,7 @@
     <ClInclude Include="Include\define.h">
       <Filter>Header</Filter>
     </ClInclude>
-    <ClInclude Include="Include\HSglTFExporter.h">
+    <ClInclude Include="Include\KHRglTFExporter.h">
       <Filter>Header</Filter>
     </ClInclude>
     <ClInclude Include="Resource\resource.h" />
@@ -131,12 +131,12 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="Resource\HSglTFExporter.rc">
+    <ResourceCompile Include="Resource\KHRglTFExporter.rc">
       <Filter>Resource</Filter>
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="SourceFiles\HSglTFExporter.def">
+    <None Include="SourceFiles\KHRglTFExporter.def">
       <Filter>Source Files</Filter>
     </None>
   </ItemGroup>

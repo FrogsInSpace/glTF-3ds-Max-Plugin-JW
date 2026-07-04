@@ -17,7 +17,7 @@
  // AUTHOR: Satoshi Hayashi 
  //***************************************************************************/
 
-#include "HSglTFExporter.h"
+#include "KHRglTFExporter.h"
 #include <sstream>
 #include <string>
 
@@ -33,8 +33,8 @@ static float s_scale = 1.0f;
 #define GRAPH_NUMCONFIG (_T("NumConfigParams"))
 #define GRAPH_EXTENSIONSTR (_T("GraphExtensionStr"))
 
-#define HSglTFImporter_CLASS_ID		Class_ID(0x87a91a65, 0xa2560866)
-#define HSGLTFIMP_INTERFACE_ID		Interface_ID(0xc230161, 0x37060a2b)
+#define KHRglTFImporter_CLASS_ID		Class_ID(0x87a91a65, 0xa2560866)
+#define KHRGLTFIMP_INTERFACE_ID		Interface_ID(0xc230161, 0x37060a2b)
 
 
 static std::string TypeStrArray[] = {
@@ -99,7 +99,7 @@ bool isNumber(const tstring& s)
 //======================================================================
 Animatable* GetAnimByUniqueID(DWORD id)
 {
-	FPInterface* p = GetInterface(SCENE_IMPORT_CLASS_ID, HSglTFImporter_CLASS_ID, HSGLTFIMP_INTERFACE_ID);
+	FPInterface* p = GetInterface(SCENE_IMPORT_CLASS_ID, KHRglTFImporter_CLASS_ID, KHRGLTFIMP_INTERFACE_ID);
 	if (!p) return 0;
 	FunctionID fid = p->FindFn(_T("GetObjByUniqueID"));
 

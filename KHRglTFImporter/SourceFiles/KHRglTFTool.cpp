@@ -11,7 +11,7 @@
  *>	Copyright (c) 2000, All Rights Reserved.
  **********************************************************************/
 
-#include "HSglTFImporter.h"
+#include "KHRglTFImporter.h"
 #include <utilapi.h>
 #include <ilayer.h>
 
@@ -30,13 +30,13 @@
 #define KHR_MATERIALS_UNLIT		             (1<<12)
 
 #define TEST_CLASS_ID		Class_ID(0xa91564c, 0x29f7754d)
-#define HSGLTFTOOL_INTERFACE_ID		Interface_ID(0x5e9360fd, 0x5d74691e)
+#define KHRGLTFTOOL_INTERFACE_ID		Interface_ID(0x5e9360fd, 0x5d74691e)
 
-//#define THECLASSNAME	"HSglTFTool"
+//#define THECLASSNAME	"KHRglTFTool"
 //#define THIS_VERASION	100
 
 
-static tstring BaseLayerName = _T("HSInteractiveGraphLayer");
+static tstring BaseLayerName = _T("KHRInteractiveGraphLayer");
 
 static void SetAttributes(Mtl* pSmat, ULONG flag = 0xffffffff, BOOL enableFlag=FALSE);
 
@@ -44,11 +44,11 @@ static void SetAttributes(Mtl* pSmat, ULONG flag = 0xffffffff, BOOL enableFlag=F
 //===================================================
 // Define Plugin class
 //===================================================
-class HSglTFTool : public UtilityObj {
+class KHRglTFTool : public UtilityObj {
 public:
 	//Constructor/Destructor
-	HSglTFTool();
-	~HSglTFTool();
+	KHRglTFTool();
+	~KHRglTFTool();
 
 	void BeginEditParams(Interface *ip,IUtil *iu);
 	void EndEditParams(Interface *ip,IUtil *iu);
@@ -69,30 +69,31 @@ public:
 	IUtil			*iu;
 	Interface		*ip;
 };
-static HSglTFTool theHSglTFToolt;
+static KHRglTFTool theKHRglTFTool;
+
 
 //===================================================
 // Class descriptor
 //===================================================
-class HSglTFToolClassDesc:public ClassDesc2 {
+class KHRglTFToolClassDesc:public ClassDesc2 {
 public:
 	int 			IsPublic() { return TRUE; }
-	void *			Create(BOOL loading = FALSE) { return &theHSglTFToolt; }
+	void *			Create(BOOL loading = FALSE) { return &theKHRglTFTool; }
 	const TCHAR *	ClassName() { return GetString(IDS_CLASS_NAME2); }
 	SClass_ID		SuperClassID() { return UTILITY_CLASS_ID; }
 	Class_ID		ClassID() { return TEST_CLASS_ID; }
 	const TCHAR* 	Category() { return GetString(IDS_CATEGORY); }
 
-	const TCHAR*	InternalName() { return _T("HSglTF Tool"); }
+	const TCHAR*	InternalName() { return _T("KHRglTFTool"); }
 	HINSTANCE		HInstance() { return hInstance; }
 #if MAX_RELEASE>=24000
 	const wchar_t* ClassDesc::NonLocalizedClassName(void) { return GetString(IDS_CLASS_NAME); }
 #endif
 };
-ClassDesc2* GetHSglTFToolDesc()
+ClassDesc2* GetKHRglTFToolDesc()
 {
-	static HSglTFToolClassDesc theHSglTFToolDesc;
-	return &theHSglTFToolDesc;
+	static KHRglTFToolClassDesc glTFToolDesc;
+	return &glTFToolDesc;
 }
 
 
@@ -101,13 +102,13 @@ ClassDesc2* GetHSglTFToolDesc()
 enum {
 	fnIdAttachExtensionAttrFn,
 };
-class HSglTFToolActions : public FPStaticInterface {
+class KHRglTFToolActions : public FPStaticInterface {
 public:
 	virtual BOOL AttachExtensionAttrFn(ReferenceTarget*, TSTR) = 0;
 };
-class HSglTFToolActionsIMP : public HSglTFToolActions {
+class KHRglTFToolActionsIMP : public KHRglTFToolActions {
 public:
-	DECLARE_DESCRIPTOR(HSglTFToolActionsIMP)
+	DECLARE_DESCRIPTOR(KHRglTFToolActionsIMP)
 
 	BEGIN_FUNCTION_MAP
 	FN_2(fnIdAttachExtensionAttrFn, TYPE_BOOL, AttachExtensionAttrFn, TYPE_REFTARG, TYPE_STRING);
@@ -153,11 +154,11 @@ public:
 		return TRUE;
 	}
 };
-static HSglTFToolActionsIMP HSglTFToolActionsFP(HSGLTFTOOL_INTERFACE_ID, _T("HSglTFTools"), 0, GetHSglTFToolDesc(), 0,
+static KHRglTFToolActionsIMP KHRglTFToolActionsFP(KHRGLTFTOOL_INTERFACE_ID, _T("KHRglTFTools"), 0, GetKHRglTFToolDesc(), 0,
 	fnIdAttachExtensionAttrFn, _T("AttachExtensionAttr"), 0, TYPE_BOOL, 0, 2, _T("target"), 0, TYPE_REFTARG, _T("extension"), 0, TYPE_STRING,
 	p_end
 );
-FPInterfaceDesc* HSglTFTool::GetDesc() { return &HSglTFToolActionsFP; }
+FPInterfaceDesc* KHRglTFTool::GetDesc() { return &KHRglTFToolActionsFP; }
 
 
 //===================================================
@@ -172,15 +173,15 @@ static BOOL CALLBACK MyDlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam
 	case WM_COMMAND:
 		switch (LOWORD(wParam)) {
 		case IDC_ATCATTR_BTN:
-			theHSglTFToolt.DoTest(hWnd);
+			theKHRglTFTool.DoTest(hWnd);
 			break;
 
 		case IDC_NODEINDEX_BTN:
-			theHSglTFToolt.NodeIndexDlg(hWnd);
+			theKHRglTFTool.NodeIndexDlg(hWnd);
 			break;
 
 		case IDC_REMOVE_SELECTED_BTN:
-			theHSglTFToolt.RemoveAttr(hWnd);
+			theKHRglTFTool.RemoveAttr(hWnd);
 			break;
 		}
 		break;
@@ -194,30 +195,30 @@ static BOOL CALLBACK MyDlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam
 
 //===================================================
 //===================================================
-//--- HSglTFTool -------------------------------------------------------
-HSglTFTool::HSglTFTool()
+//--- KHRglTFTool -------------------------------------------------------
+KHRglTFTool::KHRglTFTool()
 {
 	iu = NULL;
 	ip = NULL;	
 	hPanel = NULL;
 }
 
-HSglTFTool::~HSglTFTool()
+KHRglTFTool::~KHRglTFTool()
 {
 }
 
-void HSglTFTool::BeginEditParams(Interface *ip,IUtil *iu)
+void KHRglTFTool::BeginEditParams(Interface *ip,IUtil *iu)
 {
 	this->iu = iu;
 	this->ip = ip;
 
 	hPanel = ip->AddRollupPage(hInstance, MAKEINTRESOURCE(IDD_TOOL_DLG),
-		(DLGPROC)MyDlgProc, _T("HS glTF Tool"), 0);
+		(DLGPROC)MyDlgProc, _T("Khronos glTF Tool"), 0);
 
 	//DoTest(ip->GetMAXHWnd());
 }
 	
-void HSglTFTool::EndEditParams(Interface *ip,IUtil *iu)
+void KHRglTFTool::EndEditParams(Interface *ip,IUtil *iu)
 {
 	this->iu = NULL;
 	this->ip = NULL;
@@ -225,15 +226,15 @@ void HSglTFTool::EndEditParams(Interface *ip,IUtil *iu)
 	hPanel = NULL;
 }
 
-void HSglTFTool::Init(HWND hWnd)
+void KHRglTFTool::Init(HWND hWnd)
 {
 }
 
-void HSglTFTool::Destroy(HWND hWnd)
+void KHRglTFTool::Destroy(HWND hWnd)
 {
 }
 
-void HSglTFTool::DeleteThis(void)
+void KHRglTFTool::DeleteThis(void)
 {
 }
 
@@ -377,7 +378,7 @@ void SetAttributes(Mtl* pSmat, ULONG flag, BOOL enableFlag)
 
 //===================================================
 //===================================================
-void HSglTFTool::DoTest(HWND hWnd)
+void KHRglTFTool::DoTest(HWND hWnd)
 {
 
 	MtlBaseLib* pLib = ip->GetSceneMtls();
@@ -422,7 +423,7 @@ void RemoveNodeAttributes(INode *pNode,  const tstring &ExtensionName)
 //===================================================
 // Remove Extensions from selected Nodes
 //===================================================
-void HSglTFTool::RemoveNodeAttr(HWND hWnd)
+void KHRglTFTool::RemoveNodeAttr(HWND hWnd)
 {
 	//GetCOREInterface()->ClearNodeSelection();
 	//if (!GetCOREInterface()->DoHitByNameDialog()) return;
@@ -438,7 +439,7 @@ void HSglTFTool::RemoveNodeAttr(HWND hWnd)
 */
 //===================================================
 //===================================================
-void HSglTFTool::RemoveAttr(HWND hWnd)
+void KHRglTFTool::RemoveAttr(HWND hWnd)
 {
 	TrackViewPick tvp;
 	tvp.anim = tvp.client = NULL;
@@ -538,10 +539,10 @@ static LRESULT CALLBACK NodeIndexDlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPA
 	case WM_COMMAND:
 		switch (wParam) {
 		case IDC_NODEATTR_BTN:
-			theHSglTFToolt.SetNodeAttr(hWnd);
+			theKHRglTFTool.SetNodeAttr(hWnd);
 			break;
 		case IDC_SETVAL_BUTTON:
-			theHSglTFToolt.SetNodeExtensionValue(hWnd);
+			theKHRglTFTool.SetNodeExtensionValue(hWnd);
 			break;
 
 		case IDOK:
@@ -621,7 +622,7 @@ void SetNodeIndexListRec(INode* pNode)
 //=============================================================================
 // Launch Unique Index Dialog
 //=============================================================================
-void HSglTFTool::NodeIndexDlg(HWND hWnd)
+void KHRglTFTool::NodeIndexDlg(HWND hWnd)
 {
 	INT_PTR ret = ::DialogBoxParam(hInstance, MAKEINTRESOURCE(IDD_NODEEXTENSION_DLG), hWnd, NodeIndexDlgProc, 0);
 }
@@ -726,7 +727,7 @@ void GetSelectedListViewItemTable(HWND hListView, std::vector<INode*> &NodeTbl, 
 //===================================================
 // Add Extensions to selected Nodes
 //===================================================
-void HSglTFTool::SetNodeAttr(HWND hWnd)
+void KHRglTFTool::SetNodeAttr(HWND hWnd)
 {
 	HWND hListView = GetDlgItem(hWnd, IDC_NODEINDEX_LIST);
 
@@ -771,7 +772,7 @@ void HSglTFTool::SetNodeAttr(HWND hWnd)
 
 //=============================================================================
 //=============================================================================
-void HSglTFTool::SetNodeExtensionValue(HWND hWnd)
+void KHRglTFTool::SetNodeExtensionValue(HWND hWnd)
 {
 	HWND hListView = GetDlgItem(hWnd, IDC_NODEINDEX_LIST);
 

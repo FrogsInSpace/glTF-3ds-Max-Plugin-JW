@@ -2,8 +2,8 @@
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup Label="Globals">
     <ProjectGuid>{97D49973-99A4-41B9-B601-8E129D18F026}</ProjectGuid>
-    <ProjectName>HSglTFExporter</ProjectName>
-    <RootNamespace>HSglTFExporter</RootNamespace>
+    <ProjectName>KHRglTFExporter</ProjectName>
+    <RootNamespace>KHRglTFExporter</RootNamespace>
     <ConfigurationType>DynamicLibrary</ConfigurationType>
   </PropertyGroup>
   <ItemGroup Label="ProjectConfigurations">
@@ -79,7 +79,7 @@
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <PrecompiledHeaderOutputFile>$(IntDir)HSglTFExporter.pch</PrecompiledHeaderOutputFile>
+      <PrecompiledHeaderOutputFile>$(IntDir)KHRglTFExporter.pch</PrecompiledHeaderOutputFile>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <ObjectFileName>$(IntDir)</ObjectFileName>
       <ProgramDataBaseFileName>$(IntDir)</ProgramDataBaseFileName>
@@ -104,14 +104,14 @@
       <AdditionalDependencies>odbc32.lib;odbccp32.lib;comctl32.lib;bmm.lib;core.lib;geom.lib;gfx.lib;mesh.lib;maxutil.lib;maxscrpt.lib;gup.lib;paramblk2.lib;MNMath.lib;bonesDef.lib;Shlwapi.lib;assetmanagement.lib;iGame.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <AdditionalLibraryDirectories>$(MaxSDKPath)\lib\x64\Release;$(MaxSDKPath)\samples\modifiers\morpher\Lib\x64\Release;..\3rd_Party_Products;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <ModuleDefinitionFile>.\SourceFiles\HSglTFExporter.def</ModuleDefinitionFile>
+      <ModuleDefinitionFile>.\SourceFiles\KHRglTFExporter.def</ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>$(OutDir)$(TargetName).pdb</ProgramDatabaseFile>
       <SubSystem>Windows</SubSystem>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <DataExecutionPrevention>
       </DataExecutionPrevention>
-      <ImportLibrary>$(IntDir)HSglTFExporter.lib</ImportLibrary>
+      <ImportLibrary>$(IntDir)KHRglTFExporter.lib</ImportLibrary>
       <TargetMachine>MachineX64</TargetMachine>
     </Link>
     <PostBuildEvent>
@@ -138,7 +138,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <PrecompiledHeader>
       </PrecompiledHeader>
-      <PrecompiledHeaderOutputFile>$(IntDir)HSglTFExporter.pch</PrecompiledHeaderOutputFile>
+      <PrecompiledHeaderOutputFile>$(IntDir)KHRglTFExporter.pch</PrecompiledHeaderOutputFile>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <ObjectFileName>$(IntDir)</ObjectFileName>
       <ProgramDataBaseFileName>$(IntDir)</ProgramDataBaseFileName>
@@ -157,14 +157,14 @@
       <AdditionalDependencies>odbc32.lib;odbccp32.lib;comctl32.lib;bmm.lib;core.lib;geom.lib;gfx.lib;mesh.lib;maxutil.lib;maxscrpt.lib;gup.lib;paramblk2.lib;MNMath.lib;bonesDef.lib;Shlwapi.lib;assetmanagement.lib;iGame.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <AdditionalLibraryDirectories>$(MaxSDKPath)\lib\x64\Release;$(MaxSDKPath)\samples\modifiers\morpher\Lib\x64\Release;..\3rd_Party_Products;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <ModuleDefinitionFile>.\SourceFiles\HSglTFExporter.def</ModuleDefinitionFile>
-      <ProgramDatabaseFile>$(IntDir)HSglTFExporter.pdb</ProgramDatabaseFile>
+      <ModuleDefinitionFile>.\SourceFiles\KHRglTFExporter.def</ModuleDefinitionFile>
+      <ProgramDatabaseFile>$(IntDir)KHRglTFExporter.pdb</ProgramDatabaseFile>
       <SubSystem>Windows</SubSystem>
       <SetChecksum>true</SetChecksum>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <DataExecutionPrevention>
       </DataExecutionPrevention>
-      <ImportLibrary>$(IntDir)HSglTFExporter.lib</ImportLibrary>
+      <ImportLibrary>$(IntDir)KHRglTFExporter.lib</ImportLibrary>
       <TargetMachine>MachineX64</TargetMachine>
     </Link>
     <PostBuildEvent>
@@ -182,7 +182,7 @@
     <ClCompile Include="SourceFiles\EXT_mesh_gpu_instancing.cpp" />
     <ClCompile Include="SourceFiles\glTFMaterial.cpp" />
     <ClCompile Include="SourceFiles\gltfx_reference.cpp" />
-    <ClCompile Include="SourceFiles\HSglTFExporter.cpp" />
+    <ClCompile Include="SourceFiles\KHRglTFExporter.cpp" />
     <ClCompile Include="SourceFiles\ImageBuffer.cpp" />
     <ClCompile Include="SourceFiles\KHR_animation_pointer.cpp" />
     <ClCompile Include="SourceFiles\KHR_collision_shapes.cpp" />
@@ -209,14 +209,14 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Include\define.h" />
-    <ClInclude Include="Include\HSglTFExporter.h" />
+    <ClInclude Include="Include\KHRglTFExporter.h" />
     <ClInclude Include="Resource\resource.h" />
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="Resource\HSglTFExporter.rc" />
+    <ResourceCompile Include="Resource\KHRglTFExporter.rc" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="SourceFiles\HSglTFExporter.def" />
+    <None Include="SourceFiles\KHRglTFExporter.def" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

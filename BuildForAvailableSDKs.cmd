@@ -26,7 +26,7 @@ for /L %%V in (2020,1,2027) do (
 		SET CONFIG=Release-Max%%V
 		ECHO Building '!CONFIG!'
 
-		msbuild HSglTF.sln /p:Configuration=!CONFIG! /p:Platform=x64 /v:minimal
+		msbuild KHRglTF.sln /p:Configuration=!CONFIG! /p:Platform=x64 /v:minimal
 
 		IF ERRORLEVEL 1 GOTO :Failed		
     ) else (

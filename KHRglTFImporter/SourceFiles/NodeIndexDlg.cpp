@@ -1,6 +1,6 @@
 /// TODO: source file is not used anywhere in the project and should be removed from the public repo
 
-#include "HSglTFImporter.h"
+#include "KHRglTFImporter.h"
 
 
 static void NodeIndexDlgInit(HWND hWnd);
@@ -51,9 +51,9 @@ static LRESULT CALLBACK NodeIndexDlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPA
 }
 
 //=============================================================================
-// Variableテーブルダイアログ
+// Variable table dialog
 //=============================================================================
-void HSglTFTool::NodeIndexDlg(void)
+void KHRglTFTool::NodeIndexDlg(void)
 {
 	s_variableTable = GetVariableTable();
 

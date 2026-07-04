@@ -18,7 +18,7 @@
  //***************************************************************************/
 
 
-#include "HSglTFExporter.h"
+#include "KHRglTFExporter.h"
 
 #define MaterialSwitcherClassID		Class_ID(0x4ecd74a6, 0x0)
 

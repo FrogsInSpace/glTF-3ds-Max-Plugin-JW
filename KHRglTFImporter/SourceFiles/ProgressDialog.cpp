@@ -18,7 +18,7 @@
  //***************************************************************************/
 
 
-#include "HSglTFImporter.h"
+#include "KHRglTFImporter.h"
 
 static HWND hProgressWnd;
 
@@ -32,7 +32,7 @@ static size_t Physic_Morph = 0;
 
 //======================================================================
 //======================================================================
-INT_PTR CALLBACK HSglTFProgressDlgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
+INT_PTR CALLBACK KHRglTFProgressDlgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
 
 	//TCHAR buf[MAX_PATH];
 
@@ -64,7 +64,7 @@ void OpenProgreessDlg(cgltf_data* m_glTF_data)
 	Total_Skin = m_glTF_data->skins_count;
 	Total_Morph = 0;
 
-	hProgressWnd = ::CreateDialogParam(hInstance, MAKEINTRESOURCE(IDD_PROGRESS_DLG), GetActiveWindow(), HSglTFProgressDlgProc, (LPARAM)NULL);
+	hProgressWnd = ::CreateDialogParam(hInstance, MAKEINTRESOURCE(IDD_PROGRESS_DLG), GetActiveWindow(), KHRglTFProgressDlgProc, (LPARAM)NULL);
 }
 
 //======================================================================

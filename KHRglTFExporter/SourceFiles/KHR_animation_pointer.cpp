@@ -18,7 +18,7 @@
  //***************************************************************************/
 
 
-#include "HSglTFExporter.h"
+#include "KHRglTFExporter.h"
 #include <Shaders.h>
 
 //Control* ConvertColorToFloatController(Control* pSrcC, UINT ch);

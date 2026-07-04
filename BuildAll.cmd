@@ -17,7 +17,7 @@ SET VER_LIST=2020 2021 2022 2023 2024 2025 2026 2027
 FOR %%v IN (%VER_LIST%) DO (
 	SET CONFIG=Release-Max%%v
 	ECHO Building '!CONFIG!'
-	msbuild HSglTF.sln /p:Configuration=!CONFIG! /p:Platform=x64 /v:minimal
+	msbuild KHRglTF.sln /p:Configuration=!CONFIG! /p:Platform=x64 /v:minimal
 	IF ERRORLEVEL 1 GOTO :Failed
 )
 

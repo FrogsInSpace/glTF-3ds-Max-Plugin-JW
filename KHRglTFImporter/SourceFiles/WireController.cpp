@@ -1,5 +1,5 @@
 
-#include "HSglTFImporter.h"
+#include "KHRglTFImporter.h"
 #include <iparamwire.h>
 
 std::map<Mtl*, Texmap*> WireCtrlTable;

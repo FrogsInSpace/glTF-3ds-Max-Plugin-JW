@@ -18,7 +18,7 @@
  //***************************************************************************/
 
 
-#include "HSglTFExporter.h"
+#include "KHRglTFExporter.h"
 #include <AssetManagement/iassetmanager.h>
 
 #if 0
@@ -145,7 +145,7 @@ BOOL glTFExporter_Core::CreateGLTFXFile(const tstring& filename)
 
 	std::filesystem::path fname(filename);
 
-	Class_ID cid = HSglTFExporter_CLASS_ID;
+	Class_ID cid = KHRglTFExporter_CLASS_ID;
 	//GetCOREInterface()->FileHold();
 	int RefCnt = pRootNode->GetXRefFileCount();
 	for (int i = 0; i < RefCnt; i++) {
