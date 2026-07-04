@@ -168,7 +168,7 @@
       <TargetMachine>MachineX64</TargetMachine>
     </Link>
     <PostBuildEvent>
-      <Command>echo F | xcopy /Y /Q "$(TargetPath)" "$(SolutionDir)Packages\3ds Max $(MaxSDKRelease)\Plugins\$(ProjectName)$(TargetExt)"</Command>
+      <Command>echo F | xcopy /Y /Q "$(TargetPath)" "$(SolutionDir)Packages\3ds Max $(MaxSDKRelease)\Plugins\$(TargetFileName)"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
