@@ -94,14 +94,28 @@ The example below adds the build configuration for 3ds Max 2027 by cloning and e
 
 ---
 
-## 💾 Installation
+## 💾 Plugin Installation
 
-Once built, the following plug-in files are generated:
+Once built, the following folders are generated in the `Packages` folder for each supported 3ds Max version:
 
-1. `KHRglTFImporter.dli`
-2. `KHRglTFExporter.dlo`
+```text
+Packages/
+├─ 3ds Max 2020/
+│  └─ Plugins/
+│     ├─ KHRglTFExporter_2020.dle
+│     └─ KHRglTFImporter_2020.dli
+│
+⋮  [Intermediate 3ds Max versions]
+│
+└─ 3ds Max 2027/
+   └─ Plugins/
+      ├─ KHRglTFExporter_2027.dle
+      └─ KHRglTFImporter_2027.dli
+```
 
-Copy these files into the `Plugins` folder of your 3ds Max installation directory.
+Copy the files matching your 3ds Max version into the `Plugins` folder of your 3ds Max installation directory.
+
+---
 
 ### 🎨 Khronos PBR Neutral Tone Mapping
 
@@ -138,3 +152,7 @@ For more information regarding these licenses, please refer to the documentation
 ### 📄 License Disclaimer
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+```
+
+```
