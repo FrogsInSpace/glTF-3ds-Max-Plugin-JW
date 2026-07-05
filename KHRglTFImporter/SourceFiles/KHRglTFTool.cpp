@@ -29,8 +29,8 @@
 #define KHR_MATERIALS_SUBSURFACE             (1<<11)
 #define KHR_MATERIALS_UNLIT		             (1<<12)
 
-#define TEST_CLASS_ID		Class_ID(0xa91564c, 0x29f7754d)
-#define KHRGLTFTOOL_INTERFACE_ID		Interface_ID(0x5e9360fd, 0x5d74691e)
+#define KHRGLTFTOOL_CLASS_ID		Class_ID(0xa91564c, 0x29f7754d)
+#define KHRGLTFTOOL_INTERFACE_ID	Interface_ID(0x5e9360fd, 0x5d74691e)
 
 //#define THECLASSNAME	"KHRglTFTool"
 //#define THIS_VERASION	100
@@ -81,13 +81,13 @@ public:
 	void *			Create(BOOL loading = FALSE) { return &theKHRglTFTool; }
 	const TCHAR *	ClassName() { return GetString(IDS_CLASS_NAME2); }
 	SClass_ID		SuperClassID() { return UTILITY_CLASS_ID; }
-	Class_ID		ClassID() { return TEST_CLASS_ID; }
+	Class_ID		ClassID() { return KHRGLTFTOOL_CLASS_ID; }
 	const TCHAR* 	Category() { return GetString(IDS_CATEGORY); }
 
 	const TCHAR*	InternalName() { return _T("KHRglTFTool"); }
 	HINSTANCE		HInstance() { return hInstance; }
 #if MAX_RELEASE>=24000
-	const wchar_t* ClassDesc::NonLocalizedClassName(void) { return GetString(IDS_CLASS_NAME); }
+	const TCHAR* NonLocalizedClassName(void) { return ClassName(); }
 #endif
 };
 ClassDesc2* GetKHRglTFToolDesc()
