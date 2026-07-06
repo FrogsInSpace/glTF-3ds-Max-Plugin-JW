@@ -8,6 +8,15 @@ This documentation for end users describes the glTF importer and exporter plug-i
 1. **[glTF Editing](EditingDocumentation.md)** explains the tools within 3ds Max for editing and preparing glTF content.
 1. **[glTF Exporter](ExporterDocumentation.md)** explains the options for exporting the scene out from 3ds Max into glTF format. 
 
+## Installation Instructions
+1. To install the plugins, first quit 3ds Max if it is open.
+1. Go to the [Releases page](https://github.com/KhronosGroup/glTF-3ds-Max-Plugin/releases) on GitHub, scroll to the bottom of the chosen Release and open the _Assets_ dropdown.
+1. Download the "KHRglTF ..." ZIP file to the hard drive.
+1. Inside the ZIP file, open the folder for the appropriate version of 3ds Max, then extract its subfolder(s) to the hard drive.
+   * Depending on the version of 3ds Max, the extracted subfolder(s) will be named ***\Plugins*** and ***\ColorManagement***.
+1. Copy the subfolder(s) into the 3ds Max install location, which is usually `C:\Program Files\Autodesk\3ds Max 20xx\` (with xx representing the 3ds Max version).
+1. Start 3ds Max, then open the _File_ menu and choose either _Import_ or _Export_. At the bottom of the File Selector window, set _Files of Type:_ to ***glTF***. The importer (or exporter) interface will then appear.
+
 ## glTF Extensions Supported
 | glTF Extension | Import | Export |
 | --- | --- | --- |
