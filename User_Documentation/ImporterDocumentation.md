@@ -31,9 +31,6 @@ glTF 1.0 is not supported.
 
 - 3ds Max 2020/2021 do not support V-Ray/Corona Materials.
 
-- The following features are not implemented in the current version:
-  - CUBICSPLINE(Rotate, Scale) animation interpolation
-
 - There is a limit to the number of primitive attributes that can be
 supported:
   - UV coordinate channels:2channels（TEXCOORD_0 , TEXCOORD_1）
@@ -85,15 +82,13 @@ Converts the glTF material information into a material type supported by 3ds Max
 
 ![Radio UI element](images/ui-radio.png) `USD Mtl`
 
+![Radio UI element](images/ui-radio.png) `OpenPBR Mtl`
+
 ![Radio UI element](images/ui-radio.png) `V-Ray Mtl`
 
 ![Radio UI element](images/ui-radio.png) `Corona Mtl`
 
-![Radio UI element](images/ui-radio.png) `Pencil+ 4 Mtl` = This will switch the production renderer to Scanline.
-
-![Radio UI element](images/ui-radio.png) `OpenPBR Mtl`
-
-Note: V-Ray/Corona/Arnold/Pencil+4/USD need to be installed if you want to choose any of these conversions.
+Note: V-Ray/Corona/Arnold/USD need to be installed if you want to choose any of these conversions.
 
 
 #### Flip Normal
@@ -139,17 +134,18 @@ Specifies how to extract the metalness, roughness, and occlusion maps from the o
 
 #### Animation
 
-![Checkbox UI element](images/ui-checkbox.png) `Import Animation` = Animations will be imported.
+![Checkbox UI element](images/ui-checkbox.png) `Import Animation` = Animations will be imported. Note: CUBICSPLINE animation interpolation is supported for Translation only, not for Rotation nor for Scale.
 
 ![Checkbox UI element](images/ui-checkbox.png) `Match the Animation range to the file` =  Matches the animation range of the scene to the animation range of the imported file.
 
 ![Spinner UI element](images/ui-spinner.png) `Import Animation Channel` When importing a glTF file with multiple animation channels, specify which channel to load. When the channel is set to 0, all animation channels will be loaded at once, but if multiple animations are assigned to the same object, the last animation channel will be activated.
 
-![Dropdown UI element](images/ui-dropdown.png) `Rotate Controller` = Select a rotational animation controller type.
+![Dropdown UI element](images/ui-dropdown.png) `Rotate Controller` = Select a rotational animation controller type for import conversion.
 
   - Euler XYZ
 
   - Linear Rotation
+
 
 
 #### Color Management
