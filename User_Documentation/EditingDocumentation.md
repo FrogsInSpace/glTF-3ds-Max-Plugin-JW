@@ -135,10 +135,12 @@ will be used for unsupported materials.
 Node materials to which MtlSwitcher is assigned are output as Material
 Variant.
 
-## Extended Parameter Addition Tool
+## Khronos glTF Tool
 
-Custom attributes that are automatically added by the importer when
-reading glTF files can be added with the utility tool.
+In the Utilities panel, the Khronos glTF Tool can be added as a button, to perform various editing functions.
+
+Custom attributes can be automatically added by the importer when
+reading glTF files. They can also be added and removed with this utility. Node extensions can also be added here.
 
 - Attributes are added to materials assigned to objects in the scene.
 
@@ -148,7 +150,12 @@ reading glTF files can be added with the utility tool.
 
 - Even if you run the tool multiple times, the attribute will not be added twice.
 
-![Screenshot of the Utility Configure Button Sets dialog](./images/utilities-configure-button-sets.png)
+![Screenshot of the Utility Configure Button Sets dialog](./images/utilities-configure-button-sets.png)<br clear="all"/>_Adding the Khronos glTF Tool button to the Utilities panel_
+
+![Screenshot of the Remove Material or Texture Attributes dialog](./images/remove-mtl-tex-attributes.png)<br clear="all"/>_Using the Track View to remove attributes_
+
+![Screenshot of the Node Extension Editor dialog](./images/node-extension-editor.png)<br clear="all"/>_Using the Node Extension editor_
+
 
 ## glTF Interactivity Extension 
 
