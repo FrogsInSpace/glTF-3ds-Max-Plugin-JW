@@ -43,7 +43,7 @@ file path.
 
 To encode a newly created map:
 
-Select the object assigned with the map, and launch HSglTFTool from the
+Select the object assigned with the map, and launch KHRglTFTool from the
 Utilities tab.
 
 Click the "AddMtlAttr" button to add the attributes.
@@ -86,7 +86,7 @@ Calling exporter method: `exportFile FileName`
 If you are using multiple gltf export plugins: `exportFile FileName using:#(945315888L, 456219454L)`
 
 The parameters set in the plugin are written in the following INI file,
-which can be modified to set the parameters before executing command. `(getDir \#plugcfg)+"\\HSglTFImporter.ini"`
+which can be modified to set the parameters before executing command. `(getDir \#plugcfg)+"\\KHRglTFImporter.ini"`
 
 
 ## MtlSwitcher
