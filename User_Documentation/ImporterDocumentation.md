@@ -186,7 +186,6 @@ Since non-glTF materials do not support all the features of glTF, the importer w
 | glTF | | | | BitmapLookup/UberBitmap |
 | V-Ray | VRayCompTex | VRayNormalMap | | BitmapLookup/UberBitmap |
 | Corona | CoronaMix | CoronaNormal | *CutOff* | BitmapLookup/UberBitmap |
-| Pencil+ | | NormalMap | *CutOff* | |
 
 - Composite map will be generated only when both base color and base
 color texture are set and "Use CompositeMap" is turned on.
