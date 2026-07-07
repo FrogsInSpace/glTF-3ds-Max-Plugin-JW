@@ -101,36 +101,13 @@ void DracoDecodeProc(cgltf_buffer_view *bufferView, cgltf_primitive* primitive, 
 		auto statusor = decoder.DecodeMeshFromBuffer(&buffer);
 		if (!statusor.ok()) { tbl.clear(); return; }
 		std::unique_ptr<draco::Mesh> in_mesh = std::move(statusor).value();
-		if (in_mesh) {
-			draco::Mesh *pMesh = in_mesh.get();
-			if(type== DracoDecodeType::POSITION) {
+		if(in_mesh) {
+			draco::Mesh* pMesh = in_mesh.get();
+			if(type == DracoDecodeType::POSITION) {
 				auto attr = pMesh->GetNamedAttribute(draco::GeometryAttribute::POSITION);
-				if (!attr) return;
-				if (attr->is_mapping_identity()) {
-					for (draco::AttributeValueIndex  i(0); i < attr->size(); ++i) {
-						std::array<float, 3> value;
-						attr->ConvertValue<float, 3>(i, &value[0]);
-						tbl.push_back(value[0]);
-						tbl.push_back(value[1]);
-						tbl.push_back(value[2]);
-					}
-				} else {
-					for (draco::PointIndex i(0); i < attr->indices_map_size(); ++i) {
-						draco::AttributeValueIndex idx = attr->mapped_index(i);
-						std::array<float, 3> value;
-						attr->ConvertValue<float, 3>(idx, &value[0]);
-						tbl.push_back(value[0]);
-						tbl.push_back(value[1]);
-						tbl.push_back(value[2]);
-					}
-				}
-			}
-
-			if (type == DracoDecodeType::NORMAL) {
-				auto attr = pMesh->GetNamedAttribute(draco::GeometryAttribute::NORMAL);
-				if (!attr) return;
-				if (attr->is_mapping_identity()) {
-					for (draco::AttributeValueIndex i(0); i < attr->size(); ++i) {
+				if(!attr) return;
+				if(attr->is_mapping_identity()) {
+					for(draco::AttributeValueIndex i(0); i < attr->size(); ++i) {
 						std::array<float, 3> value;
 						attr->ConvertValue<float, 3>(i, &value[0]);
 						tbl.push_back(value[0]);
@@ -139,7 +116,7 @@ void DracoDecodeProc(cgltf_buffer_view *bufferView, cgltf_primitive* primitive, 
 					}
 				}
 				else {
-					for (draco::PointIndex i(0); i < attr->indices_map_size(); ++i) {
+					for(draco::PointIndex i(0); i < attr->indices_map_size(); ++i) {
 						draco::AttributeValueIndex idx = attr->mapped_index(i);
 						std::array<float, 3> value;
 						attr->ConvertValue<float, 3>(idx, &value[0]);
@@ -150,11 +127,35 @@ void DracoDecodeProc(cgltf_buffer_view *bufferView, cgltf_primitive* primitive, 
 				}
 			}
 
-			if (type == DracoDecodeType::COLOR) {
+			if(type == DracoDecodeType::NORMAL) {
+				auto attr = pMesh->GetNamedAttribute(draco::GeometryAttribute::NORMAL);
+				if(!attr) return;
+				if(attr->is_mapping_identity()) {
+					for(draco::AttributeValueIndex i(0); i < attr->size(); ++i) {
+						std::array<float, 3> value;
+						attr->ConvertValue<float, 3>(i, &value[0]);
+						tbl.push_back(value[0]);
+						tbl.push_back(value[1]);
+						tbl.push_back(value[2]);
+					}
+				}
+				else {
+					for(draco::PointIndex i(0); i < attr->indices_map_size(); ++i) {
+						draco::AttributeValueIndex idx = attr->mapped_index(i);
+						std::array<float, 3> value;
+						attr->ConvertValue<float, 3>(idx, &value[0]);
+						tbl.push_back(value[0]);
+						tbl.push_back(value[1]);
+						tbl.push_back(value[2]);
+					}
+				}
+			}
+
+			if(type == DracoDecodeType::COLOR) {
 				auto attr = pMesh->GetNamedAttribute(draco::GeometryAttribute::COLOR);
-				if (!attr) return;
-				if (attr->is_mapping_identity()) {
-					for (draco::AttributeValueIndex i(0); i < attr->size(); ++i) {
+				if(!attr) return;
+				if(attr->is_mapping_identity()) {
+					for(draco::AttributeValueIndex i(0); i < attr->size(); ++i) {
 						std::array<float, 4> value;
 						attr->ConvertValue<float, 4>(i, &value[0]);
 						tbl.push_back(value[0]);
@@ -164,7 +165,7 @@ void DracoDecodeProc(cgltf_buffer_view *bufferView, cgltf_primitive* primitive, 
 					}
 				}
 				else {
-					for (draco::PointIndex i(0); i < attr->indices_map_size(); ++i) {
+					for(draco::PointIndex i(0); i < attr->indices_map_size(); ++i) {
 						draco::AttributeValueIndex idx = attr->mapped_index(i);
 						std::array<float, 4> value;
 						attr->ConvertValue<float, 4>(idx, &value[0]);
@@ -176,13 +177,13 @@ void DracoDecodeProc(cgltf_buffer_view *bufferView, cgltf_primitive* primitive, 
 				}
 			}
 
-			if (type == DracoDecodeType::TEX_COORD) {
+			if(type == DracoDecodeType::TEX_COORD) {
 				std::string attrName = "TEXCOORD_" + std::to_string(AttrCh);
 
 				int attributeId = AttrCh;
-				if (primitive && primitive->has_draco_mesh_compression) {
-					for (cgltf_size i = 0; i < primitive->draco_mesh_compression.attributes_count; ++i) {
-						if (strcmp(primitive->draco_mesh_compression.attributes[i].name, attrName.c_str()) == 0) {
+				if(primitive && primitive->has_draco_mesh_compression) {
+					for(cgltf_size i = 0; i < primitive->draco_mesh_compression.attributes_count; ++i) {
+						if(strcmp(primitive->draco_mesh_compression.attributes[i].name, attrName.c_str()) == 0) {
 							attributeId = (int)primitive->draco_mesh_compression.attributes[i].index;
 							break;
 						}
@@ -190,10 +191,10 @@ void DracoDecodeProc(cgltf_buffer_view *bufferView, cgltf_primitive* primitive, 
 				}
 
 				auto attr = pMesh->GetNamedAttribute(draco::GeometryAttribute::TEX_COORD, attributeId);
-				if (!attr) return;
+				if(!attr) return;
 
-				if (attr->is_mapping_identity()) {
-					for (draco::AttributeValueIndex i(0); i < attr->size(); ++i) {
+				if(attr->is_mapping_identity()) {
+					for(draco::AttributeValueIndex i(0); i < attr->size(); ++i) {
 						std::array<float, 2> value;
 						attr->ConvertValue<float, 2>(i, &value[0]);
 						tbl.push_back(value[0]);
@@ -201,7 +202,7 @@ void DracoDecodeProc(cgltf_buffer_view *bufferView, cgltf_primitive* primitive, 
 					}
 				}
 				else {
-					for (draco::PointIndex i(0); i < attr->indices_map_size(); ++i) {
+					for(draco::PointIndex i(0); i < attr->indices_map_size(); ++i) {
 						draco::AttributeValueIndex idx = attr->mapped_index(i);
 						std::array<float, 2> value;
 						attr->ConvertValue<float, 2>(idx, &value[0]);
@@ -212,30 +213,87 @@ void DracoDecodeProc(cgltf_buffer_view *bufferView, cgltf_primitive* primitive, 
 
 
 
-/*
-				auto attr = pMesh->GetNamedAttribute(draco::GeometryAttribute::TEX_COORD);
-				if (!attr) return;
-				if (attr->is_mapping_identity()) {
-					std::string attrName = "TEXCOORD_" + std::to_string(texCoordIndex);
-					for (draco::AttributeValueIndex i(0); i < attr->size(); ++i) {
-						std::array<float, 2> value;
-						attr->ConvertValue<float, 2>(i, &value[0]);
-						tbl.push_back(value[0]);
-						tbl.push_back(value[1]);
-					}
-				}
-				else {
-					for (draco::PointIndex i(0); i < attr->indices_map_size(); ++i) {
-						draco::AttributeValueIndex idx = attr->mapped_index(i);
-						std::array<float, 2> value;
-						attr->ConvertValue<float, 2>(idx, &value[0]);
-						tbl.push_back(value[0]);
-						tbl.push_back(value[1]);
-					}
-				}
-	*/
+				/*
+								auto attr = pMesh->GetNamedAttribute(draco::GeometryAttribute::TEX_COORD);
+								if (!attr) return;
+								if (attr->is_mapping_identity()) {
+									std::string attrName = "TEXCOORD_" + std::to_string(texCoordIndex);
+									for (draco::AttributeValueIndex i(0); i < attr->size(); ++i) {
+										std::array<float, 2> value;
+										attr->ConvertValue<float, 2>(i, &value[0]);
+										tbl.push_back(value[0]);
+										tbl.push_back(value[1]);
+									}
+								}
+								else {
+									for (draco::PointIndex i(0); i < attr->indices_map_size(); ++i) {
+										draco::AttributeValueIndex idx = attr->mapped_index(i);
+										std::array<float, 2> value;
+										attr->ConvertValue<float, 2>(idx, &value[0]);
+										tbl.push_back(value[0]);
+										tbl.push_back(value[1]);
+									}
+								}
+					*/
 			}
 
+			// TODO: had to disable the refactored code and revert to the original version below, as bnew implementation broke skin weighting with draco compressed meshes (JW)
+#if TRUE
+			// Original working implementation
+			if(type == DracoDecodeType::WEIGHTS) {
+				auto attr = pMesh->GetNamedAttribute(draco::GeometryAttribute::GENERIC, 1);
+				if(!attr) return;
+				if(attr->is_mapping_identity()) {
+					for(draco::AttributeValueIndex i(0); i < attr->size(); ++i) {
+						std::array<float, 4> value;
+						attr->ConvertValue<float, 4>(i, &value[0]);
+						tbl.push_back(value[0]);
+						tbl.push_back(value[1]);
+						tbl.push_back(value[2]);
+						tbl.push_back(value[3]);
+					}
+				}
+				else {
+					for(draco::PointIndex i(0); i < attr->indices_map_size(); ++i) {
+						draco::AttributeValueIndex idx = attr->mapped_index(i);
+						std::array<float, 4> value;
+						attr->ConvertValue<float, 4>(idx, &value[0]);
+						tbl.push_back(value[0]);
+						tbl.push_back(value[1]);
+						tbl.push_back(value[2]);
+						tbl.push_back(value[3]);
+					}
+				}
+			}
+
+			if(type == DracoDecodeType::JOINTS) {
+				auto attr = pMesh->GetNamedAttribute(draco::GeometryAttribute::GENERIC, 0);
+				if(!attr) return;
+				if(attr->is_mapping_identity()) {
+					for(draco::AttributeValueIndex i(0); i < attr->size(); ++i) {
+						std::array<float, 4> value;
+						attr->ConvertValue<float, 4>(i, &value[0]);
+						tbl.push_back(value[0]);
+						tbl.push_back(value[1]);
+						tbl.push_back(value[2]);
+						tbl.push_back(value[3]);
+					}
+				}
+				else {
+					for(draco::PointIndex i(0); i < attr->indices_map_size(); ++i) {
+						draco::AttributeValueIndex idx = attr->mapped_index(i);
+						std::array<float, 4> value;
+						attr->ConvertValue<float, 4>(idx, &value[0]);
+						tbl.push_back(value[0]);
+						tbl.push_back(value[1]);
+						tbl.push_back(value[2]);
+						tbl.push_back(value[3]);
+					}
+				}
+			}
+
+#else
+            // refactored code, breaks skinning with draco compressed meshes
 			if (type == DracoDecodeType::WEIGHTS) {
 				// TODO: Replace hardcoded GENERIC attribute indices (0/1) with a lookup based on the glTF Draco extension attribute mapping (if available).
 				int attributeId = 1;
@@ -308,6 +366,7 @@ void DracoDecodeProc(cgltf_buffer_view *bufferView, cgltf_primitive* primitive, 
 					}
 				}
 			}
+#endif
 		}
 	}
 	else if (geom_type.value() == draco::POINT_CLOUD) {
