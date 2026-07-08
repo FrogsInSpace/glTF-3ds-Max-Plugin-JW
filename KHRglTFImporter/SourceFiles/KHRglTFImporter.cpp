@@ -626,12 +626,12 @@ const TCHAR *KHRglTFImporter::Ext(int i)
 
 const TCHAR *KHRglTFImporter::LongDesc()
 {
-	return _T("GL Transmission Format 2.0 importer for 3dsmax");
+	return _T("glTF 2.0 Importer for 3ds Max");
 }
 	
 const TCHAR *KHRglTFImporter::ShortDesc() 
 {			
-	return _T("GL Transmission Format 2.0 (KHRglTFImporter)");
+	return _T("glTF 2.0 (KHRglTFImporter)");
 }
 
 const TCHAR *KHRglTFImporter::AuthorName()
@@ -691,12 +691,12 @@ const TCHAR *KHRglTF2Importer::Ext(int i)
 
 const TCHAR *KHRglTF2Importer::LongDesc()
 {
-	return _T("GL Transmission Format 2.0 importer for 3dsmax");
+	return _T("glTF 2.0 Importer for 3ds Max");
 }
 
 const TCHAR *KHRglTF2Importer::ShortDesc()
 {
-	return _T("GL Transmission Format 2.0");
+	return _T("glTF 2.0 (KHRglTFImporter)");
 }
 
 const TCHAR *KHRglTF2Importer::AuthorName()
