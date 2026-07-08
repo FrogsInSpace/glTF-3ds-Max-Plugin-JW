@@ -302,7 +302,7 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_LIBDESCRIPTION      "glTF Importer"
+    IDS_LIBDESCRIPTION      "glTF 2.0 Importer (Khronos)"
     IDS_CATEGORY            "Khronos glTF Tools"
     IDS_CLASS_NAME          "KHRglTFImporter"
     IDS_CLASS_NAME2         "KHRglTFTool"
