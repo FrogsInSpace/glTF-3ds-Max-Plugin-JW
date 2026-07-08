@@ -131,9 +131,6 @@ BOOL LaunchScript(tstring &script);
 BOOL GetFileName(HWND hWnd, tstring &ret, FileType type);
 int GetMtlType(void) {return HH_MtlMode;}
 
-void SetSparseData(std::vector<float>& dataList, cgltf_accessor& acc);
-
-
 #if 0
 class KHRglTF2Importer : public SceneImport
 {
