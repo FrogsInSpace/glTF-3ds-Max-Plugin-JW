@@ -137,13 +137,13 @@ tstring glTFImporter_Core::CreateTextureFileName(cgltf_texture* tex, tstring &or
 			fs::path fullPath = (baseDir / fs::path(decodedUri)).lexically_normal();
 
 			try {
-				// lexically_relative はディスクアクセスをせず、文字列ベースで「..」などを計算します
+				// lexically_relative - calculates characters like ".." based on strings
 				fs::path rel = fullPath.lexically_relative(baseDir);
 
-				// 空、または「..」から始まる（＝ベースディレクトリより外側を指している）場合はエラー
-				// ※ std::filesystem の仕様上、外側を指す場合は "../foo" のように必ず先頭が ".." になります
+				// An error will occur if the directory is empty or starts with ".." (i.e., points outside the base directory).
+				// * Due to the specifications of std::filesystem, when pointing outside the base directory, the beginning will always be "..", like "../foo".
 				if (rel.empty() || rel.native().rfind(L"..", 0) == 0 || rel.native() == L"..") {
-					// Security Error (ディレクトリ・トラバーサル)
+					// Security Error (Directory Traversal)
 					fname = _T("");
 				}
 				else {

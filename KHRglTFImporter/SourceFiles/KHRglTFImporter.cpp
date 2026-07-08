@@ -451,7 +451,7 @@ INT_PTR CALLBACK KHRglTFImporterOptionsDlgProc(HWND hWnd,UINT message,WPARAM wPa
 		ShowWindow(GetDlgItem(hWnd, IDC_MTL_RADIO7), FALSE);
 		ShowWindow(GetDlgItem(hWnd, IDC_MTL_RADIO8), FALSE);
 		ShowWindow(GetDlgItem(hWnd, IDC_MTL_RADIO9), FALSE);
-		if (HH_MtlMode == 5 || HH_MtlMode == 6 || HH_MtlMode == 7|| || HH_MtlMode == 8)HH_MtlMode = 0;
+		if (HH_MtlMode == 5 || HH_MtlMode == 6 || HH_MtlMode == 7|| HH_MtlMode == 8) HH_MtlMode = 0;
 
 #endif
 #if MAX_RELEASE <= 24000
