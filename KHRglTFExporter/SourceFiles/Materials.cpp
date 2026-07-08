@@ -265,16 +265,23 @@ int glTFExporter_Core::findTextureIndex(Texmap* pTex, const TSTR& fname, BOOL KT
 		if (!PathFileExists(fname)) return -1;
 
 		for (auto p : m_TextureTable) {
-			TSTR n = ((BitmapTex*)p)->GetMapName();
-			if (n == fname) {
-				pTex = p;
+			if(p->ClassID() != bmptexClassID )
 				break;
+
+			// TODO: below code crashes on non-BitmapTex 
+			BitmapTex* bmpTex = static_cast<BitmapTex*>(p);
+			if(bmpTex) {
+				TSTR n = bmpTex->GetMapName();
+				if(n == fname) {
+					pTex = p;
+					break;
+				}
 			}
 		}
 
 		if (!pTex) {
 			pTex = NewDefaultBitmapTex();
-			((BitmapTex*)pTex)->SetMapName(fname);
+			static_cast<BitmapTex*>(pTex)->SetMapName(fname);
 		}
 	}
 	auto it = std::find(m_TextureTable.begin(), m_TextureTable.end(), pTex);
@@ -286,7 +293,7 @@ int glTFExporter_Core::findTextureIndex(Texmap* pTex, const TSTR& fname, BOOL KT
 		tstring mapName(_T(""));
 
 		if (pTex->ClassID() == bmptexClassID) {
-			mapName = ((BitmapTex*)pTex)->GetMapName();
+			mapName = (static_cast<BitmapTex*>(pTex))->GetMapName();
 		}
 		else if (pTex->ClassID() == VRayBitmapID) {
 			//pTex->GetParamBlock(0)->GetValueByName(_T("HDRIMapName"), m_time, *ptr, FOREVER);
