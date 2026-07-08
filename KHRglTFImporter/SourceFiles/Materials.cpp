@@ -131,7 +131,30 @@ tstring glTFImporter_Core::CreateTextureFileName(cgltf_texture* tex, tstring &or
 			fname = urlDecode(StringToWString(uri));
 			fname = tstring(m_fullpath.parent_path()) + tstring(_T("\\")) + fname;
 			*/
+			tstring decodedUri = urlDecode(StringToWString(uri));
 
+			fs::path baseDir = m_fullpath.parent_path().lexically_normal();
+			fs::path fullPath = (baseDir / fs::path(decodedUri)).lexically_normal();
+
+			try {
+				// lexically_relative はディスクアクセスをせず、文字列ベースで「..」などを計算します
+				fs::path rel = fullPath.lexically_relative(baseDir);
+
+				// 空、または「..」から始まる（＝ベースディレクトリより外側を指している）場合はエラー
+				// ※ std::filesystem の仕様上、外側を指す場合は "../foo" のように必ず先頭が ".." になります
+				if (rel.empty() || rel.native().rfind(L"..", 0) == 0 || rel.native() == L"..") {
+					// Security Error (ディレクトリ・トラバーサル)
+					fname = _T("");
+				}
+				else {
+					fname = fullPath.wstring();
+				}
+			}
+			catch (...) {
+				fname = _T("");
+			}
+
+#if 0
 			tstring decodedUri = urlDecode(StringToWString(uri));
 
 			fs::path baseDir = m_fullpath.parent_path();
@@ -154,7 +177,7 @@ tstring glTFImporter_Core::CreateTextureFileName(cgltf_texture* tex, tstring &or
 			catch (...) {
 				fname = _T("");
 			}
-
+#endif
 
 		}
 	}
