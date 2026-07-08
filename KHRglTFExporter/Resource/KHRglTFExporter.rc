@@ -213,7 +213,7 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_LIBDESCRIPTION      "glTF Exporter"
+    IDS_LIBDESCRIPTION      "glTF 2.0 Exporter (Khronos)"
     IDS_CATEGORY            "Khronos glTF Tools"
     IDS_CLASS_NAME          "KHRglTFExporter"
     IDS_PARAMS              "Parameters"

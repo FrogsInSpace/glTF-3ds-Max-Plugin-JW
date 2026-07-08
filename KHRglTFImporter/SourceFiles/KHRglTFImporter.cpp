@@ -131,9 +131,6 @@ BOOL LaunchScript(tstring &script);
 BOOL GetFileName(HWND hWnd, tstring &ret, FileType type);
 int GetMtlType(void) {return HH_MtlMode;}
 
-void SetSparseData(std::vector<float>& dataList, cgltf_accessor& acc);
-
-
 #if 0
 class KHRglTF2Importer : public SceneImport
 {
@@ -447,15 +444,20 @@ INT_PTR CALLBACK KHRglTFImporterOptionsDlgProc(HWND hWnd,UINT message,WPARAM wPa
 		ShowWindow(GetDlgItem(hWnd, IDC_MTL_RADIO3), FALSE);
 		ShowWindow(GetDlgItem(hWnd, IDC_MTL_RADIO5), FALSE);
 		ShowWindow(GetDlgItem(hWnd, IDC_USEOSL_CHK), FALSE);
+		if (HH_MtlMode == 2 || HH_MtlMode == 4)HH_MtlMode = 0;
 #endif
 #if MAX_RELEASE <= 23000
 		ShowWindow(GetDlgItem(hWnd, IDC_MTL_RADIO6), FALSE);
 		ShowWindow(GetDlgItem(hWnd, IDC_MTL_RADIO7), FALSE);
 		ShowWindow(GetDlgItem(hWnd, IDC_MTL_RADIO8), FALSE);
 		ShowWindow(GetDlgItem(hWnd, IDC_MTL_RADIO9), FALSE);
+		if (HH_MtlMode == 5 || HH_MtlMode == 6 || HH_MtlMode == 7|| HH_MtlMode == 8) HH_MtlMode = 0;
+
 #endif
 #if MAX_RELEASE <= 24000
 		ShowWindow(GetDlgItem(hWnd, IDC_MTL_RADIO4), FALSE);
+		if (HH_MtlMode == 3)HH_MtlMode = 0;
+
 #endif
 #if MAX_RELEASE >= 26000
 		CheckDlgButton(hWnd, IDC_CM_CHECK, HH_ColorManagement);
@@ -629,12 +631,12 @@ const TCHAR *KHRglTFImporter::Ext(int i)
 
 const TCHAR *KHRglTFImporter::LongDesc()
 {
-	return _T("GL Transmission Format 2.0 importer for 3dsmax");
+	return _T("glTF 2.0 Importer for 3ds Max");
 }
 	
 const TCHAR *KHRglTFImporter::ShortDesc() 
 {			
-	return _T("GL Transmission Format 2.0 (KHRglTFImporter)");
+	return _T("glTF 2.0 (KHRglTFImporter)");
 }
 
 const TCHAR *KHRglTFImporter::AuthorName()
@@ -694,12 +696,12 @@ const TCHAR *KHRglTF2Importer::Ext(int i)
 
 const TCHAR *KHRglTF2Importer::LongDesc()
 {
-	return _T("GL Transmission Format 2.0 importer for 3dsmax");
+	return _T("glTF 2.0 Importer for 3ds Max");
 }
 
 const TCHAR *KHRglTF2Importer::ShortDesc()
 {
-	return _T("GL Transmission Format 2.0");
+	return _T("glTF 2.0 (KHRglTFImporter)");
 }
 
 const TCHAR *KHRglTF2Importer::AuthorName()

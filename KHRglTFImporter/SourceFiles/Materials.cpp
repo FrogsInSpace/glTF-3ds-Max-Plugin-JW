@@ -131,7 +131,30 @@ tstring glTFImporter_Core::CreateTextureFileName(cgltf_texture* tex, tstring &or
 			fname = urlDecode(StringToWString(uri));
 			fname = tstring(m_fullpath.parent_path()) + tstring(_T("\\")) + fname;
 			*/
+			tstring decodedUri = urlDecode(StringToWString(uri));
 
+			fs::path baseDir = m_fullpath.parent_path().lexically_normal();
+			fs::path fullPath = (baseDir / fs::path(decodedUri)).lexically_normal();
+
+			try {
+				// lexically_relative - calculates characters like ".." based on strings
+				fs::path rel = fullPath.lexically_relative(baseDir);
+
+				// An error will occur if the directory is empty or starts with ".." (i.e., points outside the base directory).
+				// * Due to the specifications of std::filesystem, when pointing outside the base directory, the beginning will always be "..", like "../foo".
+				if (rel.empty() || rel.native().rfind(L"..", 0) == 0 || rel.native() == L"..") {
+					// Security Error (Directory Traversal)
+					fname = _T("");
+				}
+				else {
+					fname = fullPath.wstring();
+				}
+			}
+			catch (...) {
+				fname = _T("");
+			}
+
+#if 0
 			tstring decodedUri = urlDecode(StringToWString(uri));
 
 			fs::path baseDir = m_fullpath.parent_path();
@@ -154,7 +177,7 @@ tstring glTFImporter_Core::CreateTextureFileName(cgltf_texture* tex, tstring &or
 			catch (...) {
 				fname = _T("");
 			}
-
+#endif
 
 		}
 	}
