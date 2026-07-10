@@ -1,3 +1,8 @@
+<!--
+SPDX-FileCopyrightText: The Khronos Group, Inc.
+SPDX-License-Identifier: Apache-2.0
+-->
+
 # 📦 glTF 2.0 Importer/Exporter for Autodesk 3ds Max
 
 This project adds glTF™ (2.0) file access capabilities to Autodesk 3ds Max®, providing a seamless round-trip workflow for importing, editing, and exporting 3D content in glTF format.
