@@ -1,0 +1,117 @@
+version = 1
+SPDX-PackageName = "glTF-3ds-Max-Plugin"
+SPDX-PackageSupplier = "The Khronos Group, Inc."
+SPDX-PackageDownloadLocation = "https://github.com/KhronosGroup/glTF-3ds-Max-Plugin"
+
+[[annotations]]
+precedence = "closest"
+path = [
+    "**"
+]
+SPDX-FileCopyrightText = "The Khronos Group, Inc."
+SPDX-License-Identifier = "Apache-2.0"
+
+[[annotations]]
+precedence = "closest"
+path = [
+    "3rd_Party_Products/cgltf/**",
+]
+SPDX-FileCopyrightText = "Johannes Kuhlmann"
+SPDX-License-Identifier = "MIT"
+
+[[annotations]]
+precedence = "closest"
+path = [
+    "3rd_Party_Products/draco/**",
+]
+SPDX-FileCopyrightText = "The Draco Authors"
+SPDX-License-Identifier = "Apache-2.0"
+
+[[annotations]]
+precedence = "closest"
+path = [
+    "3rd_Party_Products/jsoncpp",
+]
+SPDX-FileCopyrightText = "Baptiste Lepilleur and The JsonCpp Authors"
+SPDX-License-Identifier = "MIT"
+
+
+[[annotations]]
+precedence = "closest"
+path = [
+    "3rd_Party_Products/tinygltf/deps/cpplint.py",
+]
+SPDX-FileCopyrightText = "Google Inc"
+SPDX-License-Identifier = "BSD-3-Clause"
+
+
+[[annotations]]
+precedence = "closest"
+path = [
+    "3rd_Party_Products/tinygltf/**"
+]
+SPDX-FileCopyrightText = "Syoyo Fujita, Aurélien Chatelain and many contributors"
+SPDX-License-Identifier = "MIT"
+
+
+[[annotations]]
+precedence = "closest"
+path = [
+    "3rd_Party_Products/tinygltf/examples/common/glm",
+]
+SPDX-FileCopyrightText = "G-Truc Creation"
+SPDX-License-Identifier = "MIT"
+
+[[annotations]]
+precedence = "closest"
+path = [
+    "3rd_Party_Products/webp/**"
+]
+SPDX-FileCopyrightText = "Google Inc"
+SPDX-License-Identifier = "BSD-3-Clause"
+
+[[annotations]]
+precedence = "closest"
+path = [
+    "KHRglTFExporter/**",
+]
+SPDX-FileCopyrightText = "The Khronos Group, Inc and Contributors"
+SPDX-License-Identifier = "Apache-2.0"
+
+[[annotations]]
+precedence = "closest"
+path = [
+    "KHRglTFExporter/Include/3dsmaxsdk_preinclude.h",
+    "KHRglTFImporter/Include/3dsmaxsdk_preinclude.h",
+]
+SPDX-FileCopyrightText = "Autodesk, Inc."
+SPDX-License-Identifier = "LicenseRef-Autodesk"
+
+[[annotations]]
+precedence = "closest"
+path = [
+    "KHRglTFExporter/SourceFiles/KHRglTFExporter.cpp",
+    "KHRglTFExporter/SourceFiles/KHRglTFImporter.cpp",
+]
+SPDX-FileCopyrightText = "The Khronos Group, Inc."
+SPDX-License-Identifier = "Apache-2.0"
+
+[[annotations]]
+precedence = "closest"
+path = [
+    "KHRglTFExporter/SourceFiles/KHRglTFExporter.cpp",
+    "KHRglTFExporter/SourceFiles/KHRglTFImporter.cpp",
+]
+SPDX-FileCopyrightText = [
+    "Google Inc",
+    "Satoshi Hayashi",
+]
+SPDX-License-Identifier = "MIT"
+
+[[annotations]]
+precedence = "closest"
+path = [
+    "KHRglTFImporter/Include/jsmn.h",
+]
+SPDX-FileCopyrightText = "Serge Zaitsev"
+SPDX-License-Identifier = "MIT"
