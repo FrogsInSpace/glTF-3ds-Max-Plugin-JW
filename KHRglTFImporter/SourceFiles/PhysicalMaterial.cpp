@@ -501,10 +501,10 @@ void glTFImporter_Core::CreatePhysicalMaterial(void)
 		//float alphaCutoff = mtl->alpha_cutoff;
 		//bool doubleSided = mtl->double_sided;
 
-
 		AttachAlphaModeCustAttr(pSmat, mtl->alpha_mode);
 
-		CreateVolumeAttr(pSmat, &mtl->volume, mtl->has_volume);
+		if (mtl->has_volume)
+			CreateVolumeAttr(pSmat, &mtl->volume, mtl->has_volume);
 
 		//CreateIridescenceAttr(pSmat, &mtl->iridescence, mtl->has_iridescence);
 		if (mtl->has_iridescence) {
@@ -537,9 +537,12 @@ void glTFImporter_Core::CreatePhysicalMaterial(void)
 
 		//CreateSheenAttr(pSmat, &mtl->sheen, mtl->has_sheen);
 		//CreateClearcoatAttr(pSmat, &mtl->clearcoat, mtl->has_clearcoat);
-		CreateUnlitAttr(pSmat, mtl->unlit);
-		CreateSpecularAttr(pSmat, &mtl->specular, mtl->has_specular);
-		CreateDiffuseTransmissionAttr(pSmat, &mtl->diffuse_transmission, mtl->has_diffuse_transmission);
+		if (mtl->unlit)
+			CreateUnlitAttr(pSmat, mtl->unlit);
+		if (mtl->has_specular)
+			CreateSpecularAttr(pSmat, &mtl->specular, mtl->has_specular);
+		if (mtl->has_diffuse_transmission)
+			CreateDiffuseTransmissionAttr(pSmat, &mtl->diffuse_transmission, mtl->has_diffuse_transmission);
 
 		m_MaterialMap.insert(std::make_pair(mtl, pSmat));
 		SetMtlImportStatus(i + 1);

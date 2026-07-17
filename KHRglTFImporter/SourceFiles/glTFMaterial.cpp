@@ -404,11 +404,16 @@ void glTFImporter_Core::CreateglTFMaterial(void)
 		float alphaCutoff = mtl->alpha_cutoff;
 		bool doubleSided = mtl->double_sided;
 
-		CreateIridescenceAttr(pSmat, &mtl->iridescence, mtl->has_iridescence);
-		CreateEmissiveStrengthAttr(pSmat, &mtl->emissive_strength, mtl->has_emissive_strength);
-		CreateAnisotropyAttr(pSmat, &mtl->anisotropy, mtl->has_anisotropy);
-		CreateDispersionAttr(pSmat, &mtl->dispersion, mtl->has_dispersion);
-		CreateDiffuseTransmissionAttr(pSmat, &mtl->diffuse_transmission, mtl->has_diffuse_transmission);
+		if(mtl->has_iridescence)
+			CreateIridescenceAttr(pSmat, &mtl->iridescence, mtl->has_iridescence);
+		if(mtl->has_emissive_strength)
+			CreateEmissiveStrengthAttr(pSmat, &mtl->emissive_strength, mtl->has_emissive_strength);
+		if(mtl->has_anisotropy)
+			CreateAnisotropyAttr(pSmat, &mtl->anisotropy, mtl->has_anisotropy);
+		if(mtl->has_dispersion)
+			CreateDispersionAttr(pSmat, &mtl->dispersion, mtl->has_dispersion);
+		if(mtl->has_diffuse_transmission)
+			CreateDiffuseTransmissionAttr(pSmat, &mtl->diffuse_transmission, mtl->has_diffuse_transmission);
 
 		m_MaterialMap.insert(std::make_pair(mtl, pSmat));
 		SetMtlImportStatus(i + 1);

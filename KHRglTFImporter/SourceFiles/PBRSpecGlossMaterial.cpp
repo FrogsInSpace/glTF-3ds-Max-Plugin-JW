@@ -173,10 +173,15 @@ Mtl* glTFImporter_Core::CreatePBRSpecGlossMtl(cgltf_material* mtl)
 	if (mtl->has_emissive_strength) {
 		cgltf_emissive_strength* strength = &mtl->emissive_strength;
 	}
-
-	CreateUnlitAttr(pSmat, mtl->unlit);
-	CreateIridescenceAttr(pSmat, &mtl->iridescence, mtl->has_iridescence);
-	CreateDiffuseTransmissionAttr(pSmat, &mtl->diffuse_transmission, mtl->has_diffuse_transmission);
+	if (mtl->unlit) {
+		CreateUnlitAttr(pSmat, mtl->unlit);
+	}
+	if (mtl->has_iridescence) {
+		CreateIridescenceAttr(pSmat, &mtl->iridescence, mtl->has_iridescence);
+	}
+	if (mtl->has_diffuse_transmission) {
+		CreateDiffuseTransmissionAttr(pSmat, &mtl->diffuse_transmission, mtl->has_diffuse_transmission);
+	}
 
 
 	return pSmat;

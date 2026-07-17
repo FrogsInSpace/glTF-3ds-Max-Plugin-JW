@@ -298,13 +298,20 @@ void glTFImporter_Core::CreateUSDMaterial(void)
 
 		AttachAlphaModeCustAttr(pSmat, mtl->alpha_mode);
 
-		CreateTransmissionAttr(pSmat, &mtl->transmission, mtl->has_transmission);
-		CreateVolumeAttr(pSmat, &mtl->volume, mtl->has_volume);
-		CreateIridescenceAttr(pSmat, &mtl->iridescence, mtl->has_iridescence);
-		CreateSheenAttr(pSmat, &mtl->sheen, mtl->has_sheen);
-		CreateUnlitAttr(pSmat, mtl->unlit);
-		CreateEmissiveStrengthAttr(pSmat, &mtl->emissive_strength, mtl->has_emissive_strength);
-		CreateDiffuseTransmissionAttr(pSmat, &mtl->diffuse_transmission, mtl->has_diffuse_transmission);
+		if(mtl->has_transmission)
+			CreateTransmissionAttr(pSmat, &mtl->transmission, mtl->has_transmission);
+		if (mtl->has_volume)
+			CreateVolumeAttr(pSmat, &mtl->volume, mtl->has_volume);
+		if (mtl->has_iridescence)
+			CreateIridescenceAttr(pSmat, &mtl->iridescence, mtl->has_iridescence);
+		if (mtl->has_sheen)
+			CreateSheenAttr(pSmat, &mtl->sheen, mtl->has_sheen);
+		if (mtl->unlit)
+			CreateUnlitAttr(pSmat, mtl->unlit);
+		if (mtl->has_emissive_strength)
+			CreateEmissiveStrengthAttr(pSmat, &mtl->emissive_strength, mtl->has_emissive_strength);
+		if (mtl->has_diffuse_transmission)
+			CreateDiffuseTransmissionAttr(pSmat, &mtl->diffuse_transmission, mtl->has_diffuse_transmission);
 
 		m_MaterialMap.insert(std::make_pair(mtl, pSmat));
 		SetMtlImportStatus(i + 1);

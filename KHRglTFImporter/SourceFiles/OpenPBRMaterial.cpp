@@ -427,9 +427,12 @@ void glTFImporter_Core::CreateOpenPBRMaterial(void)
 
 		AttachAlphaModeCustAttr(pSmat, mtl->alpha_mode);
 
-		CreateUnlitAttr(pSmat, mtl->unlit);
-		CreateVolumeAttr(pSmat, &mtl->volume, mtl->has_volume);
-		CreateDiffuseTransmissionAttr(pSmat, &mtl->diffuse_transmission, mtl->has_diffuse_transmission);
+		if(mtl->unlit)
+			CreateUnlitAttr(pSmat, mtl->unlit);
+		if(mtl->has_volume)
+			CreateVolumeAttr(pSmat, &mtl->volume, mtl->has_volume);
+		if(mtl->has_diffuse_transmission)
+			CreateDiffuseTransmissionAttr(pSmat, &mtl->diffuse_transmission, mtl->has_diffuse_transmission);
 //		CreateIORAttr(pSmat, &mtl->ior, mtl->has_ior);
 	//		CreateIridescenceAttr(pSmat, &mtl->iridescence, mtl->has_iridescence);
 //		CreateSheenAttr(pSmat, &mtl->sheen, mtl->has_sheen);

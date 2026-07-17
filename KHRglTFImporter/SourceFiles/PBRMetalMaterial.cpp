@@ -296,18 +296,30 @@ void glTFImporter_Core::CreatePBRMetalMaterial(void)
 
 		AttachAlphaModeCustAttr(pSmat, mtl->alpha_mode);
 
-		CreateIORAttr(pSmat, &mtl->ior, mtl->has_ior);
-		CreateTransmissionAttr(pSmat, &mtl->transmission, mtl->has_transmission);
-		CreateVolumeAttr(pSmat, &mtl->volume, mtl->has_volume);
-		CreateIridescenceAttr(pSmat, &mtl->iridescence, mtl->has_iridescence);
-		CreateSheenAttr(pSmat, &mtl->sheen, mtl->has_sheen);
-		CreateClearcoatAttr(pSmat, &mtl->clearcoat, mtl->has_clearcoat);
-		CreateUnlitAttr(pSmat, mtl->unlit);
-		CreateEmissiveStrengthAttr(pSmat, &mtl->emissive_strength, mtl->has_emissive_strength);
-		CreateAnisotropyAttr(pSmat, &mtl->anisotropy, mtl->has_anisotropy);
-		CreateSpecularAttr(pSmat, &mtl->specular, mtl->has_specular);
-		CreateDispersionAttr(pSmat, &mtl->dispersion, mtl->has_dispersion);
-		CreateDiffuseTransmissionAttr(pSmat, &mtl->diffuse_transmission, mtl->has_diffuse_transmission);
+		if (mtl->has_ior)
+			CreateIORAttr(pSmat, &mtl->ior, mtl->has_ior);
+		if (mtl->has_transmission)
+			CreateTransmissionAttr(pSmat, &mtl->transmission, mtl->has_transmission);
+		if(mtl->has_volume)
+			CreateVolumeAttr(pSmat, &mtl->volume, mtl->has_volume);
+		if(mtl->has_iridescence)
+			CreateIridescenceAttr(pSmat, &mtl->iridescence, mtl->has_iridescence);
+		if(mtl->has_sheen)
+			CreateSheenAttr(pSmat, &mtl->sheen, mtl->has_sheen);
+		if(mtl->has_clearcoat)
+			CreateClearcoatAttr(pSmat, &mtl->clearcoat, mtl->has_clearcoat);
+		if(mtl->unlit)
+			CreateUnlitAttr(pSmat, mtl->unlit);
+		if(mtl->has_emissive_strength)
+			CreateEmissiveStrengthAttr(pSmat, &mtl->emissive_strength, mtl->has_emissive_strength);
+		if(mtl->has_anisotropy)
+			CreateAnisotropyAttr(pSmat, &mtl->anisotropy, mtl->has_anisotropy);
+		if(mtl->has_specular)
+			CreateSpecularAttr(pSmat, &mtl->specular, mtl->has_specular);
+		if(mtl->has_dispersion)
+			CreateDispersionAttr(pSmat, &mtl->dispersion, mtl->has_dispersion);
+		if(mtl->has_diffuse_transmission)
+			CreateDiffuseTransmissionAttr(pSmat, &mtl->diffuse_transmission, mtl->has_diffuse_transmission);
 
 		m_MaterialMap.insert(std::make_pair(mtl, pSmat));
 		SetMtlImportStatus(i + 1);
