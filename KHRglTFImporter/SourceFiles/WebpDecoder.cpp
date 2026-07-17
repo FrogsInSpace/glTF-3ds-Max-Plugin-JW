@@ -71,10 +71,23 @@ BOOL glTFImporter_Core::WebpDecode(const tstring &fname, tstring &retname)
     std::filesystem::path destname(fname);
     retname = m_WorkImageFolder + tstring(destname.stem()) + _T(".png");
 
+    // Check if alpha map is needed?
+    bool has_alpha = false;
+    uint8_t* p_check = buf;
+    for (int i = 0; i < width * height; ++i) {
+        p_check += 3; // sSkip RGB channel
+        uint8_t alpha = *p_check++;
+        if (alpha < 255) { //
+            has_alpha = true;
+            break;
+        }
+    }
+
     BitmapInfo bi;
     bi.SetHeight(height);
     bi.SetWidth(width);
     bi.SetName(retname.c_str());
+
     bi.SetType(BMM_TRUE_64);
     bi.SetFlags(MAP_HAS_ALPHA);
 
@@ -101,7 +114,9 @@ BOOL glTFImporter_Core::WebpDecode(const tstring &fname, tstring &retname)
         }
     }
 
-    SetPNGInfo(m_pPNG_BmpIO, pBmp);
+    m_pPNG_BmpIO->SetType(BMM_TRUE_24);
+    m_pPNG_BmpIO->SetAlpha(has_alpha);
+    //SetPNGInfo(m_pPNG_BmpIO, pBmp);
 
     pBmp->OpenOutput(&bi);
     pBmp->Write(&bi);

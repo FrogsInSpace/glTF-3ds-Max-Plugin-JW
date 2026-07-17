@@ -146,6 +146,8 @@ bool LoadKTX2ToRawRGBA(const tstring& ktxfilename, const tstring &filename, IBit
 	Bitmap* pBmp = CreateMaxBitmapFromRawData(outData.data(), width, height);
 	if (!pBmp) { ktxTexture_Destroy(ktxTexture(kTexture)); return false; }
 
+	bool hasAlpha = (ktxTexture2_GetNumComponents(kTexture) == 4);
+
 	BitmapInfo bi = pBmp->GetBitmapInfo();
 /*
 #if MAX_RELEASE >= 26000
@@ -163,7 +165,11 @@ bool LoadKTX2ToRawRGBA(const tstring& ktxfilename, const tstring &filename, IBit
 	}
 #endif
 */
-	SetPNGInfo(pPNG_BmpIO, pBmp);
+
+
+	pPNG_BmpIO->SetType(BMM_TRUE_24);
+	pPNG_BmpIO->SetAlpha(hasAlpha);
+	//SetPNGInfo(pPNG_BmpIO, pBmp);
 
 	bi.SetName(filename.c_str());
 	pBmp->OpenOutput(&bi);
