@@ -99,6 +99,7 @@
 #define OpenPBRMaterialID			Class_ID(0xf1551e33, 0x37fb1337)
 
 #define MixTexID					Class_ID(0x230, 0x0)
+#define ShellMaterialID				Class_ID(0x255, 0x0)
 
 //#define Arnold_StandardSufaceID	Class_ID(0x7e73161f, 0x62f74b4c)
 #define ArnoldNormalMapID			Class_ID(0x7e73161f, 0x461fb78c)
@@ -452,6 +453,7 @@ extern BitmapTex* CreateBitmapTex(const tstring& texFilePath, Texmap* pTex, cons
 extern IPoint2 GetBitmapSize(void);
 extern double truncateDecimal(float value);
 extern int GetMirroredNode(INodeTab& tbl);
+extern Mtl* GetSubMtlFromShellMtl(Mtl* pMtl);
 
 //======================================================================
 //======================================================================

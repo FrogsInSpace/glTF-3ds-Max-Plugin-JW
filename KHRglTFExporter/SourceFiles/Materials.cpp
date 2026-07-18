@@ -1634,11 +1634,15 @@ void glTFExporter_Core::CreateMaterialMap(BOOL exportSelected)
 
 //======================================================================
 //======================================================================
-void glTFExporter_Core::CreateMaterialMapRec(MtlBase *pOrgMtl, BOOL VariantPart)
+void glTFExporter_Core::CreateMaterialMapRec(MtlBase* pOrgMtl, BOOL VariantPart)
 {
 	if (!pOrgMtl) return;
 
 	MtlBase* pMtl = pOrgMtl;
+	if (pOrgMtl->ClassID() == ShellMaterialID){
+		pMtl = GetSubMtlFromShellMtl((Mtl*)pOrgMtl);
+		if (!pMtl) return;
+	}
 	if (pOrgMtl->ClassID() == XREFMATERIAL_CLASS_ID) {
 		IXRefMaterial* pXrefMtl = IXRefMaterial::GetInterface(*pOrgMtl);
 		pMtl = pXrefMtl->GetSourceMaterial();
@@ -1873,3 +1877,21 @@ void GetUV(UVGen *pUVGen, float &px, float &py, float &sx, float &sy)
 	pBlock->GetValue(2, 0, sx, FOREVER);
 	pBlock->GetValue(3, 0, sy, FOREVER);
 }
+
+//======================================================================
+//======================================================================
+Mtl* GetSubMtlFromShellMtl(Mtl* pMtl)
+{
+	if (!pMtl) return NULL;
+	if (pMtl->ClassID() != ShellMaterialID) return NULL;
+
+	IParamBlock2* pblock = pMtl->GetParamBlock(0);
+	if (!pblock) return NULL;
+
+	int vpOut = 0;
+	pblock->GetValue(0, 0, vpOut, FOREVER);     // 0 = Origina
+
+	return (vpOut == 0) ? pMtl->GetSubMtl(0) : pMtl->GetSubMtl(1);
+
+}
+

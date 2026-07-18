@@ -248,6 +248,8 @@ void glTFExporter_Core::ExCreateMeshData(INode* pNode, tinygltf::Node& node)
 	//------------------------------------------
 	//------------------------------------------
 	Mtl* pMtl = pNode->GetMtl();
+	if (pMtl && pMtl->ClassID() == ShellMaterialID) pMtl = GetSubMtlFromShellMtl(pMtl);
+
 	if (!pMtl && m_WireClrToMtl) {
 		if (IsGeometryObject(pNode))
 			pMtl = m_WireColorMtlMap[pNode->GetWireColor()];

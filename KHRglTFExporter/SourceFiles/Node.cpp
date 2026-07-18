@@ -565,6 +565,8 @@ void glTFExporter_Core::CreateMeshData(INode *pNode, tinygltf::Node &node)
 
 	//tinygltf::Material *material = 0;
 	Mtl *pMtl = pNode->GetMtl();
+	if (pMtl && pMtl->ClassID() == ShellMaterialID) pMtl = GetSubMtlFromShellMtl(pMtl);
+
 	if (!pMtl && m_WireClrToMtl) {
 		if(IsGeometryObject(pNode))
 			pMtl = m_WireColorMtlMap[pNode->GetWireColor()];
