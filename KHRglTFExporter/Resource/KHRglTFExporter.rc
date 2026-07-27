@@ -15,7 +15,7 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// Japanese (Japan) resources
+// 日本語 (日本) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_JPN)
 LANGUAGE LANG_JAPANESE, SUBLANG_DEFAULT
@@ -39,12 +39,12 @@ END
 
 #endif    // APSTUDIO_INVOKED
 
-#endif    // Japanese (Japan) resources
+#endif    // 日本語 (日本) resources
 /////////////////////////////////////////////////////////////////////////////
 
 
 /////////////////////////////////////////////////////////////////////////////
-// English (United States) resources
+// 英語 (ニュートラル) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
 LANGUAGE LANG_ENGLISH, SUBLANG_NEUTRAL
@@ -107,8 +107,8 @@ BEGIN
     CONTROL         "Use original map",IDC_MRO_RADIO1,"Button",BS_AUTORADIOBUTTON,127,107,80,11
     CONTROL         "Build Mtl/Rgh/Occ map",IDC_MRO_RADIO2,"Button",BS_AUTORADIOBUTTON,127,117,114,11
     CONTROL         "Build Mtl/Rgh + Occ map",IDC_MRO_RADIO3,"Button",BS_AUTORADIOBUTTON,127,127,111,11
-    LTEXT           "Size:",IDC_SIZE_STATIC,137,138,20,8
-    COMBOBOX        IDC_SIZE_LIST,159,135,84,52,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "Size:",IDC_SIZE_STATIC,137,139,20,8
+    COMBOBOX        IDC_SIZE_LIST,159,137,84,52,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     LTEXT           "Type:",IDC_TYPE_STATIC,138,152,16,8
     COMBOBOX        IDC_TYPE_LIST,159,151,45,52,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     PUSHBUTTON      "Setting...",IDC_IMGSET_BTN,207,150,36,15,NOT WS_VISIBLE
@@ -221,7 +221,7 @@ BEGIN
     IDS_CLASS_NAME2         "KHRglTF2Exporter"
 END
 
-#endif    // English (United States) resources
+#endif    // 英語 (ニュートラル) resources
 /////////////////////////////////////////////////////////////////////////////
 
 

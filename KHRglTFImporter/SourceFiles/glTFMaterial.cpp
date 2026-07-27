@@ -175,7 +175,9 @@ void glTFImporter_Core::CreateglTFMaterial(void)
 				pBmpTex = SplitOcclusionTexture(pBmpTex);
 				pBlock0->SetValue(glTF_ambientOcclusionMap, m_time, pBmpTex);
 			}
-			pBlock0->SetValue(glTF_ambientOcclusion, m_time, occTexInfo->scale);
+			float occv = occTexInfo->scale;
+			occv = occv < 0.00001f ? 0.00001f : occv;
+			pBlock0->SetValue(glTF_ambientOcclusion, m_time, occv);
 		}
 
 		cgltf_texture_view* nrmTexInfo = &mtl->normal_texture;
