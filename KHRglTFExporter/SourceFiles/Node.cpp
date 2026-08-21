@@ -286,23 +286,45 @@ tinygltf::Node glTFExporter_Core::CreateNodeDataRec(INode *pNode, BOOL recursive
 		tm = tm * Inverse(pNode->GetParentTM(m_time));
 	}
 
-	Control *pC = pNode->GetTMController();
-	if (pC->IsAnimated() || m_FullFrame || m_ForceTRSMode) {
+	if (m_Mesh_quantization_Used) {
+		QuantizationInfo quantInfo;
+		GetQuatizationInfo(pNode, quantInfo);
+		QuantizationInfo parentInfo;
+		GetQuatizationInfo(pNode->GetParentNode(), parentInfo);
+
 		AffineParts parts;
 		decomp_affine(tm, &parts);
-		node.translation.push_back(parts.t.x * m_scale);
-		node.translation.push_back(parts.t.y * m_scale);
-		node.translation.push_back(parts.t.z * m_scale);
 		node.rotation.push_back(parts.q.x);
 		node.rotation.push_back(parts.q.y);
 		node.rotation.push_back(parts.q.z);
 		node.rotation.push_back(-parts.q.w);
-		node.scale.push_back(parts.k.x);
-		node.scale.push_back(parts.k.y);
-		node.scale.push_back(parts.k.z);
+		node.translation.push_back(parts.t.x   / parentInfo.meshScale);
+		node.translation.push_back(parts.t.y   / parentInfo.meshScale);
+		node.translation.push_back(parts.t.z   / parentInfo.meshScale);
+
+		node.scale.push_back(parts.k.x * quantInfo.meshScale   / parentInfo.meshScale);
+		node.scale.push_back(parts.k.y * quantInfo.meshScale   / parentInfo.meshScale);
+		node.scale.push_back(parts.k.z * quantInfo.meshScale   / parentInfo.meshScale);
 	}
 	else {
-		Matrix3ToFloat(tm, node.matrix, m_scale);
+		Control* pC = pNode->GetTMController();
+		if (pC->IsAnimated() || m_FullFrame || m_ForceTRSMode) {
+			AffineParts parts;
+			decomp_affine(tm, &parts);
+			node.translation.push_back(parts.t.x * m_scale);
+			node.translation.push_back(parts.t.y * m_scale);
+			node.translation.push_back(parts.t.z * m_scale);
+			node.rotation.push_back(parts.q.x);
+			node.rotation.push_back(parts.q.y);
+			node.rotation.push_back(parts.q.z);
+			node.rotation.push_back(-parts.q.w);
+			node.scale.push_back(parts.k.x);
+			node.scale.push_back(parts.k.y);
+			node.scale.push_back(parts.k.z);
+		}
+		else {
+			Matrix3ToFloat(tm, node.matrix, m_scale);
+		}
 	}
 
 	{

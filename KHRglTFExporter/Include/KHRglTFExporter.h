@@ -73,7 +73,7 @@
 //using namespace tinygltf;
 
 
-#define KHR_GLTF_EXPORTER_VER (_T("2.00"))
+#define KHR_GLTF_EXPORTER_VER (_T("2.01"))
 
 #define KHRglTFExporter_CLASS_ID	Class_ID(0x38586030, 0x1b315b3e)
 #define KHRglTF2Exporter_CLASS_ID	Class_ID(0x56337879, 0x5a732c12)
@@ -407,6 +407,27 @@ struct vertPropFlag {
 	BOOL mapCh1Used = FALSE;
 	BOOL mapCh2Used = FALSE;
 	IGameMesh* pGameMesh = nullptr;
+};
+
+//==========================================================
+// For Quantization of mesh and uvmap
+//==========================================================
+struct QuantizationInfo {
+	Point3 meshSize;
+	float meshScale;
+	Point2 uvmap1Offset;
+	float uvmap1Scale;
+	Point2 uvmap2Offset;
+	float uvmap2Scale;
+
+	QuantizationInfo() {
+		//meshOffset = Point3(0.0f, 0.0f, 0.0f);
+		meshScale = 1.0f;
+		uvmap1Offset = Point2(0.0f, 0.0f);
+		uvmap1Scale = 1.0f;
+		uvmap2Offset = Point2(0.0f, 0.0f);
+		uvmap2Scale = 1.0f;
+	}
 };
 
 inline const Matrix3 YupTM(Point3(1, 0, 0), Point3(0, 0, -1), Point3(0, 1, 0), Point3(0, 0, 0));
@@ -758,6 +779,8 @@ public:
 
 	BOOL CreateGLTFXFile(const tstring& filename);
 
+	void CreateQuatizationMap(void);
+	BOOL GetQuatizationInfo(ReferenceTarget* pRef, QuantizationInfo& info);
 
 	float m_scale;
 	BOOL m_CopyImage;
@@ -824,6 +847,7 @@ public:
 	BOOL m_Selectability_Used;
 	BOOL m_Hoverability_Used;
 	BOOL m_TexBasisu_Used;
+	BOOL m_Mesh_quantization_Used;
 
 	BOOL m_IncorrectSkinDataFound;
 };

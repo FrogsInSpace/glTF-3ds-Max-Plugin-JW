@@ -68,7 +68,7 @@ extern BOOL IsLogOut(void);
 
 
 #define KHR_APP_CODE 200
-#define KHR_GLTF_IMPORTER_VER (_T("2.00"))
+#define KHR_GLTF_IMPORTER_VER (_T("2.01"))
 
 #define KHR_UV_MODE 1
 
@@ -303,6 +303,7 @@ extern Texmap* CreateUberBitmapOSLNode(const TSTR& fname);
 extern Texmap* CreateSpecGlossFilterOSLNode(Texmap* pTex1, Texmap* pTex2);
 extern Texmap* CreateAlphaChOSLNode(AColor col);
 extern Texmap* CreateColorMultiplyOSLNode(Texmap* pTex, Color col);
+extern Texmap* CreateFlowMapTransformOSLNode(Texmap* pTex);
 
 extern void GetDracoMeshIndexList(cgltf_buffer_view* bufferView, std::vector<uint32_t> &tbl);
 extern void DracoDecodeProc(cgltf_buffer_view* bufferView, cgltf_primitive* primitive, std::vector<float> &tbl, DracoDecodeType type, UINT AttrCh=0);

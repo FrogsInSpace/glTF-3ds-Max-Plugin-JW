@@ -115,8 +115,7 @@
       <TargetMachine>MachineX64</TargetMachine>
     </Link>
     <PostBuildEvent>
-      <Command>
-      </Command>
+      <Command>echo F | xcopy /Y /Q "$(TargetPath)" "$(SolutionDir)Packages\3ds Max $(MaxSDKRelease)\Plugins\$(TargetFileName)"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="$(Configuration.Contains('Release'))">
@@ -187,6 +186,7 @@
     <ClCompile Include="SourceFiles\KHR_animation_pointer.cpp" />
     <ClCompile Include="SourceFiles\KHR_collision_shapes.cpp" />
     <ClCompile Include="SourceFiles\KHR_interactivity.cpp" />
+    <ClCompile Include="SourceFiles\KHR_mesh_quantization.cpp" />
     <ClCompile Include="SourceFiles\KTX2_Encoder.cpp" />
     <ClCompile Include="SourceFiles\Materials.cpp" />
     <ClCompile Include="SourceFiles\MergeBitmap.cpp" />

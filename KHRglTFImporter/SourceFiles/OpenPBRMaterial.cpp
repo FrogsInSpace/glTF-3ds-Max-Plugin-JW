@@ -353,40 +353,30 @@ void glTFImporter_Core::CreateOpenPBRMaterial(void)
 			if (pBmpTex) {
 				SetTextureUVoffset(pBmpTex, anisoTexInfo);
 
-				Texmap* pMetalTex = NULL;
-				Texmap* pRoughTex = NULL;
-				Texmap* pOccTex = NULL;
-				SetMetalRoughOccClrCorrectMap(pBmpTex, &pMetalTex, &pRoughTex, &pOccTex, TRUE, FALSE, TRUE);// , & metalRgh->metallic_roughness_texture);
-
-				pBlock0->SetValue(opbr_specular_roughness_anisotropy_map, m_time, pMetalTex);
-				pBlock0->SetValue(opbr_specular_roughness_anisotropy_map_on, m_time, 1);
+				Texmap* pBlueTex = NULL;
+				Texmap* pGreenTex = NULL;
+				Texmap* pRedTex = NULL;
+				SetMetalRoughOccClrCorrectMap(pBmpTex, &pBlueTex, &pGreenTex, &pRedTex, TRUE, FALSE, TRUE);// , & metalRgh->metallic_roughness_texture);
+				pBlock0->SetValue(opbr_specular_roughness_anisotropy_map, m_time, pBlueTex);
+				//pBlock0->SetValue(opbr_specular_roughness_anisotropy_map_on, m_time, 1);
 
 				Texmap* pGainTex = (Texmap*)GetCOREInterface()->CreateInstance(TEXMAP_CLASS_ID, ColorCorrectTexID);
 				IParamBlock2* p1 = pGainTex->GetParamBlock(0);
-				p1->SetValue(1, m_time, pOccTex);
+				p1->SetValue(1, m_time, pBmpTex);
 				p1->SetValue(11, m_time, 1);
-				p1->SetValue(18, m_time, 50.0f);
+				//p1->SetValue(18, m_time, 50.0f);
 				p1->SetValue(2, m_time, 2);
-				p1->SetValue(3, m_time, 4);
-				p1->SetValue(4, m_time, 5);
-				p1->SetValue(5, m_time, 6);
+				p1->SetValue(3, m_time, 10);
+				p1->SetValue(4, m_time, 10);
+				p1->SetValue(5, m_time, 8);
 
-				Texmap* pLiftTex = (Texmap*)GetCOREInterface()->CreateInstance(TEXMAP_CLASS_ID, ColorCorrectTexID);
-				IParamBlock2* p2 = pLiftTex->GetParamBlock(0);
-				p2->SetValue(1, m_time, pOccTex);
-				p2->SetValue(11, m_time, 1);
-				p2->SetValue(18, m_time, 50.0f);
-				p2->SetValue(30, m_time, 0.5f);
+				Texmap* pOSLtex = CreateFlowMapTransformOSLNode(pBmpTex);
 
-				Texmap* pCutOffTex = CreateCutOffOSLNode(pRoughTex, 0.5f);
 
-				Texmap* pMixTex = (Texmap*)GetCOREInterface()->CreateInstance(TEXMAP_CLASS_ID, MixTexID);
-				IParamBlock2* p3 = pMixTex->GetParamBlock(0);
-				p3->SetValue(6, m_time, pLiftTex);
-				p3->SetValue(7, m_time, pGainTex);
-				p3->SetValue(8, m_time, pCutOffTex);
+				pBlock0->SetValue(opbr_specular_roughness_anisotropy_map, m_time, pGainTex);
+				pBlock0->SetValue(opbr_specular_roughness_anisotropy_map_on, m_time, 1);
 
-				pBlock0->SetValue(opbr_geometry_tangent_map, m_time, pMixTex);
+				pBlock0->SetValue(opbr_geometry_tangent_map, m_time, pOSLtex);
 				pBlock0->SetValue(opbr_geometry_tangent_map_on, m_time, 1);
 			}
 		}

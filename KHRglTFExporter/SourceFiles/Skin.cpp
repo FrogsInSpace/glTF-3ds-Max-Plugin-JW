@@ -79,16 +79,43 @@ void glTFExporter_Core::CreateSkin(INode *pNode, Modifier *pSkinMod)
 
 	void *ptr = SecureMemory((int)bfView.byteLength);
 	float *pmtx = (float*)((char*)ptr + bfView.byteOffset);
-	for (int i = 0; i < BoneNum;i++) {
-		Matrix3 tm = pISkin->GetBoneTm(i);
-		tm = Inverse(tm);
-		tm = tm * Inverse(pNode->GetNodeTM(m_time));// *Inverse(pNode->GetParentTM(m_time)));
-		tm = Inverse(tm);
 
-		std::vector<double> m;
-		Matrix3ToFloat(tm, m, m_scale);
-		for(int j=0;j<16; j++)	*pmtx++ = (float)m[j];
+
+	if (m_Mesh_quantization_Used) {
+		Matrix3 nodeTM = pNode->GetNodeTM(m_time);
+		nodeTM.SetTrans(nodeTM.GetTrans() * m_scale);
+
+		QuantizationInfo quantInfo;
+		GetQuatizationInfo(pNode, quantInfo);
+		Point3 QuantScale(quantInfo.meshScale, quantInfo.meshScale, quantInfo.meshScale);
+
+		for (int i = 0; i < BoneNum; i++) {
+			Matrix3 ibm = pISkin->GetBoneTm(i);
+			ibm = Inverse(ibm);
+			ibm = ibm * Inverse(nodeTM);// *Inverse(pNode->GetParentTM(m_time)));
+			ibm = Inverse(ibm);
+
+			ibm.Scale(QuantScale);
+
+			std::vector<double> m;
+			Matrix3ToFloat(ibm, m, 1.0);
+			for (int j = 0; j < 16; j++)	*pmtx++ = (float)m[j];
+		}
 	}
+	else {
+		for (int i = 0; i < BoneNum; i++) {
+			Matrix3 tm = pISkin->GetBoneTm(i);
+			tm = Inverse(tm);
+			tm = tm * Inverse(pNode->GetNodeTM(m_time));// *Inverse(pNode->GetParentTM(m_time)));
+			tm = Inverse(tm);
+
+			std::vector<double> m;
+			Matrix3ToFloat(tm, m, m_scale);
+			for (int j = 0; j < 16; j++)	*pmtx++ = (float)m[j];
+		}
+	}
+
+
 	m_model.bufferViews.push_back(bfView);
 	acc.bufferView = (int)(m_model.bufferViews.size() - 1);
 	m_model.accessors.push_back(acc);
