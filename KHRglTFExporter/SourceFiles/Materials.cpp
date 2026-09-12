@@ -515,6 +515,9 @@ BOOL glTFExporter_Core::CreateTextureTransformBlock(tinygltf::ExtensionMap& exte
 	float sclV = 1.0f;
 	float rot = 0.0f;
 
+
+
+
 	UINT force = IsUVAnimated(pTex);
 #if TRUE
 	StdUVGen* pUVGen = GetUVGen(pTex);
@@ -623,6 +626,73 @@ BOOL glTFExporter_Core::CreateTextureTransformBlock(tinygltf::ExtensionMap& exte
 
 #endif
 
+	float QuantScale = 1.0f;
+	Point2 QuantOffset(0.0f, 0.0f);
+	if (m_Mesh_quantization_Used) {
+		QuantizationInfo info;
+		GetQuatizationInfo(pTex, info);
+		QuantScale = info.uvmap1Scale;
+		QuantOffset = info.uvmap1Offset;
+	}
+
+#if 1
+	// Quantization の影響を Texture Transform 側に合成する
+	// UV_final = (UV_quant * QuantScale + QuantOffset) * scale + offset
+	//          = UV_quant * (QuantScale * scale) + (QuantOffset * scale + offset)
+
+	// 1. スケールの合成
+	float finalScaleU = sclU * QuantScale;
+	float finalScaleV = sclV * QuantScale;
+
+	// 2. オフセットの合成 (※3ds Max と glTF の軸・符号の扱いに合わせて適用)
+	float finalOffsetU = offsetU + (QuantOffset.x * sclU);
+	float finalOffsetV = offsetV + (QuantOffset.y * sclV);
+
+	// 回転は Quantization による影響を受けないためそのまま保持
+	float finalRot = rot;
+
+
+	// ------------------------------------------------------------------
+	// glTF JSON (KHR_texture_transform) の構築
+	// ------------------------------------------------------------------
+	tinygltf::Value::Object obj;
+
+	// Quantization が適用されている場合、スケールやオフセットが変化しているため
+	// 値が 0 や 1 であっても強制的に出力条件に含めるか判定します
+	BOOL hasOffset = (finalOffsetU != 0.0f || finalOffsetV != 0.0f || (force & UV_ANIMATE_OFFSET) || (QuantOffset.x != 0.0f || QuantOffset.y != 0.0f));
+	BOOL hasScale = (finalScaleU != 1.0f || finalScaleV != 1.0f || (force & UV_ANIMATE_SCALE) || (QuantScale != 1.0f));
+	BOOL hasRot = (finalRot != 0.0f || (force & UV_ANIMATE_ROTATE));
+
+	if (hasOffset) {
+		tinygltf::Value::Array offsetArr;
+		offsetArr.push_back(tinygltf::Value(truncateDecimal(-finalOffsetU)));
+		offsetArr.push_back(tinygltf::Value(truncateDecimal(finalOffsetV)));
+		obj.insert(std::make_pair("offset", tinygltf::Value(offsetArr)));
+	}
+
+	if (hasScale) {
+		tinygltf::Value::Array sclArr;
+		sclArr.push_back(tinygltf::Value(finalScaleU));
+		sclArr.push_back(tinygltf::Value(finalScaleV));
+		obj.insert(std::make_pair("scale", tinygltf::Value(sclArr)));
+	}
+
+	if (hasRot) {
+		obj.insert(std::make_pair("rotation", tinygltf::Value(finalRot)));
+	}
+
+	if (obj.size() > 0) {
+		tinygltf::Value val(obj);
+		extension.insert(std::make_pair("KHR_texture_transform", val));
+		m_TexTransform_Used = TRUE;
+	}
+	else if (UVGenAnimated(pUVGen))
+	{
+		tinygltf::Value val(obj);
+		extension.insert(std::make_pair("KHR_texture_transform", val));
+		m_TexTransform_Used = TRUE;
+	}
+#else
 	tinygltf::Value::Object obj;
 	if (offsetU != 0.0f || offsetV != 0.0f || (force & UV_ANIMATE_OFFSET)) {
 		tinygltf::Value::Array offset;
@@ -651,7 +721,7 @@ BOOL glTFExporter_Core::CreateTextureTransformBlock(tinygltf::ExtensionMap& exte
 		extension.insert(std::make_pair("KHR_texture_transform", val));
 		m_TexTransform_Used = TRUE;
 	}
-
+#endif
 	return (obj.size() > 0);
 }
 

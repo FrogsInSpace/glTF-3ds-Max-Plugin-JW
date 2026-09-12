@@ -100,6 +100,29 @@ cgltf_accessor* findAttrAccessor(cgltf_primitive *pr, const char *str)
 	return NULL;
 }
 
+//======================================================================
+//======================================================================
+float GetQuantScale(cgltf_accessor *acc)
+{
+	if (!acc) return 1.0f;
+	if (acc->normalized) {
+		switch(acc->component_type) {
+		case cgltf_component_type_r_8: /* BYTE */
+			return 1.0f / 127.0f; break;
+		case cgltf_component_type_r_8u: /* UNSIGNED_BYTE */
+			return 1.0f / 255.0f; break;
+		case cgltf_component_type_r_16: /* SHORT */
+			return 1.0f / 32767.0f; break;
+		case cgltf_component_type_r_16u: /* UNSIGNED_SHORT */
+			return 1.0f / 65535.0f; break;
+
+		}
+	}
+
+	return 1.0f;
+
+}
+
 // Helpers to classify primitive types.
 enum class PrimCategory
 {
@@ -319,13 +342,15 @@ INode* glTFImporter_Core::CreateMaxNode(cgltf_node* node, INode* pParent)
 
 		PrimCategory primCat = GetPrimCategory(pr->type);
 
+		float quantScale = m_Quantization?GetQuantScale(findAttrAccessor(pr, "POSITION")):1.0F;
+
 		if(primCat == PrimCategory::Points) {
 			VertNum = flatCoordsBuf.size() / 3;
 			NewMesh.setNumVerts((int)(VertNum + VertOffset), TRUE);
 			UINT vIdx = VertOffset;
 			for (std::vector<float>::iterator v = flatCoordsBuf.begin(); v != flatCoordsBuf.end(); v += 3, vIdx++) {
 				Point3 p(*v, *(v + 1), *(v + 2));
-				NewMesh.setVert(vIdx, p * m_scale);
+				NewMesh.setVert(vIdx, p * quantScale * m_scale);
 			}
 		}
 		else if (primCat == PrimCategory::Lines) {
@@ -334,7 +359,7 @@ INode* glTFImporter_Core::CreateMaxNode(cgltf_node* node, INode* pParent)
 			uint32_t vIdx = VertOffset;
 			for (std::vector<float>::iterator v = flatCoordsBuf.begin(); v != flatCoordsBuf.end(); v += 3, vIdx++) {
 				Point3 p(*v, *(v + 1), *(v + 2));
-				pointBuf.push_back(p * m_scale);
+				pointBuf.push_back(p * quantScale * m_scale);
 			}
 		}
 		else if (primCat == PrimCategory::Triangles) {
@@ -343,7 +368,7 @@ INode* glTFImporter_Core::CreateMaxNode(cgltf_node* node, INode* pParent)
 			UINT vIdx = VertOffset;
 			for (std::vector<float>::iterator v = flatCoordsBuf.begin(); v != flatCoordsBuf.end(); v += 3, vIdx++) {
 				Point3 p(*v, *(v + 1), *(v + 2));
-				NewMesh.setVert(vIdx, p * m_scale);
+				NewMesh.setVert(vIdx, p * quantScale * m_scale);
 			}
 		}
 
@@ -503,10 +528,11 @@ INode* glTFImporter_Core::CreateMaxNode(cgltf_node* node, INode* pParent)
 		}
 		size_t normalNum = NormalList.size() / 3;
 		if (normalNum > 0) {
+			float quantScale = m_Quantization ? GetQuantScale(findAttrAccessor(pr, "POSITION")) : 1.0F;
 			int vIdx = NormalOffset;
 			for (std::vector<float>::iterator v = NormalList.begin(); v != NormalList.end(); v += 3, vIdx++) {
 				Point3 p( *v, *(v+1), *(v+2));
-				VertNormalTable.push_back(p);
+				VertNormalTable.push_back(p* quantScale);
 			}
 			//if (normalNum != VertNormalTable.size())VertNormalTable.clear();
 		}
@@ -565,6 +591,7 @@ INode* glTFImporter_Core::CreateMaxNode(cgltf_node* node, INode* pParent)
 
 		//Set UV1
 		std::vector<float> texCoord1List;
+		quantScale = 1.0f;
 		if (mc) {
 			DracoDecodeProc(mc->buffer_view, pr, texCoord1List, DracoDecodeType::TEX_COORD);
 		}
@@ -572,6 +599,7 @@ INode* glTFImporter_Core::CreateMaxNode(cgltf_node* node, INode* pParent)
 			cgltf_accessor* acc = findAttrAccessor(pr, "TEXCOORD_0");
 			//if(CheckBufferSize(acc))
 			GetDataList(texCoord1List, acc);
+			quantScale = m_Quantization ? GetQuantScale(acc) : 1.0F;
 		}
 
 		size_t tex1Num = texCoord1List.size() / 2;
@@ -622,8 +650,8 @@ INode* glTFImporter_Core::CreateMaxNode(cgltf_node* node, INode* pParent)
 			MeshMap *pMap = &NewMesh.Map(1);
 			UVVert *pDstUV = &(pMap->tv[vtex1Idx]);
 			for (std::vector<float>::iterator v = texCoord1List.begin(); v != texCoord1List.end(); v += 2, vtex1Idx++) {
-				float x = *v * scale_u + offset_u;
-				float y = -(*(v + 1) * scale_v + offset_v) + 1.0f;
+				float x = *v * quantScale * scale_u + offset_u;
+				float y = -(*(v + 1) * quantScale * scale_v + offset_v) + 1.0f;
 				if (x > RectUV.max.x) RectUV.max.x = x;
 				if (x < RectUV.min.x) RectUV.min.x = x;
 				if (y > RectUV.max.y) RectUV.max.y = y;
@@ -636,6 +664,7 @@ INode* glTFImporter_Core::CreateMaxNode(cgltf_node* node, INode* pParent)
 
 		// Vertex UV2 settings
 		std::vector<float> texCoord2List;
+		quantScale = 1.0f;
 		if (mc) {
 			DracoDecodeProc(mc->buffer_view, pr, texCoord2List, DracoDecodeType::TEX_COORD, 1);
 		}
@@ -643,6 +672,7 @@ INode* glTFImporter_Core::CreateMaxNode(cgltf_node* node, INode* pParent)
 			cgltf_accessor* acc = findAttrAccessor(pr, "TEXCOORD_1");
 			//if (CheckBufferSize(acc))
 			GetDataList(texCoord2List, acc);
+			quantScale = m_Quantization ? GetQuantScale(acc) : 1.0F;
 		}
 		size_t tex2Num = texCoord2List.size() / 2;
 		if (NewMesh.mapSupport(2) && tex2Num == 0) {
@@ -666,8 +696,8 @@ INode* glTFImporter_Core::CreateMaxNode(cgltf_node* node, INode* pParent)
 			UINT vtex2Idx = Tex2Offset;
 			UVVert *pDstUV = &(pMap->tv[vtex2Idx]);
 			for (std::vector<float>::iterator v = texCoord2List.begin(); v != texCoord2List.end(); v += 2, vtex2Idx++) {
-				float x = *v;
-				float y = *(v + 1);
+				float x = *v* quantScale;
+				float y = *(v + 1)* quantScale;
 				*pDstUV++ = UVVert(x, -y+1.0f, 0.0f);
 			}
 		}

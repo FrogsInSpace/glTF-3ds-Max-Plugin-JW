@@ -63,7 +63,8 @@ void glTFExporter_Core::GetFulFrameAnimation(INode* pNode, Tab<TimeValue> &PosFr
 
 			RotFrameList.Append(1, &t);
 		}
-		if (preScl != parts.k) {
+		//if (preScl != parts.k) {
+		if (FLength(preScl-parts.k) > 0.0001f) {
 			if (SclFrameList.Count() > 0)
 				if (SclFrameList[SclFrameList.Count() - 1] != preT)
 					SclFrameList.Append(1, &preT);
@@ -309,6 +310,17 @@ void glTFExporter_Core::CreateKeyFrameList(Control* pCtrl, std::list<TimeValue>&
 //======================================================================
 void glTFExporter_Core::CreateAnimationRec(INode *pNode)
 {
+	float quantScale = 1.0f;
+	float quantParentScale = 1.0f;
+	if (m_Mesh_quantization_Used) {
+		QuantizationInfo info;
+		GetQuatizationInfo(pNode, info);
+		quantScale = info.meshScale;
+		GetQuatizationInfo(pNode->GetParentNode(), info);
+		quantParentScale = info.meshScale;
+	}
+
+
 	AffineParts parts;
 	Control *pC = pNode->GetTMController();
 	if (pC->IsAnimated() || m_FullFrame) {
@@ -393,45 +405,46 @@ void glTFExporter_Core::CreateAnimationRec(INode *pNode)
 				TimeValue fr = PosFrameList[tt];
 				if (keyInfo.size() > 0) {
 					Point3 inTan = keyInfo[fr].inTan * YupTM;
-					*pData++ = inTan.x * m_scale;
-					*pData++ = inTan.y * m_scale;
-					*pData++ = inTan.z * m_scale;
+					*pData++ = inTan.x / quantParentScale * m_scale;
+					*pData++ = inTan.y / quantParentScale * m_scale;
+					*pData++ = inTan.z / quantParentScale * m_scale;
 				}
 				Matrix3 tm = pNode->GetNodeTM(fr);
 				if (pNode->GetParentNode()->IsRootNode()) tm = tm * YupTM;
 				else tm = tm * Inverse(pNode->GetParentTM(fr));
 				decomp_affine(tm, &parts);
-				*pData++ = parts.t.x * m_scale;
-				*pData++ = parts.t.y * m_scale;
-				*pData++ = parts.t.z * m_scale;
+				*pData++ = parts.t.x / quantParentScale * m_scale;
+				*pData++ = parts.t.y / quantParentScale * m_scale;
+				*pData++ = parts.t.z / quantParentScale * m_scale;
 				if (keyInfo.size() > 0) {
 					Point3 outTan = keyInfo[fr].outTan * YupTM;
-					*pData++ = outTan.x * m_scale;
-					*pData++ = outTan.y * m_scale;
-					*pData++ = outTan.z * m_scale;
+					*pData++ = outTan.x / quantParentScale * m_scale;
+					*pData++ = outTan.y / quantParentScale * m_scale;
+					*pData++ = outTan.z / quantParentScale * m_scale;
 				}
 
 			}
 #else
 			for (auto fr : PosFrameList) {
+				float scale = m_Mesh_quantization_Used ? 1.0f : m_scale;
 				if (keyInfo.size() > 0) {
 					Point3 inTan = keyInfo[fr].inTan * YupTM;
-					*pData++ = inTan.x * m_scale;
-					*pData++ = inTan.y * m_scale;
-					*pData++ = inTan.z * m_scale;
+					*pData++ = inTan.x / quantParentScale * scale;
+					*pData++ = inTan.y / quantParentScale * scale;
+					*pData++ = inTan.z / quantParentScale * scale;
 				}
 				Matrix3 tm = pNode->GetNodeTM(fr);
 				if (pNode->GetParentNode()->IsRootNode()) tm = tm * YupTM;
 				else tm = tm * Inverse(pNode->GetParentTM(fr));
 				decomp_affine(tm, &parts);
-				*pData++ = parts.t.x * m_scale;
-				*pData++ = parts.t.y * m_scale;
-				*pData++ = parts.t.z * m_scale;
+				*pData++ = parts.t.x / quantParentScale * scale;
+				*pData++ = parts.t.y / quantParentScale * scale;
+				*pData++ = parts.t.z / quantParentScale * scale;
 				if (keyInfo.size() > 0) {
 					Point3 outTan = keyInfo[fr].outTan * YupTM;
-					*pData++ = outTan.x * m_scale;
-					*pData++ = outTan.y * m_scale;
-					*pData++ = outTan.z * m_scale;
+					*pData++ = outTan.x / quantParentScale * scale;
+					*pData++ = outTan.y / quantParentScale * scale;
+					*pData++ = outTan.z / quantParentScale * scale;
 				}
 			}
 #endif
@@ -585,9 +598,9 @@ void glTFExporter_Core::CreateAnimationRec(INode *pNode)
 				if (pNode->GetParentNode()->IsRootNode()) tm = tm * YupTM;
 				else tm = tm * Inverse(pNode->GetParentTM(fr));
 				decomp_affine(tm, &parts);
-				*pData++ = parts.k.x;
-				*pData++ = parts.k.y;
-				*pData++ = parts.k.z;
+				*pData++ = parts.k.x / quantScale;
+				*pData++ = parts.k.y / quantScale;
+				*pData++ = parts.k.z / quantScale;
 			}
 #else
 			for (auto fr : SclFrameList) {
@@ -595,9 +608,9 @@ void glTFExporter_Core::CreateAnimationRec(INode *pNode)
 				if (pNode->GetParentNode()->IsRootNode()) tm = tm * YupTM;
 				else tm = tm * Inverse(pNode->GetParentTM(fr));
 				decomp_affine(tm, &parts);
-				*pData++ = parts.k.x;
-				*pData++ = parts.k.y;
-				*pData++ = parts.k.z;
+				*pData++ = parts.k.x * quantScale / quantParentScale;
+				*pData++ = parts.k.y * quantScale / quantParentScale;
+				*pData++ = parts.k.z * quantScale / quantParentScale;
 			}
 #endif
 			m_model.bufferViews.push_back(bfViewOut);

@@ -103,6 +103,9 @@
     <ClCompile Include="SourceFiles\KTX2_Encoder.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="SourceFiles\KHR_mesh_quantization.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Include\define.h">

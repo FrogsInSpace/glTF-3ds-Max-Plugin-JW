@@ -1,6 +1,6 @@
 ﻿//{{NO_DEPENDENCIES}}
-// Microsoft Visual C++ generated include file.
-// Used by KHRglTFExporter.rc
+// Microsoft Visual C++ で生成されたインクルード ファイル。
+// KHRglTFExporter.rc で使用
 //
 #define IDS_LIBDESCRIPTION              1
 #define IDS_CATEGORY                    2
@@ -15,20 +15,19 @@
 #define IDC_WM_CHK                      1000
 #define IDC_DRACO_CHECK                 1004
 #define IDC_MESHOP_CHECK                1006
-#define IDC_FTYPE_RADIO1                1015
-#define IDC_FTYPE_RADIO2                1016
-#define IDC_FTYPE_RADIO3                1017
-#define IDC_INSTANCE_CHK                1018
-#define IDC_EXPSHAPE_CHK                1019
-#define IDC_RENDERSHAPE_CHK             1020
-#define IDC_EXPSHAPE_CHK2               1020
-#define IDC_QUANT_CHK                   1020
-#define IDC_LICENSE_EDIT                1021
-#define IDC_EXPORTTAN_CHK               1021
-#define IDC_LICENSE_STATIC              1022
-#define IDC_ANIM_CHK                    1023
-#define IDC_FULLFRAME_CHK               1024
-#define IDC_BUTTON1                     1025
+#define IDC_FTYPE_RADIO1                1007
+#define IDC_FTYPE_RADIO2                1008
+#define IDC_FTYPE_RADIO3                1009
+#define IDC_INSTANCE_CHK                1010
+#define IDC_EXPSHAPE_CHK                1011
+#define IDC_RENDERSHAPE_CHK				1012
+#define IDC_QUANT_CHK                   1013
+#define IDC_LICENSE_EDIT                1014
+#define IDC_EXPORTTAN_CHK               1015
+#define IDC_LICENSE_STATIC              1016
+#define IDC_ANIM_CHK                    1017
+#define IDC_FULLFRAME_CHK               1018
+#define IDC_BUTTON1                     1019	
 #define IDC_LICENSE_BTN                 1025
 #define IDC_ANIMPTR_CHK                 1026
 #define IDC_MORPHNRM_CHK                1027
@@ -70,6 +69,8 @@
 #define IDC_PROGRESS1                   1060
 #define IDC_STATIC_INT1                 1061
 #define IDC_STATIC_INT2                 1062
+#define IDC_LIST1                       1063
+#define IDC_VER_COMBO1                  1064
 #define IDC_COPYIMAGE_CHECK             1100
 #define IDC_EDIT                        1490
 #define IDC_SPIN                        1496
@@ -80,7 +81,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        106
 #define _APS_NEXT_COMMAND_VALUE         40001
-#define _APS_NEXT_CONTROL_VALUE         1063
+#define _APS_NEXT_CONTROL_VALUE         1065
 #define _APS_NEXT_SYMED_VALUE           1051
 #endif
 #endif

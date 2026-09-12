@@ -558,8 +558,10 @@ INT_PTR CALLBACK KHRglTFImporterOptionsDlgProc(HWND hWnd,UINT message,WPARAM wPa
 			}
 			break;
 		case IDC_SETBMP_BTN:
-			if (GetFileName(hWnd, s_ImageFileString, FileType::IMAGE)) {
-				SetWindowText(GetDlgItem(hWnd, IDC_IMAGEFILESTR), s_ImageFileString.c_str());
+			{
+				BitmapInfo bi;
+				if (TheManager->SelectFileInput(&bi, hWnd, _T("Select BackGround Image")))
+					SetWindowText(GetDlgItem(hWnd, IDC_IMAGEFILESTR), bi.Name());
 			}
 			break;
 		case IDC_ANIM_CHK:
@@ -964,7 +966,9 @@ BOOL glTFImporter_Core::ImportPreProcess(const TCHAR* filename, BOOL suppressPro
 	m_fullpath = std::wstring(filename);
 	m_SourceImageFolder = m_fullpath.parent_path();
 	m_SourceImageFolder += tstring(_T("\\"));
-	m_WorkImageFolder = tstring(m_fullpath.parent_path()) + tstring(_T("\\Images\\"));
+	//m_WorkImageFolder = tstring(m_fullpath.parent_path()) + tstring(_T("\\Images\\"));
+	TSTR imgPath = GetCOREInterface()->GetDir(APP_IMAGE_DIR);
+	 m_WorkImageFolder = tstring(imgPath.data()) + _T("\\") + tstring(m_fullpath.stem()) + tstring(_T("_Images\\"));
 	std::filesystem::create_directory(m_WorkImageFolder);
 
 	ClassEntry* ce = GetCOREInterface()->GetDllDirectory()->ClassDir().FindClassEntry(BMM_IO_CLASS_ID, Class_ID(0x6be260fb, 0));

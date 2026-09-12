@@ -219,6 +219,10 @@ void glTFExporter_Core::ExCreateMeshData(INode* pNode, tinygltf::Node& node)
 
 	//------------------------------------------
 	//------------------------------------------
+	//float quantizationScale = 1.0f;
+	//Point3 quantizationOfset(0, 0, 0);
+	QuantizationInfo quatInfo;
+
 	BOOL deleteIt = FALSE;
 	TriObject* pTri = NULL;
 	if (!pMesh) {
@@ -228,6 +232,19 @@ void glTFExporter_Core::ExCreateMeshData(INode* pNode, tinygltf::Node& node)
 			return;
 		}
 		pMesh = &pTri->mesh;
+
+		if (m_Mesh_quantization_Used) {
+			GetQuatizationInfo(pNode, quatInfo);
+			/*
+			Box3 box;
+			pTri->GetDeformBBox(0, box);
+			float lenX = box.pmax.x - box.pmin.x;
+			float lenY = box.pmax.y - box.pmin.y;
+			float lenZ = box.pmax.z - box.pmin.z;
+			quantizationScale = std::max({ lenX, lenY, lenZ }) / 65535.0f * m_scale;
+			quantizationOfset = -box.pmin;
+			*/
+		}
 	}
 
 	//------------------------------------------
@@ -373,13 +390,22 @@ void glTFExporter_Core::ExCreateMeshData(INode* pNode, tinygltf::Node& node)
 			//----------- Position
 			{
 				tinygltf::Accessor acc;
-				acc.componentType = TINYGLTF_COMPONENT_TYPE_FLOAT;
+				acc.componentType = m_Mesh_quantization_Used ? TINYGLTF_COMPONENT_TYPE_SHORT : TINYGLTF_COMPONENT_TYPE_FLOAT;
 				acc.type = TINYGLTF_TYPE_VEC3;
 				acc.count = vertNum;
+				if (m_Mesh_quantization_Used) {
+					acc.normalized = true; // 0.0 ~ 1.0 
+				}
 				tinygltf::BufferView bfView;
 				bfView.buffer = 0;
 				bfView.byteOffset = m_BufferByteOffset;
-				bfView.byteLength = acc.count * sizeof(float) * 3;
+				if (m_Mesh_quantization_Used) {
+					bfView.byteLength = acc.count * 8;
+					bfView.byteStride = 8;
+				}
+				else {
+					bfView.byteLength = acc.count * sizeof(float) * 3;
+				}
 				bfView.target = TINYGLTF_TARGET_ARRAY_BUFFER;
 
 				Point3 minPos = pMesh->verts[pFace[faceIDTable[0]].v[0]] * m_scale * OffsetTM;
@@ -387,10 +413,17 @@ void glTFExporter_Core::ExCreateMeshData(INode* pNode, tinygltf::Node& node)
 
 				void* ptr = SecureMemory(bfView.byteLength);
 				float* pPos = (float*)((char*)ptr + bfView.byteOffset);
+				SHORT* pPosQ = (SHORT*)((char*)ptr + bfView.byteOffset);
+				float quantScale = 32767.0f / quatInfo.meshScale / m_scale;
 
 				for (auto v : VertPropTable) {
 					Point3 pp = pMesh->verts[v.originalIdx] * m_scale;
 					Point3 p = pp * OffsetTM;
+					if (m_Mesh_quantization_Used) {
+						if (p.x > quatInfo.meshScale)	p.x = quatInfo.meshScale;
+						if (p.y > quatInfo.meshScale)	p.y = quatInfo.meshScale;
+						if (p.z > quatInfo.meshScale)	p.z = quatInfo.meshScale;
+					}
 					if (p.x > maxPos.x)	maxPos.x = p.x;
 					if (p.y > maxPos.y)	maxPos.y = p.y;
 					if (p.z > maxPos.z)	maxPos.z = p.z;
@@ -398,17 +431,35 @@ void glTFExporter_Core::ExCreateMeshData(INode* pNode, tinygltf::Node& node)
 					if (p.y < minPos.y)	minPos.y = p.y;
 					if (p.z < minPos.z)	minPos.z = p.z;
 
-					*pPos++ = p.x;
-					*pPos++ = p.y;
-					*pPos++ = p.z;
+					if (m_Mesh_quantization_Used) {
+						*pPosQ++ = round(p.x * quantScale);
+						*pPosQ++ = round(p.y * quantScale);
+						*pPosQ++ = round(p.z * quantScale);
+						*pPosQ++ = 0;
+					}
+					else {
+						*pPos++ = p.x;
+						*pPos++ = p.y;
+						*pPos++ = p.z;
+					}
 				}
 
-				acc.maxValues.push_back(maxPos.x);
-				acc.maxValues.push_back(maxPos.y);
-				acc.maxValues.push_back(maxPos.z);
-				acc.minValues.push_back(minPos.x);
-				acc.minValues.push_back(minPos.y);
-				acc.minValues.push_back(minPos.z);
+				if (m_Mesh_quantization_Used) {
+					acc.maxValues.push_back(round(maxPos.x * quantScale));
+					acc.maxValues.push_back(round(maxPos.y * quantScale));
+					acc.maxValues.push_back(round(maxPos.z * quantScale));
+					acc.minValues.push_back(round(minPos.x * quantScale));
+					acc.minValues.push_back(round(minPos.y  * quantScale));
+					acc.minValues.push_back(round(minPos.z  * quantScale));
+				}
+				else {
+					acc.maxValues.push_back(maxPos.x);
+					acc.maxValues.push_back(maxPos.y);
+					acc.maxValues.push_back(maxPos.z);
+					acc.minValues.push_back(minPos.x);
+					acc.minValues.push_back(minPos.y);
+					acc.minValues.push_back(minPos.z);
+				}
 
 				m_model.bufferViews.push_back(bfView);
 				acc.bufferView = m_model.bufferViews.size() - 1;
@@ -419,25 +470,42 @@ void glTFExporter_Core::ExCreateMeshData(INode* pNode, tinygltf::Node& node)
 			//----------- Normal
 			{
 				tinygltf::Accessor acc;// = Create_glTFAccessor();
-				acc.componentType = TINYGLTF_COMPONENT_TYPE_FLOAT;
+				acc.componentType = m_Mesh_quantization_Used ? TINYGLTF_COMPONENT_TYPE_BYTE : TINYGLTF_COMPONENT_TYPE_FLOAT;
 				acc.type = TINYGLTF_TYPE_VEC3;
 				acc.count = vertNum;
-				tinygltf::BufferView bfView;// = Create_glTFBufferView();
+				if (m_Mesh_quantization_Used)acc.normalized = true;
 
+				tinygltf::BufferView bfView;// = Create_glTFBufferView();
 				bfView.buffer = 0;
 				bfView.byteOffset = m_BufferByteOffset;
-				bfView.byteLength = acc.count * sizeof(float) * 3;
 				bfView.target = TINYGLTF_TARGET_ARRAY_BUFFER;
+				if (m_Mesh_quantization_Used) {
+				bfView.byteLength = acc.count * 4;
+					bfView.byteStride = 4;
+				}
+				else {
+					bfView.byteLength = acc.count * sizeof(float) * 3;
+				}
 
 				void* ptr = SecureMemory(bfView.byteLength);
-				float* pNrm = (float*)((char*)ptr + bfView.byteOffset);
-
-				for (auto v : VertPropTable) {
-					//Point3 nrm = pNrmSpec->GetNormalArray()[v.normal];
-					Point3 nrm = v.normal;
-					*pNrm++ = nrm.x;
-					*pNrm++ = nrm.y;
-					*pNrm++ = nrm.z;
+				if (m_Mesh_quantization_Used) {
+					char* pNrmQ = (char*)((char*)ptr + bfView.byteOffset);
+					for (auto v : VertPropTable) {
+						*pNrmQ++ = round(v.normal.x * 127.0f);
+						*pNrmQ++ = round(v.normal.y * 127.0f);
+						*pNrmQ++ = round(v.normal.z * 127.0f);
+						*pNrmQ++ = 0;
+					}
+				}
+				else {
+					float* pNrm = (float*)((char*)ptr + bfView.byteOffset);
+					for (auto v : VertPropTable) {
+						//Point3 nrm = pNrmSpec->GetNormalArray()[v.normal];
+						Point3 nrm = v.normal;
+						*pNrm++ = nrm.x;
+						*pNrm++ = nrm.y;
+						*pNrm++ = nrm.z;
+					}
 				}
 
 				m_model.bufferViews.push_back(bfView);
@@ -452,7 +520,7 @@ void glTFExporter_Core::ExCreateMeshData(INode* pNode, tinygltf::Node& node)
 				mapCh = 1;
 
 				tinygltf::Accessor acc;// = Create_glTFAccessor();
-				acc.componentType = TINYGLTF_COMPONENT_TYPE_FLOAT;
+				acc.componentType = m_Mesh_quantization_Used ? TINYGLTF_COMPONENT_TYPE_BYTE : TINYGLTF_COMPONENT_TYPE_FLOAT;
 				acc.type = TINYGLTF_TYPE_VEC4;
 				acc.count = vertNum;
 				tinygltf::BufferView bfView;// = Create_glTFBufferView();
@@ -461,9 +529,16 @@ void glTFExporter_Core::ExCreateMeshData(INode* pNode, tinygltf::Node& node)
 				bfView.byteOffset = m_BufferByteOffset;
 				bfView.byteLength = acc.count * sizeof(float) * 4;
 				bfView.target = TINYGLTF_TARGET_ARRAY_BUFFER;
-
+				if (m_Mesh_quantization_Used) {
+					bfView.byteLength = acc.count * 4;
+					bfView.byteStride = 4;
+				}
+				else {
+					bfView.byteLength = acc.count * sizeof(float) * 3;
+				}
 				void* ptr = SecureMemory(bfView.byteLength);
 				float* pTan = (float*)((char*)ptr + bfView.byteOffset);
+				char* pTanQ = (char*)((char*)ptr + bfView.byteOffset);
 
 				for (auto v : VertPropTable) {
 					Point3 normal = pGameMesh->GetNormal(v.faceID, v.corner, TRUE);
@@ -477,11 +552,18 @@ void glTFExporter_Core::ExCreateMeshData(INode* pNode, tinygltf::Node& node)
 					bitangent.FNormalize();
 
 					float w = GetW(normal, tangent, bitangent);
-
-					*pTan++ = tangent.x;
-					*pTan++ = tangent.y;
-					*pTan++ = tangent.z;
-					*pTan++ = w;
+					if (m_Mesh_quantization_Used) {
+						*pTanQ++ = round(tangent.x * 127.0f);
+						*pTanQ++ = round(tangent.y * 127.0f);
+						*pTanQ++ = round(tangent.z * 127.0f);
+						*pTanQ++ = round(w * 127.0f);
+					}
+					else {
+						*pTan++ = tangent.x;
+						*pTan++ = tangent.y;
+						*pTan++ = tangent.z;
+						*pTan++ = w;
+					}
 				}
 
 				m_model.bufferViews.push_back(bfView);
@@ -495,14 +577,20 @@ void glTFExporter_Core::ExCreateMeshData(INode* pNode, tinygltf::Node& node)
 			//if (pMesh->mapSupport(mapCh) && pMtl) {
 			if (propFlag.mapCh1Used) {
 				tinygltf::Accessor acc;// = Create_glTFAccessor();
-				acc.componentType = TINYGLTF_COMPONENT_TYPE_FLOAT;
+				acc.componentType = m_Mesh_quantization_Used ? TINYGLTF_COMPONENT_TYPE_UNSIGNED_SHORT : TINYGLTF_COMPONENT_TYPE_FLOAT;
 				acc.type = TINYGLTF_TYPE_VEC2;
 				acc.count = vertNum;
 				tinygltf::BufferView bfView;// = Create_glTFBufferView();
 
 				bfView.buffer = 0;
 				bfView.byteOffset = m_BufferByteOffset;
-				bfView.byteLength = acc.count * sizeof(float) * 2;
+				if (m_Mesh_quantization_Used) {
+					bfView.byteLength = acc.count * 4;
+					bfView.byteStride = 4;
+				}
+				else {
+					bfView.byteLength = acc.count * sizeof(float) * 2;
+				}
 				bfView.target = TINYGLTF_TARGET_ARRAY_BUFFER;
 
 				MeshMap* pMap = &pMesh->Map(mapCh);
@@ -511,11 +599,13 @@ void glTFExporter_Core::ExCreateMeshData(INode* pNode, tinygltf::Node& node)
 				//Point3 minUV = *pSrcUV * Point3(1.0f, -1.0f, 0.0f);
 				//Point3 maxUV = *pSrcUV * Point3(1.0f, -1.0f, 0.0f);
 				Point3 minUV = pSrcUV[pTVFace[faceIDTable[0]].t[0]];
+
 				minUV.y = 1.0f - minUV.y;
 				Point3 maxUV = minUV;
 
 				void* ptr = SecureMemory(bfView.byteLength);
 				float* pTexUV = (float*)((char*)ptr + bfView.byteOffset);
+				USHORT* pTexUVQ = (USHORT*)((char*)ptr + bfView.byteOffset);
 				for (auto v : VertPropTable) {
 					UVVert p = pMesh->mapVerts(mapCh)[v.uv1];
 					p.y = -p.y + 1.0f;
@@ -524,14 +614,28 @@ void glTFExporter_Core::ExCreateMeshData(INode* pNode, tinygltf::Node& node)
 					if (p.x < minUV.x)	minUV.x = p.x;
 					if (p.y < minUV.y)	minUV.y = p.y;
 
-					*pTexUV++ = p.x;
-					*pTexUV++ = p.y;
+					if (m_Mesh_quantization_Used) {
+						*pTexUVQ++ = (USHORT)round((p.x + quatInfo.uvmap1Offset.x) / quatInfo.uvmap1Scale);
+						*pTexUVQ++ = (USHORT)round((p.y + quatInfo.uvmap1Offset.y) / quatInfo.uvmap1Scale);
+					}
+					else{
+						*pTexUV++ = p.x;
+						*pTexUV++ = p.y;
+					}
 				}
 
-				acc.maxValues.push_back(maxUV.x);
-				acc.maxValues.push_back(maxUV.y);
-				acc.minValues.push_back(minUV.x);
-				acc.minValues.push_back(minUV.y);
+				if (m_Mesh_quantization_Used) {
+					acc.maxValues.push_back(round((maxUV.x + quatInfo.uvmap1Offset.x) / quatInfo.uvmap1Scale));
+					acc.maxValues.push_back(round((maxUV.y + quatInfo.uvmap1Offset.y) / quatInfo.uvmap1Scale));
+					acc.minValues.push_back(round((minUV.x + quatInfo.uvmap1Offset.x) / quatInfo.uvmap1Scale));
+					acc.minValues.push_back(round((minUV.y + quatInfo.uvmap1Offset.y) / quatInfo.uvmap1Scale));
+				}
+				else {
+					acc.maxValues.push_back(maxUV.x);
+					acc.maxValues.push_back(maxUV.y);
+					acc.minValues.push_back(minUV.x);
+					acc.minValues.push_back(minUV.y);
+				}
 
 				m_model.bufferViews.push_back(bfView);
 				acc.bufferView = m_model.bufferViews.size() - 1;
@@ -543,15 +647,21 @@ void glTFExporter_Core::ExCreateMeshData(INode* pNode, tinygltf::Node& node)
 			mapCh = 2;
 			if (propFlag.mapCh2Used) {
 				tinygltf::Accessor acc;// = Create_glTFAccessor();
-				acc.componentType = TINYGLTF_COMPONENT_TYPE_FLOAT;
+				acc.componentType = m_Mesh_quantization_Used ? TINYGLTF_COMPONENT_TYPE_UNSIGNED_SHORT : TINYGLTF_COMPONENT_TYPE_FLOAT;
 				acc.type = TINYGLTF_TYPE_VEC2;
 				acc.count = vertNum;
 				tinygltf::BufferView bfView;// = Create_glTFBufferView();
 
 				bfView.buffer = 0;
 				bfView.byteOffset = m_BufferByteOffset;
-				bfView.byteLength = acc.count * sizeof(float) * 2;
 				bfView.target = TINYGLTF_TARGET_ARRAY_BUFFER;
+				if (m_Mesh_quantization_Used) {
+					bfView.byteLength = acc.count * 4;
+					bfView.byteStride = 4;
+				}
+				else {
+					bfView.byteLength = acc.count * sizeof(float) * 2;
+				}
 
 				MeshMap* pMap = &pMesh->Map(mapCh);
 				UVVert* pSrcUV = pMap->tv;
@@ -565,6 +675,8 @@ void glTFExporter_Core::ExCreateMeshData(INode* pNode, tinygltf::Node& node)
 
 				void* ptr = SecureMemory(bfView.byteLength);
 				float* pTexUV = (float*)((char*)ptr + bfView.byteOffset);
+				USHORT* pTexUVQ = (USHORT*)((char*)ptr + bfView.byteOffset);
+
 				for (auto v : VertPropTable) {
 					UVVert p = pMesh->mapVerts(mapCh)[v.uv2];
 					p.y = -p.y + 1.0f;
@@ -573,14 +685,29 @@ void glTFExporter_Core::ExCreateMeshData(INode* pNode, tinygltf::Node& node)
 					if (p.x < minUV.x)	minUV.x = p.x;
 					if (p.y < minUV.y)	minUV.y = p.y;
 
-					*pTexUV++ = p.x;
-					*pTexUV++ = p.y;
+					if (m_Mesh_quantization_Used) {
+						*pTexUVQ++ = (USHORT)round((p.x + quatInfo.uvmap2Offset.x) / quatInfo.uvmap2Scale);
+						*pTexUVQ++ = (USHORT)round((p.y + quatInfo.uvmap2Offset.y) / quatInfo.uvmap2Scale);
+					}
+					else{
+						*pTexUV++ = p.x;
+						*pTexUV++ = p.x;
+						*pTexUV++ = p.y;
+					}
 				}
 
-				acc.maxValues.push_back(maxUV.x);
-				acc.maxValues.push_back(maxUV.y);
-				acc.minValues.push_back(minUV.x);
-				acc.minValues.push_back(minUV.y);
+				if (m_Mesh_quantization_Used) {
+					acc.maxValues.push_back(round((maxUV.x + quatInfo.uvmap2Offset.x) / quatInfo.uvmap2Scale));
+					acc.maxValues.push_back(round((maxUV.y + quatInfo.uvmap2Offset.y) / quatInfo.uvmap2Scale));
+					acc.minValues.push_back(round((minUV.x + quatInfo.uvmap2Offset.x) / quatInfo.uvmap2Scale));
+					acc.minValues.push_back(round((minUV.y + quatInfo.uvmap2Offset.y) / quatInfo.uvmap2Scale));
+				}
+				else {
+					acc.maxValues.push_back(maxUV.x);
+					acc.maxValues.push_back(maxUV.y);
+					acc.minValues.push_back(minUV.x);
+					acc.minValues.push_back(minUV.y);
+				}
 
 				m_model.bufferViews.push_back(bfView);
 				acc.bufferView = m_model.bufferViews.size() - 1;
@@ -592,14 +719,20 @@ void glTFExporter_Core::ExCreateMeshData(INode* pNode, tinygltf::Node& node)
 			mapCh = 0;
 			if (propFlag.VColorUsed) {
 				tinygltf::Accessor acc;// = Create_glTFAccessor();
-				acc.componentType = TINYGLTF_COMPONENT_TYPE_FLOAT;
+				acc.componentType = m_Mesh_quantization_Used ? TINYGLTF_COMPONENT_TYPE_UNSIGNED_BYTE : TINYGLTF_COMPONENT_TYPE_FLOAT;
 				acc.type = TINYGLTF_TYPE_VEC3;
 				acc.count = vertNum;
 				tinygltf::BufferView bfView;// = Create_glTFBufferView();
 
 				bfView.buffer = 0;
 				bfView.byteOffset = m_BufferByteOffset;
-				bfView.byteLength = acc.count * sizeof(float) * 3;
+				if (m_Mesh_quantization_Used) {
+					bfView.byteLength = acc.count * 4;
+					bfView.byteStride = 4;
+				}
+				else {
+					bfView.byteLength = acc.count * sizeof(float) * 3;
+				}
 				bfView.target = TINYGLTF_TARGET_ARRAY_BUFFER;
 
 				MeshMap* pMap = &pMesh->Map(0);
@@ -610,6 +743,8 @@ void glTFExporter_Core::ExCreateMeshData(INode* pNode, tinygltf::Node& node)
 
 				void* ptr = SecureMemory(bfView.byteLength);
 				float* pTexUV = (float*)((char*)ptr + bfView.byteOffset);
+				char* pTexUVQ = (char*)((char*)ptr + bfView.byteOffset);
+
 				for (auto v : VertPropTable) {
 					UVVert p = pMesh->mapVerts(0)[v.vc];
 					if (p.x > maxUV.x)	maxUV.x = p.x;
@@ -619,17 +754,35 @@ void glTFExporter_Core::ExCreateMeshData(INode* pNode, tinygltf::Node& node)
 					if (p.y < minUV.y)	minUV.y = p.y;
 					if (p.z < minUV.z)	minUV.z = p.z;
 
-					*pTexUV++ = p.x;
-					*pTexUV++ = p.y;
-					*pTexUV++ = p.z;
+					if (m_Mesh_quantization_Used) {
+						*pTexUVQ++ = (unsigned char)round(p.x * 255.0);
+						*pTexUVQ++ = (unsigned char)round(p.y * 255.0);
+						*pTexUVQ++ = (unsigned char)round(p.z * 255.0);
+						*pTexUVQ++ = 0;
+					}
+					else {
+						*pTexUV++ = p.x;
+						*pTexUV++ = p.y;
+						*pTexUV++ = p.z;
+					}
 				}
 
-				acc.maxValues.push_back(maxUV.x);
-				acc.maxValues.push_back(maxUV.y);
-				acc.maxValues.push_back(maxUV.z);
-				acc.minValues.push_back(minUV.x);
-				acc.minValues.push_back(minUV.y);
-				acc.minValues.push_back(minUV.z);
+				if (m_Mesh_quantization_Used) {
+					acc.maxValues.push_back(round(maxUV.x * 255.0f));
+					acc.maxValues.push_back(round(maxUV.y * 255.0f));
+					acc.maxValues.push_back(round(maxUV.z * 255.0f));
+					acc.minValues.push_back(round(minUV.x * 255.0f));
+					acc.minValues.push_back(round(minUV.y * 255.0f));
+					acc.minValues.push_back(round(minUV.z * 255.0f));
+				}
+				else{
+					acc.maxValues.push_back(maxUV.x);
+					acc.maxValues.push_back(maxUV.y);
+					acc.maxValues.push_back(maxUV.z);
+					acc.minValues.push_back(minUV.x);
+					acc.minValues.push_back(minUV.y);
+					acc.minValues.push_back(minUV.z);
+				}
 
 				m_model.bufferViews.push_back(bfView);
 				acc.bufferView = m_model.bufferViews.size() - 1;
@@ -695,25 +848,44 @@ void glTFExporter_Core::ExCreateMeshData(INode* pNode, tinygltf::Node& node)
 					primitive.attributes.insert(std::make_pair("JOINTS_0", m_model.accessors.size() - 1));
 				}
 
-				//---------------------------------
+				//------ Weight ---------------------------
 				{
 					tinygltf::Accessor acc;// = Create_glTFAccessor();
-					acc.componentType = TINYGLTF_COMPONENT_TYPE_FLOAT;
+					acc.componentType = m_Mesh_quantization_Used ? TINYGLTF_COMPONENT_TYPE_UNSIGNED_SHORT : TINYGLTF_COMPONENT_TYPE_FLOAT;
 					acc.type = TINYGLTF_TYPE_VEC4;
 					acc.count = wTable.size();
-					tinygltf::BufferView bfView;// = Create_glTFBufferView();
+					if (m_Mesh_quantization_Used) {
+						acc.normalized = true; // 0.0 ~ 1.0 
+					}
 
+					tinygltf::BufferView bfView;// = Create_glTFBufferView();
 					bfView.buffer = 0;
 					bfView.byteOffset = m_BufferByteOffset;
-					bfView.byteLength = acc.count * sizeof(float) * 4;
+					if (m_Mesh_quantization_Used) {
+						bfView.byteLength = acc.count * sizeof(USHORT) * 4;
+					}
+					else {
+						bfView.byteLength = acc.count * sizeof(float) * 4;
+					}
 					bfView.target = TINYGLTF_TARGET_ARRAY_BUFFER;
 					void* ptr = SecureMemory(bfView.byteLength);
-					float* pWeight = (float*)((char*)ptr + bfView.byteOffset);
-					for (auto w : wTable) {
-						*pWeight++ = w[0];
-						*pWeight++ = w[1];
-						*pWeight++ = w[2];
-						*pWeight++ = w[3];
+					if (m_Mesh_quantization_Used) {
+						USHORT* pWeightQ = (USHORT*)((char*)ptr + bfView.byteOffset);
+						for (auto w : wTable) {
+							*pWeightQ++ = (USHORT)round(w[0] * 65535.0f);
+							*pWeightQ++ = (USHORT)round(w[1] * 65535.0f);
+							*pWeightQ++ = (USHORT)round(w[2] * 65535.0f);
+							*pWeightQ++ = (USHORT)round(w[3] * 65535.0f);
+						}
+					}
+					else {
+						float* pWeight = (float*)((char*)ptr + bfView.byteOffset);
+						for (auto w : wTable) {
+							*pWeight++ = w[0];
+							*pWeight++ = w[1];
+							*pWeight++ = w[2];
+							*pWeight++ = w[3];
+						}
 					}
 
 					m_model.bufferViews.push_back(bfView);
@@ -885,7 +1057,9 @@ void glTFExporter_Core::ExCreateMeshData(INode* pNode, tinygltf::Node& node)
 
 	if (mesh.primitives.size() > 0) {
 		m_model.meshes.push_back(mesh);
+
 		node.mesh = m_model.meshes.size() - 1;
+
 		m_MeshMap[pNode->GetObjectRef()] = node.mesh;
 	}
 

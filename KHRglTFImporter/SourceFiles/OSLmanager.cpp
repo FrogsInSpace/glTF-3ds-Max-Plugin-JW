@@ -236,6 +236,35 @@ Texmap* CreateColorMultiplyOSLNode(Texmap* pTex, Color col)
 
 //======================================================================
 //======================================================================
+Texmap* CreateFlowMapTransformOSLNode(Texmap* pTex)
+{
+	TSTR ComStr;
+#if MAX_RELEASE > 26000
+	TSTR fname = GetCOREInterface()->GetDir(APP_MAX_SYS_ROOT_DIR) + TSTR(_T("OSL\\FlowMapTransform.osl"));
+	ComStr.printf(_T("temp = OSLMap OSLPath:\"%s\""), fname.data());
+#else
+	tstring fname = GetCOREInterface()->GetDir(APP_MAX_SYS_ROOT_DIR) + tstring(_T("OSL\\ColorScale.osl"));
+	ComStr.printf(_T("temp = OSLMap OSLPath:\"%s\""), fname.c_str());
+#endif
+	FPValue fpv;
+#if MAX_RELEASE >= 24000
+	ExecuteMAXScriptScript(ComStr, MAXScript::ScriptSource::NonEmbedded, FALSE, &fpv);
+#else
+	ExecuteMAXScriptScript(ComStr, FALSE, &fpv);
+#endif
+	Texmap* pOSLMap = fpv.tex;
+	if (!pOSLMap) return NULL;
+	auto pMapInterface = (MaxSDK::OSL::IOSLMapInterface*)pOSLMap->GetInterface(MAXOSL_OSLMAP_INTERFACE);
+	IParamBlock2* pPBlock = pMapInterface->GetParameters();
+	pPBlock->SetValueByName(_T("FlowMap_map"), pTex, 0);
+
+	return pOSLMap;
+}
+
+
+
+//======================================================================
+//======================================================================
 Texmap *CreateCutOffOSLNode(Texmap *pTex, float value, Texmap* pAlphaTex)
 {
 	Texmap *pOSLMap = (Texmap*)GetCOREInterface()->CreateInstance(TEXMAP_CLASS_ID, OSLTex_CLASS_ID);

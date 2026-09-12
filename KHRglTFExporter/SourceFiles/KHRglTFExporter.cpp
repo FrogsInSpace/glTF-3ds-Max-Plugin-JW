@@ -69,6 +69,8 @@ static BOOL HH_ReferenceFileMode;
 static BOOL HH_Interactivity;
 static int HH_InteractiveGraphID;
 static BOOL HH_CubicSplineT;
+static BOOL HH_Quantization;
+static int HH_glTFFileVer;
 
 static BOOL Open_InstanceWithMtl;
 
@@ -100,6 +102,7 @@ glTFExporter_Core theExporterCore;
 static BOOL LogExport = TRUE;
 static tstring LogFileName;
 
+std::vector<tstring> glTF_File_Ver = {_T("2.0"),_T("2.1")};
 //======================================================================
 //======================================================================
 void LogInit(const tstring &output)
@@ -286,10 +289,12 @@ void KHRglTF2Exporter::ShowAbout(HWND /*hWnd*/)
 }
 int KHRglTF2Exporter::DoExport(const TCHAR* filename, ExpInterface* exporterInt, Interface* ip, BOOL suppressPrompts, DWORD options)
 {
+	/*
 	if (!IsValid()) {
 		MessageBox(GetCOREInterface()->GetMAXHWnd(), TEXT("License Expired."), TEXT("License Expired"), MB_ICONINFORMATION);;
 		return TRUE;
 	}
+	*/
 
 	return theExporterCore.ExportPreProcess(filename, suppressPrompts, 2);
 }
@@ -438,6 +443,7 @@ INT_PTR CALLBACK KHRglTFExporterOptionsDlgProc(HWND hWnd, UINT message, WPARAM w
 		CheckDlgButton(hWnd, IDC_SCL_CHECK, HH_ApplyScaling);
 		CheckDlgButton(hWnd, IDC_PHYSQ_CHK, HH_Collision);
 		CheckDlgButton(hWnd, IDC_INTERACT_CHK, HH_Interactivity);
+		CheckDlgButton(hWnd, IDC_QUANT_CHK, HH_Quantization);
 
 		CheckRadioButton(hWnd, IDC_MRO_RADIO1, IDC_MRO_RADIO3, IDC_MRO_RADIO1 + HH_MROMapExportMode);
 		if (GetCOREInterface()->GetRootNode()->GetXRefFileCount() > 0) {
@@ -469,6 +475,11 @@ INT_PTR CALLBACK KHRglTFExporterOptionsDlgProc(HWND hWnd, UINT message, WPARAM w
 		SendMessage(GetDlgItem(hWnd, IDC_TYPE_LIST), CB_ADDSTRING, 0, (LPARAM)_T("JPG"));
 		SendMessage(GetDlgItem(hWnd, IDC_TYPE_LIST), CB_ADDSTRING, 0, (LPARAM)_T("PNG"));
 		SendMessage(GetDlgItem(hWnd, IDC_TYPE_LIST), CB_SETCURSEL, HH_MROImageType, 0);
+
+		for (const tstring& ver : glTF_File_Ver) {
+			SendMessage(GetDlgItem(hWnd, IDC_VER_COMBO1), CB_ADDSTRING, 0, (LPARAM)ver.c_str());
+		}
+		SendMessage(GetDlgItem(hWnd, IDC_VER_COMBO1), CB_SETCURSEL, HH_glTFFileVer, 0);
 
 		EnableWindow(GetDlgItem(hWnd, IDC_FULLFRAME_CHK), HH_ExportAnimation);
 		EnableWindow(GetDlgItem(hWnd, IDC_ANIMPTR_CHK), HH_ExportAnimation);
@@ -545,6 +556,13 @@ INT_PTR CALLBACK KHRglTFExporterOptionsDlgProc(HWND hWnd, UINT message, WPARAM w
 			theExporterCore.ImageSetting(hWnd, (int)SendMessage(GetDlgItem(hWnd, IDC_TYPE_LIST), CB_GETCURSEL, 0, 0));
 			break;
 
+		case IDC_QUANT_CHK:
+			CheckDlgButton(hWnd, IDC_DRACO_CHECK, FALSE);
+			break;
+		case IDC_DRACO_CHECK:
+			CheckDlgButton(hWnd, IDC_QUANT_CHK, FALSE);
+			break;
+
 		case IDOK:
 			HH_CopyImage = IsDlgButtonChecked(hWnd, IDC_COPYIMAGE_CHECK);
 			HH_DracoCompress = IsDlgButtonChecked(hWnd, IDC_DRACO_CHECK);
@@ -574,8 +592,9 @@ INT_PTR CALLBACK KHRglTFExporterOptionsDlgProc(HWND hWnd, UINT message, WPARAM w
 			HH_ReferenceFileMode = IsDlgButtonChecked(hWnd, IDC_REFERENCE_CHK);
 			HH_Collision = IsDlgButtonChecked(hWnd, IDC_PHYSQ_CHK);
 			HH_Interactivity = IsDlgButtonChecked(hWnd, IDC_INTERACT_CHK);
+			HH_Quantization = IsDlgButtonChecked(hWnd, IDC_QUANT_CHK);
 
-			 HH_InteractiveGraphID = (int)SendMessage(GetDlgItem(hWnd, IDC_INTERACT_COMBO), CB_GETCURSEL, 0, 0);
+				HH_glTFFileVer = SendMessage(GetDlgItem(hWnd, IDC_VER_COMBO1), CB_GETCURSEL, 0, 0);
 
 			if (IsDlgButtonChecked(hWnd, IDC_MRO_RADIO1)) HH_MROMapExportMode = 0;
 			if (IsDlgButtonChecked(hWnd, IDC_MRO_RADIO2)) HH_MROMapExportMode = 1;
@@ -913,6 +932,8 @@ BOOL glTFExporter_Core::ExportPreProcess(const TCHAR* filename, BOOL suppressPro
 	HH_ReferenceFileMode = MaxSDK::Util::GetPrivateProfileInt(_T("ExpSettings"), _T("ReferenceFileMode"), 0, profle);
 	HH_Interactivity = MaxSDK::Util::GetPrivateProfileInt(_T("ExpSettings"), _T("Interactivity"), 0, profle);
 	HH_CubicSplineT	= MaxSDK::Util::GetPrivateProfileInt(_T("ExpSettings"), _T("CubicSplineT"), 0, profle);
+	HH_Quantization = MaxSDK::Util::GetPrivateProfileInt(_T("ExpSettings"), _T("Quantization"), 0, profle);
+	HH_glTFFileVer = MaxSDK::Util::GetPrivateProfileInt(_T("ExpSettings"), _T("glTFFileVer"), 0, profle);
 
 	HH_PostProcess = FALSE;
 
@@ -985,6 +1006,10 @@ BOOL glTFExporter_Core::ExportPreProcess(const TCHAR* filename, BOOL suppressPro
 		MaxSDK::Util::WritePrivateProfileString(_T("ExpSettings"), _T("Interactivity"), buf, profle);
 		_stprintf_s(buf, MAX_PATH, _T("%d"), HH_CubicSplineT);
 		MaxSDK::Util::WritePrivateProfileString(_T("ExpSettings"), _T("CubicSplineT"), buf, profle);
+		_stprintf_s(buf, MAX_PATH, _T("%d"), HH_Quantization);
+		MaxSDK::Util::WritePrivateProfileString(_T("ExpSettings"), _T("Quantization"), buf, profle);
+		_stprintf_s(buf, MAX_PATH, _T("%d"), HH_glTFFileVer);
+		MaxSDK::Util::WritePrivateProfileString(_T("ExpSettings"), _T("glTFFileVer"), buf, profle);
 	}
 
 	// only show messagebox if not suppressed
@@ -1071,6 +1096,7 @@ BOOL glTFExporter_Core::ExportPreProcess(const TCHAR* filename, BOOL suppressPro
 	m_InteractiveGraphID = HH_InteractiveGraphID;
 	m_ResetPivotTM = FALSE;
 	m_CubicSplineT = HH_CubicSplineT;
+	m_Mesh_quantization_Used = HH_Quantization;
 
 	int dc = GetSpinnerPrecision();
 
@@ -1200,6 +1226,10 @@ void glTFExporter_Core::ExportScene(int ver)
 
 	m_model.extensionsUsed.clear();
 	m_model.extensionsRequired.clear();
+
+	if (m_Mesh_quantization_Used) {
+		CreateQuatizationMap();
+	}
 
 	CreateMorphTable();
 
@@ -1350,6 +1380,10 @@ void glTFExporter_Core::ExportScene(int ver)
 		m_model.extensionsUsed.push_back("KHR_draco_mesh_compression");
 		m_model.extensionsRequired.push_back("KHR_draco_mesh_compression");
 	}
+	if (m_Mesh_quantization_Used) {
+		m_model.extensionsUsed.push_back("KHR_mesh_quantization");
+		m_model.extensionsRequired.push_back("KHR_mesh_quantization");
+	}
 
 	for (auto p : interactiveExtensionList) {
 		m_model.extensionsUsed.push_back(p);
@@ -1359,7 +1393,7 @@ void glTFExporter_Core::ExportScene(int ver)
 		s_TitleString += _T(" (C)Khronos Group Inc.");
 		m_model.asset.generator = WStringToString(s_TitleString);
 		m_model.asset.copyright = WStringToString(GetCompanyString());
-		m_model.asset.version = "2.0";
+		m_model.asset.version = WStringToString(glTF_File_Ver[HH_glTFFileVer]);
 	}
 
 	std::string fname = WStringToString(m_fullpath);
