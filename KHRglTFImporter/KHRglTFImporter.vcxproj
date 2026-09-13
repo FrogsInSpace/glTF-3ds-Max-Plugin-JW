@@ -54,6 +54,7 @@
   </ItemGroup>
   <ImportGroup Label="PropertySheets">
     <Import Project="$(ProjectDir)propertysheets\MaxSDKSetup.props" />
+    <Import Project="$(SolutionDir)3rdParty\3rdParty_deps.props" />   
   </ImportGroup>
   <ImportGroup Label="PropertySheets">
     <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
