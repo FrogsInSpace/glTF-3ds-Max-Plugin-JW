@@ -203,6 +203,7 @@
     <ClCompile Include="SourceFiles\SceneExtension.cpp" />
     <ClCompile Include="SourceFiles\Shape.cpp" />
     <ClCompile Include="SourceFiles\Skin.cpp" />
+    <ClCompile Include="SourceFiles\ThumbnailFunc.cpp" />
     <ClCompile Include="SourceFiles\USDMaterial.cpp" />
     <ClCompile Include="SourceFiles\VRayMaterial.cpp" />
     <ClCompile Include="SourceFiles\WebpEncoder.cpp" />

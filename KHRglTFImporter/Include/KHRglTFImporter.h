@@ -304,6 +304,7 @@ extern Texmap* CreateSpecGlossFilterOSLNode(Texmap* pTex1, Texmap* pTex2);
 extern Texmap* CreateAlphaChOSLNode(AColor col);
 extern Texmap* CreateColorMultiplyOSLNode(Texmap* pTex, Color col);
 extern Texmap* CreateFlowMapTransformOSLNode(Texmap* pTex);
+extern Texmap* CreateHDRIEnvironOSLNode(const tstring& mapName);
 
 extern void GetDracoMeshIndexList(cgltf_buffer_view* bufferView, std::vector<uint32_t> &tbl);
 extern void DracoDecodeProc(cgltf_buffer_view* bufferView, cgltf_primitive* primitive, std::vector<float> &tbl, DracoDecodeType type, UINT AttrCh=0);

@@ -782,6 +782,9 @@ public:
 	void CreateQuatizationMap(void);
 	BOOL GetQuatizationInfo(ReferenceTarget* pRef, QuantizationInfo& info);
 
+	int CreateThumbNail(void);
+
+
 	float m_scale;
 	BOOL m_CopyImage;
 	int m_ExportFileType;
@@ -848,6 +851,8 @@ public:
 	BOOL m_Hoverability_Used;
 	BOOL m_TexBasisu_Used;
 	BOOL m_Mesh_quantization_Used;
+
+	BOOL m_ThumbNail;
 
 	BOOL m_IncorrectSkinDataFound;
 };

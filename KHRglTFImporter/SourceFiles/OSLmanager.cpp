@@ -243,7 +243,7 @@ Texmap* CreateFlowMapTransformOSLNode(Texmap* pTex)
 	TSTR fname = GetCOREInterface()->GetDir(APP_MAX_SYS_ROOT_DIR) + TSTR(_T("OSL\\FlowMapTransform.osl"));
 	ComStr.printf(_T("temp = OSLMap OSLPath:\"%s\""), fname.data());
 #else
-	tstring fname = GetCOREInterface()->GetDir(APP_MAX_SYS_ROOT_DIR) + tstring(_T("OSL\\ColorScale.osl"));
+	tstring fname = GetCOREInterface()->GetDir(APP_MAX_SYS_ROOT_DIR) + tstring(_T("OSL\\FlowMapTransform.osl"));
 	ComStr.printf(_T("temp = OSLMap OSLPath:\"%s\""), fname.c_str());
 #endif
 	FPValue fpv;
@@ -257,6 +257,34 @@ Texmap* CreateFlowMapTransformOSLNode(Texmap* pTex)
 	auto pMapInterface = (MaxSDK::OSL::IOSLMapInterface*)pOSLMap->GetInterface(MAXOSL_OSLMAP_INTERFACE);
 	IParamBlock2* pPBlock = pMapInterface->GetParameters();
 	pPBlock->SetValueByName(_T("FlowMap_map"), pTex, 0);
+
+	return pOSLMap;
+}
+
+//======================================================================
+//======================================================================
+Texmap* CreateHDRIEnvironOSLNode(const tstring &mapName)
+{
+	TSTR ComStr;
+#if MAX_RELEASE > 26000
+	TSTR fname = GetCOREInterface()->GetDir(APP_MAX_SYS_ROOT_DIR) + TSTR(_T("OSL\\HDRIEnviron.osl"));
+	ComStr.printf(_T("temp = OSLMap OSLPath:\"%s\""), fname.data());
+#else
+	tstring fname = GetCOREInterface()->GetDir(APP_MAX_SYS_ROOT_DIR) + tstring(_T("OSL\\HDRIEnviron.osl"));
+	ComStr.printf(_T("temp = OSLMap OSLPath:\"%s\""), fname.c_str());
+#endif
+	FPValue fpv;
+#if MAX_RELEASE >= 24000
+	ExecuteMAXScriptScript(ComStr, MAXScript::ScriptSource::NonEmbedded, FALSE, &fpv);
+#else
+	ExecuteMAXScriptScript(ComStr, FALSE, &fpv);
+#endif
+	Texmap* pOSLMap = fpv.tex;
+	if (!pOSLMap) return NULL;
+
+	auto pMapInterface = (MaxSDK::OSL::IOSLMapInterface*)pOSLMap->GetInterface(MAXOSL_OSLMAP_INTERFACE);
+	IParamBlock2* pPBlock = pMapInterface->GetParameters();
+	pPBlock->SetValueByName(_T("HDRI"), mapName.c_str(), 0);
 
 	return pOSLMap;
 }

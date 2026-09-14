@@ -2018,13 +2018,19 @@ void SetEnvironmentMap(const tstring& mapName)
 {
 	if (!GetCOREInterface()->CanImportBitmap(mapName.c_str())) return;
 
-	BitmapTex* pTex = NewDefaultBitmapTex();
-	pTex->SetName(mapName.c_str());
-	pTex->GetUVGen()->SetCoordMapping(UVMAP_SCREEN_ENV);
-	pTex->GetUVGen()->SetTextureTiling(U_WRAP | V_WRAP);
-	pTex->GetUVGen()->InitSlotType(MAPSLOT_TEXTURE);
-	pTex->SetMapName(mapName.c_str());
-	pTex->SetMtlFlag(MTL_TEX_DISPLAY_ENABLED, TRUE);
+	Texmap* pTex = NULL;
+	if (mapName.find(_T(".hdr")) != tstring::npos){
+		pTex = CreateHDRIEnvironOSLNode(mapName);
+	}
+	else {
+		pTex = NewDefaultBitmapTex();
+		pTex->SetName(mapName.c_str());
+		((BitmapTex*)pTex)->GetUVGen()->SetCoordMapping(UVMAP_SCREEN_ENV);
+		((BitmapTex*)pTex)->GetUVGen()->SetTextureTiling(U_WRAP | V_WRAP);
+		((BitmapTex*)pTex)->GetUVGen()->InitSlotType(MAPSLOT_TEXTURE);
+		((BitmapTex*)pTex)->SetMapName(mapName.c_str());
+		pTex->SetMtlFlag(MTL_TEX_DISPLAY_ENABLED, TRUE);
+	}
 
 	GetCOREInterface()->SetUseEnvironmentMap(TRUE);
 	GetCOREInterface()->SetEnvironmentMap(pTex);

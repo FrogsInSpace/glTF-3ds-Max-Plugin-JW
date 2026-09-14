@@ -11,6 +11,7 @@
 #define IDD_MAIN_DIALOG                 101
 #define IDD_EXPORT_DIALOG               102
 #define IDD_RAPIDCOMP_DIALOG            103
+#define IDD_V21_DIALOG                  103
 #define IDC_CLOSEBUTTON                 1000
 #define IDC_WM_CHK                      1000
 #define IDC_DRACO_CHECK                 1004
@@ -20,14 +21,14 @@
 #define IDC_FTYPE_RADIO3                1009
 #define IDC_INSTANCE_CHK                1010
 #define IDC_EXPSHAPE_CHK                1011
-#define IDC_RENDERSHAPE_CHK				1012
+#define IDC_RENDERSHAPE_CHK             1012
 #define IDC_QUANT_CHK                   1013
 #define IDC_LICENSE_EDIT                1014
 #define IDC_EXPORTTAN_CHK               1015
 #define IDC_LICENSE_STATIC              1016
 #define IDC_ANIM_CHK                    1017
 #define IDC_FULLFRAME_CHK               1018
-#define IDC_BUTTON1                     1019	
+#define IDC_BUTTON1                     1019
 #define IDC_LICENSE_BTN                 1025
 #define IDC_ANIMPTR_CHK                 1026
 #define IDC_MORPHNRM_CHK                1027
@@ -58,6 +59,7 @@
 #define IDC_SCNLAYER_CHK                1050
 #define IDC_HYPERLINK_STATIC3           1050
 #define IDC_CHECK1                      1050
+#define IDC_THUMBNEIL_CHK               1050
 #define IDC_COMBO1                      1052
 #define IDC_EDIT1                       1053
 #define IDC_SCL_CHECK                   1054

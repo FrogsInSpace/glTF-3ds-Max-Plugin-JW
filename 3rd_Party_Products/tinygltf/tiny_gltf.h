@@ -1076,6 +1076,7 @@ struct Asset {
   std::string generator;
   std::string minVersion;
   std::string copyright;
+  int thumbnail = -1;    /*** Hayashi 2026.Sep.03 ***/
   ExtensionMap extensions;
   Value extras;
 
@@ -6769,6 +6770,11 @@ static void SerializeGltfAsset(Asset &asset, json &o) {
 
   if (!asset.copyright.empty()) {
     SerializeStringProperty("copyright", asset.copyright, o);
+  }
+
+  /*** Hayashi 2026.Sep.03 ***/
+  if (asset.thumbnail > -1) {
+    SerializeNumberProperty("thumbnail", asset.thumbnail, o);
   }
 
   if (asset.version.empty()) {

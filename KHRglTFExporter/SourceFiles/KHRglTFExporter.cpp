@@ -71,9 +71,10 @@ static int HH_InteractiveGraphID;
 static BOOL HH_CubicSplineT;
 static BOOL HH_Quantization;
 static int HH_glTFFileVer;
+static BOOL HH_ThumbNail;
 
 static BOOL Open_InstanceWithMtl;
-
+static HWND s_hMainTab = 0;
 
 static const TCHAR *pLicenseStr = _T(
 "glTF/glb Exporter for 3dsmax Designed By Satoshi Hayashi\r\n \
@@ -333,27 +334,13 @@ DWORD WINAPI StatusBarFn(LPVOID arg)
 //======================================================================
 // Parameter Setting Dialog CallBack
 //======================================================================
-INT_PTR CALLBACK KHRglTFRapidCompOptionsDlgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) 
+INT_PTR CALLBACK KHRglTFV21OptionsDlgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) 
 {
 	static KHRglTFExporter* exp = nullptr;
 
 	switch (message) {
 	case WM_INITDIALOG:
-	{
-		CheckDlgButton(hWnd, IDC_CHECK1, HH_PostProcess);
-
-		// Set hyperlink color to blue
-		HWND hLink = GetDlgItem(hWnd, IDC_HYPERLINK_STATIC);
-		//SetWindowText(hLink, L"Click here to visit Google");
-
-		// Undeline font
-		HFONT hFont = (HFONT)SendMessage(hLink, WM_GETFONT, 0, 0);
-		LOGFONT lf;
-		GetObject(hFont, sizeof(lf), &lf);
-		lf.lfUnderline = TRUE;
-		HFONT hUnderlineFont = CreateFontIndirect(&lf);
-		SendMessage(hLink, WM_SETFONT, (WPARAM)hUnderlineFont, TRUE);
-	}
+		CheckDlgButton(hWnd, IDC_THUMBNEIL_CHK, HH_ThumbNail);
 		return TRUE;
 
 	case WM_CLOSE:
@@ -362,34 +349,12 @@ INT_PTR CALLBACK KHRglTFRapidCompOptionsDlgProc(HWND hWnd, UINT message, WPARAM 
 
 	case WM_COMMAND:
 		switch (LOWORD(wParam)) {
-		case IDC_HYPERLINK_STATIC:
-			if (HIWORD(wParam) == STN_CLICKED)
-			{
-				ShellExecute(NULL, L"open", L"https://www.rapidcompact.com/product/", NULL, NULL, SW_SHOWNORMAL);
-				//OpenHyperlink(L"https://www.rapidcompact.com/product/");
-			}
-			return 1;
-
 		case IDOK:
-			HH_PostProcess = IsDlgButtonChecked(hWnd, IDC_CHECK1);
-
+			HH_ThumbNail = IsDlgButtonChecked(hWnd, IDC_THUMBNEIL_CHK);
 			::EndDialog(hWnd, 1);
 			return 1;
 		}
 		break;
-
-	case WM_CTLCOLORSTATIC:
-	{
-		HDC hdcStatic = (HDC)wParam;
-		HWND hwndStatic = (HWND)lParam;
-		if (GetDlgCtrlID(hwndStatic) == IDC_HYPERLINK_STATIC)
-		{
-			SetTextColor(hdcStatic, RGB(0, 0, 255));
-			SetBkMode(hdcStatic, TRANSPARENT);
-			return (INT_PTR)GetStockObject(NULL_BRUSH);
-		}
-	}
-	break;
 
 	default:
 		return (BOOL)DefWindowProc(hWnd, message, wParam, lParam);
@@ -516,6 +481,11 @@ INT_PTR CALLBACK KHRglTFExporterOptionsDlgProc(HWND hWnd, UINT message, WPARAM w
 			EnableWindow(GetDlgItem(hWnd, IDC_STATIC_INT2), FALSE);
 		}
 
+#ifndef _DEBUG
+		EnableWindow(GetDlgItem(hWnd, IDC_VER_COMBO1), FALSE);
+		EnableWindow(GetDlgItem(hWnd, IDC_REFERENCE_CHK), FALSE);
+#endif
+
 		return TRUE;
 
 	case WM_CLOSE:
@@ -563,6 +533,22 @@ INT_PTR CALLBACK KHRglTFExporterOptionsDlgProc(HWND hWnd, UINT message, WPARAM w
 			CheckDlgButton(hWnd, IDC_QUANT_CHK, FALSE);
 			break;
 
+		case IDC_VER_COMBO1:
+			HH_glTFFileVer = SendMessage(GetDlgItem(hWnd, IDC_VER_COMBO1), CB_GETCURSEL, 0, 0);
+			{
+				TCITEM tie;
+				tie.mask = TCIF_TEXT;
+				if (HH_glTFFileVer == 0) {
+					tie.pszText = (LPTSTR)_T("");
+				}
+				else {
+					tie.pszText = (LPTSTR)_T("2.1 options");
+				}
+				TabCtrl_SetItem(s_hMainTab, 1, &tie);
+				TabCtrl_SetCurSel(s_hMainTab, 0);
+			}
+			break;
+
 		case IDOK:
 			HH_CopyImage = IsDlgButtonChecked(hWnd, IDC_COPYIMAGE_CHECK);
 			HH_DracoCompress = IsDlgButtonChecked(hWnd, IDC_DRACO_CHECK);
@@ -594,7 +580,7 @@ INT_PTR CALLBACK KHRglTFExporterOptionsDlgProc(HWND hWnd, UINT message, WPARAM w
 			HH_Interactivity = IsDlgButtonChecked(hWnd, IDC_INTERACT_CHK);
 			HH_Quantization = IsDlgButtonChecked(hWnd, IDC_QUANT_CHK);
 
-				HH_glTFFileVer = SendMessage(GetDlgItem(hWnd, IDC_VER_COMBO1), CB_GETCURSEL, 0, 0);
+			HH_glTFFileVer = SendMessage(GetDlgItem(hWnd, IDC_VER_COMBO1), CB_GETCURSEL, 0, 0);
 
 			if (IsDlgButtonChecked(hWnd, IDC_MRO_RADIO1)) HH_MROMapExportMode = 0;
 			if (IsDlgButtonChecked(hWnd, IDC_MRO_RADIO2)) HH_MROMapExportMode = 1;
@@ -622,6 +608,7 @@ INT_PTR CALLBACK KHRglTFExporterOptionsDlgProc(HWND hWnd, UINT message, WPARAM w
 		}
 		break;
 
+
 	default:
 		return (BOOL)DefWindowProc(hWnd, message, wParam, lParam);
 	}
@@ -648,11 +635,10 @@ INT_PTR CALLBACK KHRglTFExporterMainDlgProc(HWND hWnd, UINT message, WPARAM wPar
 		tabItem.cchTextMax = 16;
 		TabCtrl_InsertItem(::GetDlgItem(hWnd, IDC_TAB1), 0, &tabItem);
 		hExportWnd = ::CreateDialogParam(hInstance, MAKEINTRESOURCE(IDD_EXPORT_DIALOG), hWnd, KHRglTFExporterOptionsDlgProc, (LPARAM)NULL);
-#ifdef _DEBUG
-		tabItem.pszText = _T("Post Proc");
+		tabItem.pszText = (LPWSTR)_T("");
 		TabCtrl_InsertItem(::GetDlgItem(hWnd, IDC_TAB1), 1, &tabItem);
-		hRapidCompWnd = ::CreateDialogParam(hInstance, MAKEINTRESOURCE(IDD_RAPIDCOMP_DIALOG), hWnd, KHRglTFRapidCompOptionsDlgProc, (LPARAM)NULL);
-#endif
+		hRapidCompWnd = ::CreateDialogParam(hInstance, MAKEINTRESOURCE(IDD_V21_DIALOG), hWnd, KHRglTFV21OptionsDlgProc, (LPARAM)NULL);
+		s_hMainTab = ::GetDlgItem(hWnd, IDC_TAB1);
 	}
 
 		//if (!hRapidCompWnd)
@@ -702,6 +688,7 @@ INT_PTR CALLBACK KHRglTFExporterMainDlgProc(HWND hWnd, UINT message, WPARAM wPar
 		case TCN_SELCHANGE:
 			{
 			int n = TabCtrl_GetCurSel(::GetDlgItem(hWnd, IDC_TAB1));
+			if (HH_glTFFileVer == 0 && n == 1) return TRUE;
 			ShowWindow(hExportWnd, n == 0 ? SW_SHOW : SW_HIDE);
 			ShowWindow(hRapidCompWnd, n == 1 ? SW_SHOW : SW_HIDE);
 			}
@@ -933,9 +920,9 @@ BOOL glTFExporter_Core::ExportPreProcess(const TCHAR* filename, BOOL suppressPro
 	HH_Interactivity = MaxSDK::Util::GetPrivateProfileInt(_T("ExpSettings"), _T("Interactivity"), 0, profle);
 	HH_CubicSplineT	= MaxSDK::Util::GetPrivateProfileInt(_T("ExpSettings"), _T("CubicSplineT"), 0, profle);
 	HH_Quantization = MaxSDK::Util::GetPrivateProfileInt(_T("ExpSettings"), _T("Quantization"), 0, profle);
-	HH_glTFFileVer = MaxSDK::Util::GetPrivateProfileInt(_T("ExpSettings"), _T("glTFFileVer"), 0, profle);
+	HH_glTFFileVer = 0;//MaxSDK::Util::GetPrivateProfileInt(_T("ExpSettings"), _T("glTFFileVer"), 0, profle);
 
-	HH_PostProcess = FALSE;
+	HH_ThumbNail = MaxSDK::Util::GetPrivateProfileInt(_T("ExpSettings"), _T("ThumbNail"), 0, profle);
 
 	Open_InstanceWithMtl = MaxSDK::Util::GetPrivateProfileInt(_T("ExpSettings"), _T("Open_InstanceWithMtl"), 0, profle);
 
@@ -1010,6 +997,8 @@ BOOL glTFExporter_Core::ExportPreProcess(const TCHAR* filename, BOOL suppressPro
 		MaxSDK::Util::WritePrivateProfileString(_T("ExpSettings"), _T("Quantization"), buf, profle);
 		_stprintf_s(buf, MAX_PATH, _T("%d"), HH_glTFFileVer);
 		MaxSDK::Util::WritePrivateProfileString(_T("ExpSettings"), _T("glTFFileVer"), buf, profle);
+		_stprintf_s(buf, MAX_PATH, _T("%d"), HH_ThumbNail);
+		MaxSDK::Util::WritePrivateProfileString(_T("ExpSettings"), _T("ThumbNail"), buf, profle);
 	}
 
 	// only show messagebox if not suppressed
@@ -1097,6 +1086,7 @@ BOOL glTFExporter_Core::ExportPreProcess(const TCHAR* filename, BOOL suppressPro
 	m_ResetPivotTM = FALSE;
 	m_CubicSplineT = HH_CubicSplineT;
 	m_Mesh_quantization_Used = HH_Quantization;
+	m_ThumbNail = HH_ThumbNail;
 
 	int dc = GetSpinnerPrecision();
 
@@ -1104,6 +1094,11 @@ BOOL glTFExporter_Core::ExportPreProcess(const TCHAR* filename, BOOL suppressPro
 	m_TimeScale = (float)(GetTicksPerFrame() * GetFrameRate());
 
 	m_fullpath = std::wstring(filename);
+
+	if (m_ReferenceFileMode) {
+		return TRUE;
+	}
+
 
 #if MAX_RELEASE>=25000
 	GetCOREInterface()->ProgressStart(_M("gtTF file Exporting."), FALSE, NULL, NULL);
@@ -1302,6 +1297,11 @@ void glTFExporter_Core::ExportScene(int ver)
 	}
 
 	LogOutput(_T("Create Skin Table->Finish."));
+
+	if (HH_glTFFileVer==1 && m_ThumbNail) {
+		CreateThumbNail();
+	}
+
 	LogOutput(_T("Create Image Buffer."));
 
 	if (m_ExportFileType == 3) {
@@ -1324,6 +1324,7 @@ void glTFExporter_Core::ExportScene(int ver)
 	if (m_Interactivity) {
 		GetInteractivityNodeList(interactiveExtensionList);
 	}
+
 
 	unsigned char *ptr = (unsigned char *)m_glTf_Buffer;
 	tinygltf::Buffer buffer;

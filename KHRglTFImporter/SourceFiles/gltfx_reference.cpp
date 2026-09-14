@@ -104,8 +104,12 @@ BOOL glTFImporter_Core::gltfx_reference(const TCHAR* filename)
 		GetImportedNodeTab(tt);
 		if (tt.Count() > 0) {
 			GetCOREInterface()->SelectNodeTab(tt, TRUE);
+			// WARNING: Calling FileSaveSelected() / saveNodes directly causes a crash in Debug build.
+			// Works fine in Release build, but needs refactoring if Debug execution is required.
+			//GetCOREInterface()->FileSaveNodes(&tt, max_file.c_str());
 			GetCOREInterface()->FileSaveSelected(max_file.c_str());
 			GetCOREInterface14()->DeleteNodes(tt);
+			//for (int ii = 0; ii < tt.Count(); ii++)	GetCOREInterface()->DeleteNode(tt[ii]);
 
 			MaxSDK::AssetManagement::AssetUser asset = MaxSDK::AssetManagement::IAssetManager::GetInstance()->GetAsset(TSTR(max_file.c_str()), MaxSDK::AssetManagement::AssetType::kXRefAsset);
 			//pRootNode->AddNewXRefFile(asset);
