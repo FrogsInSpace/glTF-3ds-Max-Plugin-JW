@@ -76,7 +76,7 @@
     <ClCompile>
       <ConformanceMode>false</ConformanceMode>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>.\;.\include;.\Resource;$(MaxSDKPath)\include;$(MaxSDKPath)\modifiers\bonesdef;$(MaxSDKPath)\include\geom;$(MaxSDKPath)\samples\modifiers\morpher;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\;.\include;.\tinygltf;.\Resource;$(MaxSDKPath)\include;$(MaxSDKPath)\modifiers\bonesdef;$(MaxSDKPath)\include\geom;$(MaxSDKPath)\samples\modifiers\morpher;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
@@ -131,7 +131,7 @@
       <ConformanceMode>false</ConformanceMode>
       <AdditionalOptions>/LD  %(AdditionalOptions)</AdditionalOptions>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
-      <AdditionalIncludeDirectories>.\;.\include;.\Resource;$(MaxSDKPath)\include;$(MaxSDKPath)\modifiers\bonesdef;$(MaxSDKPath)\include\geom;$(MaxSDKPath)\samples\modifiers\morpher;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\;.\include;.\Resource;.\tinygltf;$(MaxSDKPath)\include;$(MaxSDKPath)\modifiers\bonesdef;$(MaxSDKPath)\include\geom;$(MaxSDKPath)\samples\modifiers\morpher;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>

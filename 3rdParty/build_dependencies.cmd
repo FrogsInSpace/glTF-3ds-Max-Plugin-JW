@@ -10,6 +10,9 @@ set "DIST_DIR=%~dp0_dist_%VC_TOOLSET%"
 :: to hold the downloaded zip archives
 set "ARCHIVE_DIR=%~dp0_archives"
 
+:: skip tinygltf as it has been ( slightly ) modified
+:: modified tinygltf has been moved to the KHRglTFEporter Project folder, as its only used there
+set "BUILD_TINYGLTF=0"
 
 echo.
 echo =====================================================
@@ -17,11 +20,13 @@ echo Building 3rd party dependencies
 echo =====================================================
 echo.
 
-echo.
-echo "Cloning 'tinygltf' ..."
-echo =====================================================
-call :CLONE "tinygltf" "https://github.com/syoyo/tinygltf.git" "v3.0.1"
-if errorlevel 1 goto :ERROR
+if "%BUILD_TINYGLTF%"=="1" (
+	echo.
+	echo "Cloning 'tinygltf' ..."
+	echo =====================================================
+	call :CLONE "tinygltf" "https://github.com/syoyo/tinygltf.git" "v3.0.1"
+	if errorlevel 1 goto :ERROR
+)
 
 echo.
 echo "Cloning and building 'draco' ..."

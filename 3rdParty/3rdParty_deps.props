@@ -15,7 +15,6 @@
 				$(MSBuildThisFileDirectory)KTX-Software\include;
 				$(MSBuildThisFileDirectory)KTX-Software\lib;
 				$(MSBuildThisFileDirectory)libwebp\src;
-				$(MSBuildThisFileDirectory)tinygltf\attic;		
 				%(AdditionalIncludeDirectories)
 			</AdditionalIncludeDirectories>
     </ClCompile>
