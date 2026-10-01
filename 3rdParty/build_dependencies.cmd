@@ -1,6 +1,15 @@
 @echo off
 setlocal EnableDelayedExpansion
 
+:: Check for Visual Studio x64 dev environment
+if /I NOT "%VSCMD_ARG_TGT_ARCH%"=="x64" (
+	echo.
+	echo ##############################################
+    echo Visual Studio x64 environment not initialized!
+	echo ##############################################
+    goto :Failed
+)
+
 :: the MSVC toolset version to use for building the libraries
 :: has to match the minimal targeted 3ds Max version's SDK requirement ( v141 for 3ds Max 2020 - 2022 )
 set "VC_TOOLSET=v141"
@@ -12,7 +21,7 @@ set "ARCHIVE_DIR=%~dp0_archives"
 
 :: skip tinygltf as it has been ( slightly ) modified
 :: modified tinygltf has been moved to the KHRglTFEporter Project folder, as its only used there
-set "BUILD_TINYGLTF=0"
+set "CLONE_TINYGLTF=0"
 
 echo.
 echo =====================================================
@@ -20,7 +29,7 @@ echo Building 3rd party dependencies
 echo =====================================================
 echo.
 
-if "%BUILD_TINYGLTF%"=="1" (
+if "%CLONE_TINYGLTF%"=="1" (
 	echo.
 	echo "Cloning 'tinygltf' ..."
 	echo =====================================================
@@ -32,7 +41,9 @@ echo.
 echo "Cloning and building 'draco' ..."
 echo =====================================================
 call :CLONE "draco" "https://github.com/Google/draco.git" "1.5.7"
+if errorlevel 1 goto :ERROR
 call :CONFIGURE "draco" "-DCMAKE_INSTALL_PREFIX=installed"
+if errorlevel 1 goto :ERROR
 call :BUILD "draco" "INSTALL"
 if errorlevel 1 goto :ERROR
 
@@ -40,7 +51,9 @@ echo.
 echo "Cloning and building 'jsoncpp' ..."
 echo =====================================================
 call :CLONE "jsoncpp" "https://github.com/open-source-parsers/jsoncpp.git" "1.9.8"
+if errorlevel 1 goto :ERROR
 call :CONFIGURE "jsoncpp" "-DJSONCPP_WITH_TESTS=OFF -DJSONCPP_WITH_POST_BUILD_UNITTEST=OFF -DJSONCPP_WITH_PKGCONFIG_SUPPORT=OFF -DJSONCPP_WITH_CMAKE_PACKAGE=OFF -DBUILD_SHARED_LIBS=OFF -DBUILD_OBJECT_LIBS=OFF -DBUILD_STATIC_LIBS=ON"
+if errorlevel 1 goto :ERROR
 call :BUILD "jsoncpp" "jsoncpp_static"
 if errorlevel 1 goto :ERROR
 
@@ -48,7 +61,9 @@ echo.
 echo "Cloning and building 'KTX' ..."
 echo =====================================================
 call :CLONE "KTX-Software" "https://github.com/KhronosGroup/KTX-Software.git" "v4.1.0"
+if errorlevel 1 goto :ERROR
 call :CONFIGURE "KTX-Software" "-DKTX_FEATURE_STATIC_LIBRARY=ON"
+if errorlevel 1 goto :ERROR
 call :BUILD "KTX-Software" "ktx"
 if errorlevel 1 goto :ERROR
 
@@ -56,7 +71,9 @@ echo.
 echo "Cloning and building 'libwebp' ..."
 echo =====================================================
 call :CLONE "libwebp" "https://github.com/webmproject/libwebp.git" "v1.6.0"
+if errorlevel 1 goto :ERROR
 call :CONFIGURE "libwebp"
+if errorlevel 1 goto :ERROR
 call :BUILD "libwebp" "webp" "sharpyuv" "webpdecoder"
 if errorlevel 1 goto :ERROR
 
@@ -77,6 +94,12 @@ exit /b 0
 
 :CLONE
   if not exist "%~1" (
+  	:: Check if git is available
+	where git >nul 2>&1
+	if errorlevel 1 (
+		echo ERROR: Git is not available in PATH. Aborting...
+		exit /b 1
+	)  
     git -c advice.detachedHead=false clone --depth 1 -b "%~3" "%~2" "%~1"
     if errorlevel 1 (
         echo ERROR: failed to clone %~1
@@ -104,6 +127,13 @@ exit /b 0
 :: =====================================================
 
 :CONFIGURE
+  :: Check if cmake is available
+  where cmake >nul 2>&1
+  if errorlevel 1 (
+    echo ERROR: cmake is not available in PATH. Aborting...
+    exit /b 1
+  )  
+
   set "SRC_DIR=%~1"
   :: Strip source directory argument.
   shift
@@ -145,6 +175,13 @@ exit /b 0
 :: =====================================================
 
 :BUILD
+  :: Check if cmake is available
+  where cmake >nul 2>&1
+  if errorlevel 1 (
+    echo ERROR: cmake is not available in PATH. Aborting...
+    exit /b 1
+  )  
+  
   set "SRC_DIR=%~1"
   :: Strip source directory argument.
   shift
