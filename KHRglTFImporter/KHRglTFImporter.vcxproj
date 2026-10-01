@@ -53,8 +53,8 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ImportGroup Label="PropertySheets">
-    <Import Project="$(ProjectDir)propertysheets\MaxSDKSetup.props" />
-    <Import Project="$(SolutionDir)3rdParty\3rdParty_deps.props" />   
+    <Import Project="$(MSBuildProjectDirectory)\propertysheets\MaxSDKSetup.props" />
+    <Import Project="$(MSBuildProjectDirectory)\..\3rdParty\3rdParty_deps.props" />   
   </ImportGroup>
   <ImportGroup Label="PropertySheets">
     <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -116,7 +116,7 @@
       <TargetMachine>MachineX64</TargetMachine>
     </Link>
     <PostBuildEvent>
-      <Command>echo F | xcopy /Y /Q "$(TargetPath)" "$(SolutionDir)Packages\3ds Max $(MaxSDKRelease)\Plugins\$(TargetFileName)"</Command>
+      <Command>echo F | xcopy /Y /Q "$(TargetPath)" "$(MSBuildProjectDirectory)\..\Packages\3ds Max $(MaxSDKRelease)\Plugins\$(TargetFileName)"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="$(Configuration.Contains('Release'))">
@@ -168,7 +168,7 @@
       <TargetMachine>MachineX64</TargetMachine>
     </Link>
     <PostBuildEvent>
-      <Command>echo F | xcopy /Y /Q "$(TargetPath)" "$(SolutionDir)Packages\3ds Max $(MaxSDKRelease)\Plugins\$(TargetFileName)"</Command>
+      <Command>echo F | xcopy /Y /Q "$(TargetPath)" "$(MSBuildProjectDirectory)\..\Packages\3ds Max $(MaxSDKRelease)\Plugins\$(TargetFileName)"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
