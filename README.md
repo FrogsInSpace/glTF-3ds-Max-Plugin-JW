@@ -64,13 +64,14 @@ If environment variables are missing, you must manually set them to point to the
 | 2026            | `ADSK_3DSMAX_SDK_2026`    |
 | 2027            | `ADSK_3DSMAX_SDK_2027`    |
 
-### 🛠️ Intial Building of 3rd-Party Dependencies
+### 🛠️ Initial Building of 3rd-Party Dependencies
 
 The project depends on several prebuilt 3rd-party libraries, which must be available in the <b>`3rdParty\_dist\_v141\Debug`</b> and <b>`3rdParty\_dist\_v141\Release`</b> directories.
 
 - A batch script is provided to build these libraries from source: <b>`3rdParty\build_dependencies.cmd`</b>
-- Run the script once from a **Visual Studio x64 Developer Command Prompt**.
+- The script should be run once from a **Visual Studio x64 Developer Command Prompt**.
 - The script will fetch, build, and install all required dependencies into <b>`3rdParty\_dist_v141`</b>.
+- The script relies on **MSVC v141 - VS 2017 C++ x64/x86 build tools** to be installed.
 - The <b>`BuildAll.cmd`</b> and <b>`BuildForAvailableSDKs.cmd`</b> described below perform this step automatically.
 
 ### 🛠️ Building the Project
