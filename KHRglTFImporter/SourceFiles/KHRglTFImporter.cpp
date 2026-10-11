@@ -753,10 +753,9 @@ int KHRglTFImporter::DoImport(const TCHAR* filename, ImpInterface* importerInt, 
 //======================================================================
 // Importer body
 //======================================================================
-BOOL glTFImporter_Core::ImportPreProcess(const TCHAR* filename, BOOL suppressPrompts, int ver)
+int glTFImporter_Core::ImportPreProcess(const TCHAR* filename, BOOL suppressPrompts, int ver)
 {
 	TCHAR buf[MAX_PATH];
-
 
 	s_TitleString = _T("Khronos glTF importer for 3dsmax ") + tstring(KHR_GLTF_IMPORTER_VER);
 
@@ -817,7 +816,10 @@ BOOL glTFImporter_Core::ImportPreProcess(const TCHAR* filename, BOOL suppressPro
 	HH_ApplyScale = MaxSDK::Util::GetPrivateProfileInt(_T("ImpSettings"), _T("ApplyScale"), 1, profle);
 
 	if (!suppressPrompts) {
-		if (DialogBoxParam(hInstance, MAKEINTRESOURCE(IDD_PANEL), GetActiveWindow(), KHRglTFImporterOptionsDlgProc, (LPARAM)this) == 0) return TRUE;
+		if(DialogBoxParam(hInstance, MAKEINTRESOURCE(IDD_PANEL), GetActiveWindow(), KHRglTFImporterOptionsDlgProc, (LPARAM)this) == 0) {
+			// 0 ... cancel pressed on options dialog
+			return IMPEXP_CANCEL;
+		}
 
 		_stprintf_s(buf, MAX_PATH, _T("%d"), (int)(HH_scale*1000.0f));
 		MaxSDK::Util::WritePrivateProfileString(_T("ImpSettings"), _T("scale"), buf, profle);
@@ -959,7 +961,7 @@ BOOL glTFImporter_Core::ImportPreProcess(const TCHAR* filename, BOOL suppressPro
 	std::filesystem::path p(filename);
 	if (p.extension() == _T(".gltfx")) {
 		gltfx_reference(filename);
-		return TRUE;
+		return IMPEXP_SUCCESS;
 	}
 
 
@@ -986,7 +988,7 @@ BOOL glTFImporter_Core::ImportPreProcess(const TCHAR* filename, BOOL suppressPro
 		}
 	}
 	else {
-		return TRUE;
+		return IMPEXP_FAIL;
 	}
 
 	s_ImportedNodeTab.ZeroCount();
@@ -995,7 +997,7 @@ BOOL glTFImporter_Core::ImportPreProcess(const TCHAR* filename, BOOL suppressPro
 	}
 
 
-	return TRUE;
+	return IMPEXP_SUCCESS;
 }
 
 //======================================================================

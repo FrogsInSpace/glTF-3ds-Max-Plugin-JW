@@ -481,7 +481,7 @@ extern Mtl* GetSubMtlFromShellMtl(Mtl* pMtl);
 class glTFExporter_Core
 {
 public:
-	BOOL ExportPreProcess(const TCHAR* filename, BOOL suppressPrompts, int ver);
+	int ExportPreProcess(const TCHAR* filename, BOOL suppressPrompts, int ver);
 	void ExportScene(int ver);
 	void CreateMtlIDTable(Mesh *pMesh, Mtl *pMtl, std::map<int, std::vector<int> > &mtlIDMap);
 	void GetFulFrameAnimation(INode* pNode, Tab<TimeValue>& PosFrameList, Tab<TimeValue>& RotFrameList, Tab<TimeValue>& SclFrameList);
