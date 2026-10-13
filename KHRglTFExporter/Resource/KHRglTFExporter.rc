@@ -15,7 +15,7 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// 日本語 (日本) resources
+// Japanese (Japan) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_JPN)
 LANGUAGE LANG_JAPANESE, SUBLANG_DEFAULT
@@ -39,12 +39,12 @@ END
 
 #endif    // APSTUDIO_INVOKED
 
-#endif    // 日本語 (日本) resources
+#endif   // Japanese (Japan) resources
 /////////////////////////////////////////////////////////////////////////////
 
 
 /////////////////////////////////////////////////////////////////////////////
-// 英語 (ニュートラル) resources
+// English (United States) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
 LANGUAGE LANG_ENGLISH, SUBLANG_NEUTRAL
@@ -145,7 +145,7 @@ END
 
 IDD_MAIN_DIALOG DIALOGEX 0, 0, 257, 321
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
-CAPTION "glTF2.0 Exporter for 3ds Max v1.45"
+CAPTION "glTF 2.0 Exporter for 3ds Max"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     DEFPUSHBUTTON   "OK",IDOK,135,269,50,14
@@ -223,7 +223,7 @@ BEGIN
     IDS_CLASS_NAME2         "KHRglTF2Exporter"
 END
 
-#endif    // 英語 (ニュートラル) resources
+#endif    // English (United States) resources
 /////////////////////////////////////////////////////////////////////////////
 
 
