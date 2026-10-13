@@ -348,7 +348,7 @@ extern BOOL ISFlatHierarchy(void);
 class glTFImporter_Core
 {
 public:
-	BOOL ImportPreProcess(const TCHAR* filename, BOOL suppressPrompts, int ver);
+	int ImportPreProcess(const TCHAR* filename, BOOL suppressPrompts, int ver);
 	BOOL ImportScene(BOOL suppressPrompts);
 
 	BOOL GetDataList(std::vector<float>& data, cgltf_accessor *acc);

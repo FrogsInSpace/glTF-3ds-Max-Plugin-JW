@@ -791,8 +791,7 @@ int KHRglTFExporter::DoExport(const TCHAR* filename, ExpInterface* exporterInt, 
 
 	exportSelected = (options & SCENE_EXPORT_SELECTED) ? TRUE : FALSE;
 
-	int ret = theExporterCore.ExportPreProcess(filename, suppressPrompts, 1);
-	return ret;
+	return theExporterCore.ExportPreProcess(filename, suppressPrompts, 1);
 }
 
 // -----------------------------------------------------------
@@ -895,7 +894,7 @@ void glTFExporter_Core::FreeSceneData(void)
 
 //======================================================================
 //======================================================================
-BOOL glTFExporter_Core::ExportPreProcess(const TCHAR* filename, BOOL suppressPrompts, int ver)
+int glTFExporter_Core::ExportPreProcess(const TCHAR* filename, BOOL suppressPrompts, int ver)
 {
 	s_TitleString = _T("Khronos glTF exporter for 3dsmax ") + tstring(KHR_GLTF_EXPORTER_VER);
 
@@ -948,7 +947,8 @@ BOOL glTFExporter_Core::ExportPreProcess(const TCHAR* filename, BOOL suppressPro
 
 	if (!suppressPrompts) {
 		if (DialogBoxParam(hInstance, MAKEINTRESOURCE(IDD_MAIN_DIALOG), GetActiveWindow(), KHRglTFExporterMainDlgProc, (LPARAM)this) == 0) {
-			return TRUE;
+			// 0 ... cancel pressed on options dialog
+			return IMPEXP_CANCEL;
 		}
 
 		TCHAR buf[MAX_PATH];
@@ -1014,16 +1014,17 @@ BOOL glTFExporter_Core::ExportPreProcess(const TCHAR* filename, BOOL suppressPro
 
 	// only show messagebox if not suppressed
 	if(!suppressPrompts) {
-		{
-#define MESSAGE_STR _T("Negative transform(Mirrored Object) detected, meshes may not export correctly to glTF.\nThe use of the ResetXForm utility is highly recommended.")
-			INodeTab tbl;
-			GetMirroredNode(tbl);
-			if(tbl.Count() > 0) {
-				int ret = MessageBox(NULL, MESSAGE_STR, _T("WARNING:Mirrored Objexct detected"), MB_OKCANCEL | MB_ICONWARNING);
-				if(ret == IDCANCEL) {
-					if(!exportSelected) GetCOREInterface()->SelectNodeTab(tbl, TRUE);
-					return TRUE;
-				}
+		// TODO: check if its better to only skip the node containing the negative scale ?
+		INodeTab tbl;
+		if(GetMirroredNode(tbl) > 0) {
+			int ret = MessageBox(NULL, _T("Negative scale (mirrored object) detected, meshes may not export correctly to glTF."
+											"\nThe use of the ResetXForm utility is highly recommended."
+											"\n\nDo you want to continue?"),
+					                    _T("WARNING: Mirrored Object detected"), 
+					                    MB_OKCANCEL | MB_ICONWARNING);
+			if(ret == IDCANCEL) {
+				if(!exportSelected) GetCOREInterface()->SelectNodeTab(tbl, TRUE);
+				return IMPEXP_CANCEL;
 			}
 		}
 	}
@@ -1058,7 +1059,7 @@ BOOL glTFExporter_Core::ExportPreProcess(const TCHAR* filename, BOOL suppressPro
 		CreateGLTFXFile(filename);
 		MaxSDK::Util::WritePrivateProfileString(_T("ExpSettings"), _T("ReferenceFileMode"), _T("1"), profle);
 		HH_ReferenceFileMode = TRUE;
-		return TRUE;
+		return IMPEXP_SUCCESS;
 	}
 
 	//m_CopyImage = HH_CopyImage;
@@ -1127,7 +1128,7 @@ BOOL glTFExporter_Core::ExportPreProcess(const TCHAR* filename, BOOL suppressPro
 		);
 	}
 
-	return TRUE;
+	return IMPEXP_SUCCESS;
 }
 
 // -----------------------------------------------------------

@@ -753,10 +753,9 @@ int KHRglTFImporter::DoImport(const TCHAR* filename, ImpInterface* importerInt, 
 //======================================================================
 // Importer body
 //======================================================================
-BOOL glTFImporter_Core::ImportPreProcess(const TCHAR* filename, BOOL suppressPrompts, int ver)
+int glTFImporter_Core::ImportPreProcess(const TCHAR* filename, BOOL suppressPrompts, int ver)
 {
 	TCHAR buf[MAX_PATH];
-
 
 	s_TitleString = _T("Khronos glTF importer for 3dsmax ") + tstring(KHR_GLTF_IMPORTER_VER);
 
@@ -817,7 +816,10 @@ BOOL glTFImporter_Core::ImportPreProcess(const TCHAR* filename, BOOL suppressPro
 	HH_ApplyScale = MaxSDK::Util::GetPrivateProfileInt(_T("ImpSettings"), _T("ApplyScale"), 1, profle);
 
 	if (!suppressPrompts) {
-		if (DialogBoxParam(hInstance, MAKEINTRESOURCE(IDD_PANEL), GetActiveWindow(), KHRglTFImporterOptionsDlgProc, (LPARAM)this) == 0) return TRUE;
+		if(DialogBoxParam(hInstance, MAKEINTRESOURCE(IDD_PANEL), GetActiveWindow(), KHRglTFImporterOptionsDlgProc, (LPARAM)this) == 0) {
+			// 0 ... cancel pressed on options dialog
+			return IMPEXP_CANCEL;
+		}
 
 		_stprintf_s(buf, MAX_PATH, _T("%d"), (int)(HH_scale*1000.0f));
 		MaxSDK::Util::WritePrivateProfileString(_T("ImpSettings"), _T("scale"), buf, profle);
@@ -959,7 +961,7 @@ BOOL glTFImporter_Core::ImportPreProcess(const TCHAR* filename, BOOL suppressPro
 	std::filesystem::path p(filename);
 	if (p.extension() == _T(".gltfx")) {
 		gltfx_reference(filename);
-		return TRUE;
+		return IMPEXP_SUCCESS;
 	}
 
 
@@ -986,7 +988,7 @@ BOOL glTFImporter_Core::ImportPreProcess(const TCHAR* filename, BOOL suppressPro
 		}
 	}
 	else {
-		return TRUE;
+		return IMPEXP_FAIL;
 	}
 
 	s_ImportedNodeTab.ZeroCount();
@@ -995,7 +997,7 @@ BOOL glTFImporter_Core::ImportPreProcess(const TCHAR* filename, BOOL suppressPro
 	}
 
 
-	return TRUE;
+	return IMPEXP_SUCCESS;
 }
 
 //======================================================================
@@ -1023,8 +1025,8 @@ BOOL glTFImporter_Core::ImportScene(BOOL suppressPrompts)
 	if (m_glTF_data->extensions_used_count>0) {
 		for (int i = 0; i < m_glTF_data->extensions_used_count;i++) {
 			char *ptr = m_glTF_data->extensions_used[i];
-			if (!_stricmp(ptr, "EXT_meshopt_compression")) {
-				if(!suppressPrompts) MessageBox(GetCOREInterface()->GetMAXHWnd(), _T("WARNING:EXT_meshopt_compression is not supported."), _T("File Import Failed"), MB_OK | MB_ICONWARNING);
+			if ( _stricmp(ptr, "EXT_meshopt_compression") == 0 || _stricmp(ptr, "KHR_meshopt_compression") == 0 ) {
+				if(!suppressPrompts) MessageBox(GetCOREInterface()->GetMAXHWnd(), _T("WARNING: EXT_meshopt_compression is not supported."), _T("File Import Failed"), MB_OK | MB_ICONWARNING);
 				cgltf_free(m_glTF_data);
 				return FALSE;
 			}
@@ -1486,7 +1488,7 @@ void glTFImporter_Core::SetSparseData(std::vector<float>& retVal, cgltf_accessor
 /// TODO: throws exception when importing Khronos gltf-meshopt samples
 /// !!! This function crashes at memcpy when importing Khronos meshopt samples 
 /// BrainStem\glTF-Meshopt\BrainStem.gltf
-/// glTF-Meshopt\DragonAttenuation.gltf
+/// DragonAttenuation\glTF-Meshopt\DragonAttenuation.gltf
 
 void glTFImporter_Core::SetSparseData(std::vector<float>& retVal, cgltf_accessor* acc)
 {
@@ -1783,6 +1785,10 @@ int FindModifier(INode* pNode, const Class_ID &CID, Modifier **pMod)
 }
 
 //======================================================================
+// TODO: check this function's implementation and need for custom 
+// unicode escape handling. if possible make use of possibly existing 
+// API's in one of the json libs already used by the project
+// 
 //   Char. number range  |        UTF-8 octet sequence
 //      (hexadecimal)    |              (binary)
 //   --------------------+---------------------------------------------
@@ -1926,6 +1932,9 @@ std::string UTF8toSjis(std::string srcUTF8)
 
 //======================================================================
 //	string to wstring
+// TODO: check this function's implementation and need for custom 
+// unicode escape handling. if possible make use of possibly existing 
+// API's in one of the json libs already used by the project
 //======================================================================
 std::wstring StringToWString(const char *oStringOrg, int code)
 {
