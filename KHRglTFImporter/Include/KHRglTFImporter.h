@@ -68,7 +68,7 @@ extern BOOL IsLogOut(void);
 
 
 #define KHR_APP_CODE 200
-#define KHR_GLTF_IMPORTER_VER (_T("2.01"))
+#define KHR_GLTF_IMPORTER_VER (_T("2.02"))
 
 #define KHR_UV_MODE 1
 
