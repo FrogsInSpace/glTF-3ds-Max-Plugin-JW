@@ -64,7 +64,7 @@
 #include <CustAttrib.h>
 #include <XRef\iXrefMaterial.h>
 
-#include <tinygltf/tiny_gltf.h>
+#include <tiny_gltf.h>
 
 #include "resource.h"
 #include "MimeTypes.h"
@@ -73,7 +73,7 @@
 //using namespace tinygltf;
 
 
-#define KHR_GLTF_EXPORTER_VER (_T("2.01"))
+#define KHR_GLTF_EXPORTER_VER (_T("2.02"))
 
 #define KHRglTFExporter_CLASS_ID	Class_ID(0x38586030, 0x1b315b3e)
 #define KHRglTF2Exporter_CLASS_ID	Class_ID(0x56337879, 0x5a732c12)

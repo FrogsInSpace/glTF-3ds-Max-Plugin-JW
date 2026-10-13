@@ -63,12 +63,12 @@ extern std::string UTF8toSjis(std::string srcUTF8);
 extern void LogOutput(const std::string& str, int pcs = 0);
 extern BOOL IsLogOut(void);
 
-#include <cgltf/cgltf-1.12b/cgltf.h>
+#include <cgltf.h>
 
 
 
 #define KHR_APP_CODE 200
-#define KHR_GLTF_IMPORTER_VER (_T("2.01"))
+#define KHR_GLTF_IMPORTER_VER (_T("2.02"))
 
 #define KHR_UV_MODE 1
 
