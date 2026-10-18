@@ -19,11 +19,10 @@
   <ItemDefinitionGroup>
     <ClCompile>
       <AdditionalIncludeDirectories>
-				$(MSBuildThisFileDirectory)draco\installed\include;
-				$(MSBuildThisFileDirectory)jsoncpp\include;
-				$(MSBuildThisFileDirectory)KTX-Software\include;
-				$(MSBuildThisFileDirectory)KTX-Software\lib;
-				$(MSBuildThisFileDirectory)libwebp\src;
+				$(MSBuildThisFileDirectory)_dist_v141\include\draco;
+				$(MSBuildThisFileDirectory)_dist_v141\include\jsoncpp;
+				$(MSBuildThisFileDirectory)_dist_v141\include\KTX-Software;
+				$(MSBuildThisFileDirectory)_dist_v141\include\libwebp;
 				%(AdditionalIncludeDirectories)
 			</AdditionalIncludeDirectories>
     </ClCompile>
