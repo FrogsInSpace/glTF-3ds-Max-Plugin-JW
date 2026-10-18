@@ -22,12 +22,10 @@ if not defined CLEAN_MODE if /I NOT "%VSCMD_ARG_TGT_ARCH%"=="x64" (
     exit /b 1
 )
 
-:: the MSVC toolset version to use for building the libraries
-:: has to match the minimal targeted 3ds Max version's SDK requirement ( v141 for 3ds Max 2020 - 2022 )
+:: the MSVC toolset version to use, has to match the minimal targeted 3ds Max version's SDK requirement ( v141 for 3ds Max 2020 - 2022 )
 set "VC_TOOLSET=v141"
 
-:: to hold the built libraries ( %DIST_DIR%\Debug and %DIST_DIR%\Release, written directly by the build via
-:: CMAKE_ARCHIVE_OUTPUT_DIRECTORY_<CONFIG> ) and the public headers ( %DIST_DIR%\include\<dependency folder>, see :INSTALL )
+:: to hold the built libraries ( %DIST_DIR%\Debug and %DIST_DIR%\Release) and the public headers ( %DIST_DIR%\include\<dependency folder>)
 set "DIST_DIR=%~dp0_dist_%VC_TOOLSET%"
 :: to hold the downloaded zip archives
 set "ARCHIVE_DIR=%~dp0_archives"
@@ -48,8 +46,7 @@ if exist "%DIST_DIR%" if not exist "%COMPLETE_MARKER%" (
 )
 if exist "%COMPLETE_MARKER%" del "%COMPLETE_MARKER%"
 
-:: skip tinygltf as it has been ( slightly ) modified
-:: modified tinygltf has been moved to the KHRglTFEporter Project folder, as its only used there
+:: skip tinygltf as it has been ( slightly ) modified and moved to the KHRglTFEporter Project folder
 set "CLONE_TINYGLTF=0"
 
 echo.
@@ -112,7 +109,6 @@ if errorlevel 1 goto :ERROR
 call :INSTALL "KTX-Software"
 if errorlevel 1 goto :ERROR
 :: vkformat_enum.h is an internal libktx header that is not part of the KTX install rules, but the plugins use it
-:: ( it has to be copied after :INSTALL, which mirrors the include folder and would remove it )
 copy /Y "%~dp0KTX-Software\lib\vkformat_enum.h" "%DIST_DIR%\include\KTX-Software\" >nul
 if errorlevel 1 goto :ERROR
 
@@ -121,8 +117,6 @@ echo "Cloning and building 'libwebp' ..."
 echo =====================================================
 call :CLONE "libwebp" "https://github.com/webmproject/libwebp.git" "v1.6.0"
 if errorlevel 1 goto :ERROR
-:: only the libraries are needed: the command line tools ( and with them the image library lookups ) are switched off,
-:: otherwise the install rules would expect the tool executables as well. libwebpmux is not part of the dependencies
 call :CONFIGURE "libwebp" "-DWEBP_BUILD_ANIM_UTILS=OFF" ^
 	"-DWEBP_BUILD_CWEBP=OFF" ^
 	"-DWEBP_BUILD_DWEBP=OFF" ^
@@ -338,6 +332,7 @@ exit /b 0
 :: =====================================================
 :: LICENSES
 :: Copies the license files of the dependencies to %DIST_DIR%\licenses
+:: in case the whole %DIST_DIR% is planned to be zipped and distributed later
 :: =====================================================
 
 :LICENSES
@@ -368,8 +363,6 @@ exit /b 0
 :: CLEAN
 :: %CLEAN_MODE% = 1 : delete the dist folder and the build folders of all dependencies
 ::                2 : additionally delete the cloned repositories and the downloaded archives
-::
-:: Only the folders named here are touched, nothing is wildcarded.
 :: =====================================================
 
 :CLEAN
