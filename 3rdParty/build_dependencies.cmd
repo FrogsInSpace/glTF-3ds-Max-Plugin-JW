@@ -105,7 +105,7 @@ echo =====================================================
 call :CLONE "KTX-Software" "https://github.com/KhronosGroup/KTX-Software.git" "v4.1.0"
 if errorlevel 1 goto :ERROR
 :: FIX for CMAKE 4: override "cmake_minimum_required 2.8.12" declared in cmake/cputypetest.cmake, which CMake 4 would reject
-call :CONFIGURE "KTX-Software" "-DKTX_FEATURE_STATIC_LIBRARY=ON" "-DKTX_FEATURE_TOOLS=OFF" "-DCMAKE_POLICY_VERSION_MINIMUM=3.5"
+call :CONFIGURE "KTX-Software" "-DKTX_FEATURE_STATIC_LIBRARY=ON" "-DKTX_FEATURE_TOOLS=OFF" "-DCMAKE_POLICY_VERSION_MINIMUM=3.5" "-DISA_SSE41=ON"
 if errorlevel 1 goto :ERROR
 call :BUILD "KTX-Software" "ktx"
 if errorlevel 1 goto :ERROR
