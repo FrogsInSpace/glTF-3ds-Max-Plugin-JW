@@ -66,13 +66,19 @@ If environment variables are missing, you must manually set them to point to the
 
 ### 🛠️ Initial Building of 3rd-Party Dependencies
 
-The project depends on several prebuilt 3rd-party libraries, which must be available in the <b>`3rdParty\_dist\_v141\Debug`</b> and <b>`3rdParty\_dist\_v141\Release`</b> directories.
+The project depends on several 3rd-party libraries (**draco, jsoncpp, KTX, libwebp**), which must be available in the
+**`3rdParty\_dist_v141\Debug`** and **`3rdParty\_dist_v141\Release`** directories.
+The necessary header files are expected in subfolders of **`3rdParty\_dist_v141\include`**
 
-- A batch script is provided to build these libraries from source: <b>`3rdParty\build_dependencies.cmd`</b>
-- The script should be run once from a **Visual Studio x64 Developer Command Prompt**.
-- The script will fetch, build, and install all required dependencies into <b>`3rdParty\_dist_v141`</b>.
-- The script relies on **MSVC v141 - VS 2017 C++ x64/x86 build tools** to be installed.
-- The <b>`BuildAll.cmd`</b> and <b>`BuildForAvailableSDKs.cmd`</b> described below perform this step automatically.
+- A batch script is provided to build these libraries from source: **`3rdParty\build_dependencies.cmd`**
+- The script should be run once from the **Visual Studio 2022 x64 Developer Command Prompt**.
+- The **`BuildAll.cmd`** and **`BuildForAvailableSDKs.cmd`** described below perform this step automatically.
+- The script will fetch, build, and install all required dependencies into **`3rdParty\_dist_v141`**.
+- The script relies on **MSVC v141 - VS 2017 C++ x64/x86 build tools** to be installed.
+- The script expects **`git`**, **`curl`** and **`cmake`** being available in the `PATH`.
+- If a run fails or is interrupted, the folders can be left in an unclear state. Start over with:
+  - **`3rdParty\build_dependencies.cmd clean`** removes **`_dist_v141`** and the build folders, but keeps the cloned repositories
+  - **`3rdParty\build_dependencies.cmd cleanall`** additionally removes the cloned repositories and the downloaded archives
 
 ### 🛠️ Building the Project
 
@@ -81,7 +87,7 @@ The solution includes two primary build configurations for each 3ds Max version:
 - <b>`Release-{Max Version}`</b>: Production-ready build.
 - <b>`Hybrid-{Max Version}`</b>: Optimized build with debug symbols (for development).
 
-To build all release configurations at once, either use Visual Studio's "Batch Build..." functionality or run one of the accompanying batch scripts from inside the **Visual Studio x64 Developer Command Prompt**:
+To build all release configurations at once, either use Visual Studio's "Batch Build..." functionality or run one of the accompanying batch scripts from inside the **Visual Studio 2022 x64 Developer Command Prompt**:
 
 - <b>`BuildAll.cmd`</b>: Build for all 3ds Max Versions
 - <b>`BuildForAvailableSDKs.cmd`</b>: Build for all 3ds Max Versions with matching SDK available
