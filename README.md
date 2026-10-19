@@ -43,9 +43,10 @@ To build or use this project, the following environment is required:
 - **MSVC v141 - VS 2017 C++ x64/x86 build tools**: For 3ds Max 2020, 2021 and 2022
 - **Git** and **CMake** executables in your PATH to build the 3rd-party dependencies
 
-### 🧰 Required SDK
+### 🧰 Required SDKs
 
 - **Autodesk 3ds Max SDK**: Provided by Autodesk.
+- **Windows SDK**: As specified in Autodesk's 3ds Max SDK requirements documentation. For legacy Windows SDK versions, refer to the [Windows SDK downloads archive](https://learn.microsoft.com/en-us/windows/apps/windows-sdk/downloads-archive).
 
 ### 🌐 Environment Variables
 
@@ -71,7 +72,7 @@ The project depends on several 3rd-party libraries (**draco, jsoncpp, KTX, libwe
 The necessary header files are expected in subfolders of **`3rdParty\_dist_v141\include`**
 
 - A batch script is provided to build these libraries from source: **`3rdParty\build_dependencies.cmd`**
-- The script should be run once from the **Visual Studio 2022 x64 Developer Command Prompt**.
+- The script should be run once from the **x64 Native Tools Command Prompt for VS 2022**.
 - The **`BuildAll.cmd`** and **`BuildForAvailableSDKs.cmd`** described below perform this step automatically.
 - The script will fetch, build, and install all required dependencies into **`3rdParty\_dist_v141`**.
 - The script relies on **MSVC v141 - VS 2017 C++ x64/x86 build tools** to be installed.
@@ -87,7 +88,7 @@ The solution includes two primary build configurations for each 3ds Max version:
 - <b>`Release-{Max Version}`</b>: Production-ready build.
 - <b>`Hybrid-{Max Version}`</b>: Optimized build with debug symbols (for development).
 
-To build all release configurations at once, either use Visual Studio's "Batch Build..." functionality or run one of the accompanying batch scripts from inside the **Visual Studio 2022 x64 Developer Command Prompt**:
+To build all release configurations at once, either use Visual Studio's "Batch Build..." functionality or run one of the accompanying batch scripts from inside the **x64 Native Tools Command Prompt for VS 2022**:
 
 - <b>`BuildAll.cmd`</b>: Build for all 3ds Max Versions
 - <b>`BuildForAvailableSDKs.cmd`</b>: Build for all 3ds Max Versions with matching SDK available
